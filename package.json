@@ -1,0 +1,48 @@
+{
+  "name": "@quests/directory",
+  "version": "0.0.0",
+  "description": "Quests Directory",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/finalpointco/directory"
+  },
+  "author": {
+    "name": "Finalpoint",
+    "email": "oss@finalpoint.co"
+  },
+  "type": "module",
+  "files": [],
+  "scripts": {
+    "knip": "knip",
+    "lint": "turbo run lint",
+    "lint:fix": "turbo run lint:fix",
+    "typecheck": "turbo run check:types",
+    "typecheck:all": "turbo run build --dry-run",
+    "check": "turbo run lint check:types syncpack:lint knip",
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "create-app": "tsx scripts/create-app.ts",
+    "apply-block": "tsx scripts/apply-block.ts",
+    "list-blocks": "tsx scripts/list-blocks.ts",
+    "syncpack": "syncpack",
+    "syncpack:lint": "syncpack lint",
+    "syncpack:fix": "syncpack fix"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "ignore": "^7.0.5",
+    "jscodeshift": "^17.3.0",
+    "knip": "^5.63.0",
+    "syncpack": "14.0.0-alpha.19",
+    "tsx": "^4.20.4",
+    "turbo": "^2.5.6",
+    "typescript": "^5"
+  },
+  "packageManager": "pnpm@10.11.0",
+  "engines": {
+    "node": "22"
+  },
+  "publishConfig": {
+    "provenance": true
+  }
+}

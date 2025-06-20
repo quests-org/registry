@@ -1,0 +1,8 @@
+{
+  "name": "New Project",
+  "description": "",
+  "icon": {
+    "lucide": "square-dashed",
+    "background": "conic-gradient(from 42deg at 50% 50%, #18181b, #27272a)"
+  }
+}

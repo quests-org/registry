@@ -1,0 +1,58 @@
+[
+  {
+    "id": "email",
+    "title": "Write an email",
+    "description": "Professional email composition",
+    "icon": "Mail",
+    "prompt": "Write a polite, professional and succinct email.",
+    "color": "bg-gradient-to-br from-blue-500 to-blue-600"
+  },
+  {
+    "id": "meeting-notes",
+    "title": "Create meeting notes",
+    "description": "Structure and summarize meetings",
+    "icon": "NotebookPen",
+    "prompt": "Please create meeting notes from the following transcript.",
+    "color": "bg-gradient-to-br from-emerald-500 to-emerald-600"
+  },
+  {
+    "id": "text-message",
+    "title": "Write a text message",
+    "description": "Casual messaging assistance",
+    "icon": "MessageSquare",
+    "prompt": "Write a clear and friendly text message.",
+    "color": "bg-gradient-to-br from-violet-500 to-violet-600"
+  },
+  {
+    "id": "organize-notes",
+    "title": "Organize notes",
+    "description": "Structure and format notes",
+    "icon": "FileText",
+    "prompt": "Please organize and structure these personal notes.",
+    "color": "bg-gradient-to-br from-amber-500 to-amber-600"
+  },
+  {
+    "id": "summarize",
+    "title": "Summarize content",
+    "description": "Create concise summaries",
+    "icon": "FileText",
+    "prompt": "Please provide a clear summary of the following content.",
+    "color": "bg-gradient-to-br from-rose-500 to-rose-600"
+  },
+  {
+    "id": "mindmap",
+    "title": "Mindmap",
+    "description": "Generate a mindmap",
+    "icon": "Sparkles",
+    "prompt": "Help me generate a mindmap from the following transcript.",
+    "color": "bg-gradient-to-br from-violet-500 to-violet-600"
+  },
+  {
+    "id": "bullet-points",
+    "title": "Bullet points",
+    "description": "Generate bullet points",
+    "icon": "ListIcon",
+    "prompt": "Turn this transcript into a bullet point summary.",
+    "color": "bg-gradient-to-br from-slate-500 to-slate-600"
+  }
+]

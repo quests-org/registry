@@ -1,0 +1,11 @@
+# Turbo
+.turbo
+
+# Storage
+*.local
+
+# Quests
+.quests/
+
+# TypeScript cache
+*.tsbuildinfo

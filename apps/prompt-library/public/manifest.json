@@ -1,0 +1,52 @@
+{
+  "name": "Prompt Library",
+  "short_name": "Prompt Library",
+  "description": "Save and reuse your common AI prompts",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#7f22fe",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "icons": [
+    {
+      "sizes": "192x192",
+      "src": "icon-192.png",
+      "type": "image/png"
+    },
+    {
+      "sizes": "512x512",
+      "src": "icon-512.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "maskable",
+      "sizes": "192x192",
+      "src": "icon-192-maskable.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "maskable",
+      "sizes": "512x512",
+      "src": "icon-512-maskable.png",
+      "type": "image/png"
+    },
+    {
+      "sizes": "16x16",
+      "src": "favicon-16.png",
+      "type": "image/png"
+    },
+    {
+      "sizes": "32x32",
+      "src": "favicon-32.png",
+      "type": "image/png"
+    },
+    {
+      "sizes": "48x48",
+      "src": "favicon-48.png",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["productivity", "utilities", "ai", "chat", "llm"]
+}

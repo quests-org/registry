@@ -1,0 +1,8 @@
+{
+  "name": "Micro Chatbot",
+  "description": "Chat with AI models in Quests",
+  "icon": {
+    "lucide": "message-circle",
+    "background": "conic-gradient(from 42deg at 50% 50%, #0d84ff, #5856d7)"
+  }
+}

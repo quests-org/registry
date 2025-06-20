@@ -1,0 +1,19 @@
+env:
+  DO_NOT_TRACK: "1"
+jobs:
+  check:
+    name: Turbo Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/prepare
+      - uses: rharkor/caching-for-turbo@v1.8
+      - run: pnpm check
+
+name: CI
+
+on:
+  pull_request: ~
+  push:
+    branches:
+      - main
