@@ -1,5 +1,5 @@
-import { router as mainRouter } from "./main";
+import { demo } from "./demo";
 
 export const router = {
-  main: mainRouter,
+  demo,
 };

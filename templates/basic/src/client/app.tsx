@@ -1,18 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
-import { queryClient } from "./rpc-client";
+import { RPCDemo } from "./components/demo/rpc";
 
 function App() {
-  const { data } = useQuery(
-    queryClient.main.hello.queryOptions({
-      input: {
-        name: "Quests",
-      },
-    })
-  );
-
   return (
     <div className="h-full w-full">
-      <h1>{data}</h1>
+      {window.location.pathname === "/demo/rpc" && <RPCDemo />}
     </div>
   );
 }

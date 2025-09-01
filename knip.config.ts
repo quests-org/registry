@@ -5,6 +5,13 @@ const config: KnipConfig = {
     "templates/*": {
       entry: ["src/server/index.ts", "src/client/main.tsx"],
     },
+    "templates/basic": {
+      entry: [
+        "src/server/index.ts",
+        "src/client/main.tsx",
+        "src/client/components/demo/*.tsx",
+      ],
+    },
     "templates/shadcn": {
       entry: [
         "src/server/index.ts",
