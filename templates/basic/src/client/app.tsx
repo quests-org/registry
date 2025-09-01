@@ -11,7 +11,7 @@ function App() {
   );
 
   return (
-    <div className="h-full w-full flex items-center justify-center">
+    <div className="h-full w-full">
       <h1>{data}</h1>
     </div>
   );
