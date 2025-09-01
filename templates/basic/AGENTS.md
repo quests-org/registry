@@ -32,8 +32,9 @@ These dependencies are carefully configured and should **NOT** be changed:
 
 ## Understanding RPC
 
-**When to use RPC**: Database operations, file I/O, external APIs, authentication, server-side validation.
-**When NOT to use RPC**: UI state, form validation, client-side calculations, styling, component logic.
+- **When to use RPC**: Database operations, file I/O, external APIs, authentication, server-side validation.
+- **When NOT to use RPC**: UI state, form validation, client-side calculations, styling, component logic.
+- **Live Updates**: oRPC endpoints do not live update unless you return a generator and consume them on the client using `.experimental_liveOptions()`.
 
 ## Demo Files
 
