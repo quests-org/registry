@@ -1,11 +1,5 @@
-import { RPCDemo } from "./components/demo/rpc";
-
 function App() {
-  return (
-    <div className="h-full w-full">
-      {window.location.pathname === "/demo/rpc" && <RPCDemo />}
-    </div>
-  );
+  return <div className="h-full w-full">{/* App here */}</div>;
 }
 
 export default App;

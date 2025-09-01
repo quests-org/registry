@@ -6,6 +6,7 @@ This is a foundational template for building React applications. Follow these gu
 
 This template uses a **client-server architecture** with:
 
+- **Primary language**: TypeScript
 - **Frontend**: React 19 + Vite + Tailwind CSS 4
 - **Backend**: Hono server with oRPC for type-safe APIs
 - **Full-stack type safety** between client and server
@@ -25,8 +26,9 @@ These dependencies are carefully configured and should **NOT** be changed:
 
 - **Tailwind CSS v4** syntax only (not v3)
 - Use **RPC pattern** for all server communication
-- **TanStack Query** is pre-configured
-- **Read demo files first** for implementation patterns
+- **ALWAYS read demo files first** - Do not guess implementation patterns
+- **Main React entry point**: `./src/client/app.tsx`
+- **File naming**: Use lowercase, dash-case (kebab-case) for filenames (e.g. `component-name.tsx`)
 
 ## Understanding RPC
 
@@ -35,11 +37,9 @@ These dependencies are carefully configured and should **NOT** be changed:
 
 ## Demo Files
 
-Read these demo implementations to understand advanced functionality. Modify directly or learn from them:
-
-- **`src/client/components/demo/rpc.tsx`** - Client RPC patterns: `useQuery`, `useMutation`, live updates
-- **`src/server/rpc/demo/storage.ts`** - Server RPC handlers with key-value storage and live subscriptions
-- **`src/server/lib/create-kv.ts`** - File-based storage utility with event publishing
+- **`src/client/components/demo/rpc.tsx`** - Client RPC patterns.
+- **`src/server/rpc/demo/storage.ts`** - Server RPC handlers with key-value storage and live subscriptions.
+- **`src/server/lib/create-kv.ts`** - Server-side storage that works well with oRPC.
 
 ## Adding New Features
 
