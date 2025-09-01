@@ -5,10 +5,15 @@ import { queryClient, rpcClient } from "../../rpc-client";
 export function RPCDemo() {
   const [value, setValue] = useState("");
 
+  // Live data query - automatically updates when server data changes
+  // Use .experimental_liveOptions() for real-time subscriptions
+  // Use .queryOptions() for static data that doesn't need live updates
   const { data: items } = useQuery(
     queryClient.demo.storage.live.list.experimental_liveOptions()
   );
 
+  // Mutations handle data changes with loading states
+  // Automatically invalidates related queries on success
   const { mutate: createItem, isPending: isCreatingItem } = useMutation(
     queryClient.demo.storage.create.mutationOptions()
   );
@@ -43,7 +48,8 @@ export function RPCDemo() {
             {item.id}: {item.value}
             <button
               onClick={() => {
-                // rpcClient can also call functions directly
+                // Direct RPC calls bypass React Query caching/mutations
+                // Use for one-off operations or when you need immediate execution
                 return rpcClient.demo.storage.remove(item.id);
               }}
             >

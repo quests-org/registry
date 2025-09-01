@@ -20,27 +20,21 @@ These dependencies are carefully configured and should **NOT** be changed:
 - **oRPC** - Provides type-safe client-server communication
 - **Hono** - Server framework
 - **Vite 7** - Build tool with specific plugins configured
-- **Zod** - Schema validation (used by oRPC)
+- **Zod** - Schema validation
 
 ## Important Reminders
 
-- Use **RPC pattern** for all server communication
-- **ALWAYS read demo files first** - Do not guess implementation patterns
 - **Main React entry point**: `./src/client/app.tsx`
 - **File naming**: Use lowercase, dash-case (kebab-case) for filenames (e.g. `component-name.tsx`)
 - **Flexbox layouts**: Avoid centering containers that constrain component width in `app.tsx`
 
-## Understanding RPC
-
-- **When to use RPC**: Database operations, file I/O, external APIs, authentication, server-side validation.
-- **When NOT to use RPC**: UI state, form validation, client-side calculations, styling, component logic.
-- **Live Updates**: oRPC endpoints do not live update unless you return a generator and consume them on the client using `.experimental_liveOptions()`.
-
 ## Demo Files
 
-- **`src/client/components/demo/rpc.tsx`** - Client RPC patterns.
-- **`src/server/rpc/demo/storage.ts`** - Server RPC handlers with key-value storage and live subscriptions.
-- **`src/server/lib/create-kv.ts`** - Server-side storage that works well with oRPC.
+> [!IMPORTANT] ALWAYS read demo files first - Do not guess implementation based on file names.
+
+- **`src/client/components/demo/rpc.tsx`** - Client RPC patterns with TanStack Query
+- **`src/server/rpc/demo/storage.ts`** - Server RPC handlers with key-value storage and live subscriptions
+- **`src/server/lib/create-kv.ts`** - Server-side storage that works well with oRPC
 
 ## Adding New Features
 

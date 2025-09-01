@@ -10,8 +10,11 @@ const DemoSchema = z.object({
 
 type Demo = z.output<typeof DemoSchema>;
 
+// createKV provides simple key-value storage with publisher/subscriber support
+// perfect for live queries and small amounts of data
 const kv = createKV<Demo>("demo");
 
+// Handler with input validation using .input() and schema
 const create = os
   .input(DemoSchema.omit({ id: true }))
   .handler(async ({ input }) => {
@@ -24,10 +27,13 @@ const remove = os.input(z.string()).handler(async ({ input }) => {
   await kv.removeItem(input);
 });
 
+// Handler without input - returns all items
 const list = os.handler(async () => {
   return kv.getAllItems();
 });
 
+// Live data stream using generator function
+// Yields initial data, then subscribes to changes for real-time updates
 const live = {
   list: os.handler(async function* ({ signal }) {
     yield call(list, {}, { signal });
