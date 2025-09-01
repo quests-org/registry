@@ -3,7 +3,7 @@ import { queryClient } from "./rpc-client";
 
 function App() {
   const { data } = useQuery(
-    queryClient.hello.sayHello.queryOptions({
+    queryClient.main.hello.queryOptions({
       input: {
         name: "Quests",
       },
