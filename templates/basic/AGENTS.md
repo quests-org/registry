@@ -46,9 +46,14 @@ Add new RPC functions directly to `src/server/rpc/main.ts` by expanding the rout
 // src/server/rpc/main.ts - Add to existing router
 import fs from "node:fs/promises";
 import { join } from "path";
+import { EventPublisher } from "@orpc/server";
 
 const STORAGE_DIR = ".storage";
 const ITEMS_FILE = join(STORAGE_DIR, "items.json");
+
+const publisher = new EventPublisher<{
+  "items-updated": { items: any[] };
+}>();
 
 async function loadItems() {
   await fs.mkdir(STORAGE_DIR, { recursive: true });
@@ -62,6 +67,7 @@ async function loadItems() {
 
 async function saveItems(items: any[]) {
   await fs.writeFile(ITEMS_FILE, JSON.stringify(items, null, 2));
+  publisher.publish("items-updated", { items });
 }
 
 const addItem = os
@@ -74,18 +80,27 @@ const addItem = os
     return item;
   });
 
-const getItems = os.handler(async () => await loadItems());
+const liveItems = os.handler(async function* ({ signal }) {
+  yield await loadItems();
+  for await (const { items } of publisher.subscribe("items-updated", {
+    signal,
+  })) {
+    yield items;
+  }
+});
 
 export const router = {
   hello, // existing
   addItem,
-  getItems,
+  liveItems,
 };
 ```
 
 ```typescript
-// Client usage
-const { data } = useQuery(queryClient.main.getItems.queryOptions());
+// Client usage - Live updates
+const { data } = useQuery(
+  queryClient.main.liveItems.experimental_liveOptions()
+);
 const addMutation = useMutation({
   mutationFn: queryClient.main.addItem.mutationFn,
 });
@@ -105,3 +120,4 @@ const addMutation = useMutation({
 1. Add React components in `src/client/components/`
 2. Add RPC functions to `src/server/rpc/main.ts` router
 3. Use `queryClient.main.yourFunction` in components to call RPC functions
+4. Use `experimental_liveOptions()` for real-time updates
