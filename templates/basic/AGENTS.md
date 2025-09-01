@@ -24,11 +24,11 @@ These dependencies are carefully configured and should **NOT** be changed:
 
 ## Important Reminders
 
-- **Tailwind CSS v4** syntax only (not v3)
 - Use **RPC pattern** for all server communication
 - **ALWAYS read demo files first** - Do not guess implementation patterns
 - **Main React entry point**: `./src/client/app.tsx`
 - **File naming**: Use lowercase, dash-case (kebab-case) for filenames (e.g. `component-name.tsx`)
+- **Flexbox layouts**: Avoid centering containers that constrain component width in `app.tsx`
 
 ## Understanding RPC
 
@@ -46,7 +46,7 @@ These dependencies are carefully configured and should **NOT** be changed:
 ### UI Components
 
 1. Create in `src/client/components/` (organize by feature)
-2. Use Tailwind CSS 4 syntax
+2. Use Tailwind CSS
 3. Reference `demo/rpc.tsx` for RPC integration
 
 ### Server Functions
