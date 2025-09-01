@@ -140,3 +140,6 @@ dist
 
 # macOS
 .DS_Store
+
+# Code Workspace
+*.code-workspace
