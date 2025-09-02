@@ -21,9 +21,7 @@ const chatHandler = os
     try {
       const chatMessages = convertToModelMessages(input.messages);
 
-      // If there are files in the context, add information about them to the system message
       if (input.fileIds && input.fileIds.length > 0) {
-        // Fetch file information for all requested file IDs
         const filePromises = input.fileIds.map(async (id: string) => {
           try {
             return call(fileRouter.get, { id });
@@ -70,11 +68,10 @@ const chatHandler = os
                 }
           );
 
-          // Add file content as a separate user message
           chatMessages.push({
             role: "user",
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            content: [{ type: "text", text: fileSummary }, ...fileParts] as any, // Type assertion to handle complex content types
+            content: [{ type: "text", text: fileSummary }, ...fileParts] as any,
           });
         }
       }

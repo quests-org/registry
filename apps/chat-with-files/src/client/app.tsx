@@ -5,7 +5,6 @@ import { eventIteratorToStream } from "@orpc/client";
 import { UploadedFileMetadata } from "@/server/rpc/file";
 import { rpcClient } from "./rpc-client";
 
-// Simplified CSS with only essential utilities
 const simplifiedStyles = `
   .line-clamp-2 {
     display: -webkit-box;
@@ -15,10 +14,7 @@ const simplifiedStyles = `
   }
 `;
 
-// Remove the custom Message interface as we'll use the one from AI SDK
-
 export function App() {
-  // State for file management
   const [files, setFiles] = useState<UploadedFileMetadata[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -27,19 +23,13 @@ export function App() {
   );
   const [deletingFile, setDeletingFile] = useState<string | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-  // Add character counter state
   const [charCount, setCharCount] = useState<number>(0);
-  // Add keyboard focus state
   const inputRef = useRef<HTMLInputElement>(null);
-  // Add scroll state for new messages button
   const [showScrollButton, setShowScrollButton] = useState(false);
-  // Add input state for message input
   const [input, setInput] = useState("");
 
-  // Ref for chat container
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
-  // AI chat state using the useChat hook
   const { messages, sendMessage, status } = useChat({
     transport: {
       async sendMessages(options) {
@@ -60,7 +50,6 @@ export function App() {
     },
   });
 
-  // Function to scroll chat to bottom
   const scrollToBottom = () => {
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop =
@@ -68,7 +57,6 @@ export function App() {
     }
   };
 
-  // Function to check if user needs to scroll down
   const checkScrollPosition = () => {
     const container = messagesContainerRef.current;
     if (!container) {
@@ -81,12 +69,10 @@ export function App() {
     setShowScrollButton(!atBottom);
   };
 
-  // Check scroll position when messages change
   useEffect(() => {
     const container = messagesContainerRef.current;
     if (container) {
       container.addEventListener("scroll", checkScrollPosition);
-      // Check initial position
       checkScrollPosition();
     }
 
@@ -97,9 +83,7 @@ export function App() {
     };
   }, [messages]);
 
-  // Scroll to bottom when messages change
   useEffect(() => {
-    // Only auto-scroll if we're already at the bottom
     if (messagesContainerRef.current) {
       const container = messagesContainerRef.current;
       const isAtBottom =
@@ -114,19 +98,16 @@ export function App() {
     }
   }, [messages]);
 
-  // Focus input field after AI response is complete
   useEffect(() => {
     if (status === "ready" && inputRef.current) {
       inputRef.current.focus();
     }
   }, [status]);
 
-  // Fetch the list of files on component mount
   useEffect(() => {
     fetchFiles();
   }, []);
 
-  // Function to fetch all files
   const fetchFiles = async () => {
     setIsLoading(true);
     try {
@@ -139,23 +120,18 @@ export function App() {
     }
   };
 
-  // Handle file selection
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       setIsUploading(true);
 
       try {
-        // Process all selected files
         const uploadPromises = Array.from(e.target.files).map((file) =>
           rpcClient.file.create({ file })
         );
 
-        // Wait for all uploads to complete
         await Promise.all(uploadPromises);
 
-        // Clear the file input
         e.target.value = "";
-        // Refresh the file list
         fetchFiles();
       } catch (error) {
         console.error("Error uploading files:", error);
@@ -165,36 +141,27 @@ export function App() {
     }
   };
 
-  // Toggle selection of a file for chat context
   const toggleFileSelection = (file: UploadedFileMetadata) => {
     if (selectedFiles.some((f) => f.id === file.id)) {
-      // If already selected, remove it
       setSelectedFiles(selectedFiles.filter((f) => f.id !== file.id));
     } else {
-      // Otherwise add to selection
       setSelectedFiles([...selectedFiles, file]);
     }
   };
 
-  // Select all files
   const selectAllFiles = () => {
     setSelectedFiles([...files]);
   };
 
-  // Deselect all files
   const deselectAllFiles = () => {
     setSelectedFiles([]);
   };
 
-  // Handle file deletion
   const handleDelete = async (fileId: string) => {
     try {
       await rpcClient.file.remove({ id: fileId });
-      // Remove from selected files if it was selected
       setSelectedFiles(selectedFiles.filter((f) => f.id !== fileId));
-      // Refresh the file list
       fetchFiles();
-      // Reset the deleting state
       setDeletingFile(null);
     } catch (error) {
       console.error("Error deleting file:", error);
@@ -202,33 +169,27 @@ export function App() {
     }
   };
 
-  // Set file for deletion confirmation
   const confirmDelete = (fileId: string) => {
     setDeletingFile(fileId);
   };
 
-  // Cancel deletion
   const cancelDelete = () => {
     setDeletingFile(null);
   };
 
-  // Show image preview
   const showPreview = (imageUrl: string) => {
     setPreviewImage(imageUrl);
   };
 
-  // Hide image preview
   const hidePreview = () => {
     setPreviewImage(null);
   };
 
-  // Function to handle input change and track character count
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value);
     setCharCount(e.target.value.length);
   };
 
-  // Custom submit handler to include selected files
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (input.trim()) {
@@ -245,7 +206,6 @@ export function App() {
     }
   };
 
-  // Helper function to get file type icon
   const getFileTypeIcon = (fileType: string, isLarge = false) => {
     const iconSize = isLarge ? "text-base" : "text-xs";
 
@@ -276,7 +236,6 @@ export function App() {
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 flex-grow overflow-hidden">
-        {/* Chat section - now takes 2/3 of the space and full height */}
         <div className="md:col-span-2 flex flex-col h-full overflow-hidden order-2 md:order-1">
           <article className="bg-white border border-gray-200 p-3 sm:p-5 rounded-lg flex flex-col h-full overflow-hidden shadow-sm">
             <div
@@ -310,7 +269,6 @@ export function App() {
                 </div>
               ))}
 
-              {/* Show typing indicator when AI is responding */}
               {status === "streaming" && (
                 <div className="p-3 rounded-lg bg-gray-100 mr-auto max-w-[80%]">
                   <div className="font-medium mb-1 flex justify-between items-center">
@@ -328,9 +286,6 @@ export function App() {
                 </div>
               )}
 
-              {/* Error handling will be handled by the useChat hook internally */}
-
-              {/* Scroll to bottom button */}
               {showScrollButton && (
                 <button
                   onClick={scrollToBottom}
@@ -355,7 +310,6 @@ export function App() {
               )}
             </div>
 
-            {/* Display currently selected files */}
             {selectedFiles.length > 0 && (
               <div className="mb-3 p-2 sm:p-3 border border-gray-200 rounded-lg bg-gray-50">
                 <div className="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2">
@@ -466,9 +420,7 @@ export function App() {
           </article>
         </div>
 
-        {/* Right column for file management */}
         <div className="flex flex-col space-y-4 sm:space-y-6 h-auto md:h-full overflow-hidden order-1 md:order-2">
-          {/* Compact upload experience */}
           <article className="bg-white border border-gray-200 p-3 sm:p-4 rounded-lg flex-shrink-0 shadow-sm">
             <header className="mb-2 sm:mb-3">
               <h2 className="text-base sm:text-lg font-semibold">
@@ -530,7 +482,6 @@ export function App() {
             </div>
           </article>
 
-          {/* File selection area */}
           <article className="bg-white border border-gray-200 p-3 sm:p-4 rounded-lg flex-grow flex flex-col overflow-hidden shadow-sm">
             <header className="mb-2 sm:mb-3 flex justify-between items-center">
               <h2 className="text-base sm:text-lg font-semibold">
@@ -616,10 +567,10 @@ export function App() {
                                 (f) => f.id === file.id
                               )}
                               onChange={(e) => {
-                                e.stopPropagation(); // Prevent click from bubbling to parent
+                                e.stopPropagation();
                                 toggleFileSelection(file);
                               }}
-                              onClick={(e) => e.stopPropagation()} // Prevent click from bubbling to parent
+                              onClick={(e) => e.stopPropagation()}
                               className="w-4 h-4 mt-0.5 text-blue-600 flex-shrink-0"
                               disabled={
                                 status === "submitted" || status === "streaming"
@@ -638,7 +589,7 @@ export function App() {
                               <button
                                 className="text-white bg-red-600 text-xs px-1.5 py-0.5 rounded disabled:bg-gray-400 disabled:cursor-not-allowed"
                                 onClick={(e) => {
-                                  e.stopPropagation(); // Prevent click from bubbling to parent
+                                  e.stopPropagation();
                                   handleDelete(file.id);
                                 }}
                                 disabled={
@@ -651,7 +602,7 @@ export function App() {
                               <button
                                 className="text-gray-600 text-xs px-1.5 py-0.5 bg-gray-100 rounded disabled:text-gray-400 disabled:cursor-not-allowed"
                                 onClick={(e) => {
-                                  e.stopPropagation(); // Prevent click from bubbling to parent
+                                  e.stopPropagation();
                                   cancelDelete();
                                 }}
                                 disabled={
@@ -670,7 +621,7 @@ export function App() {
                                   : "text-red-500"
                               }`}
                               onClick={(e) => {
-                                e.stopPropagation(); // Prevent click from bubbling to parent
+                                e.stopPropagation();
                                 confirmDelete(file.id);
                               }}
                               aria-label="Delete file"
@@ -688,7 +639,7 @@ export function App() {
                             <div
                               className="w-8 h-8 bg-gray-100 rounded flex-shrink-0 border border-gray-200 cursor-pointer"
                               onClick={(e) => {
-                                e.stopPropagation(); // Prevent click from bubbling to parent
+                                e.stopPropagation();
                                 showPreview(file.previewUrl!);
                               }}
                             >
@@ -728,7 +679,6 @@ export function App() {
         </div>
       </div>
 
-      {/* Image Preview Overlay */}
       {previewImage && (
         <div
           className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
