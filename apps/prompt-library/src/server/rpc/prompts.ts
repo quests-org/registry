@@ -25,6 +25,11 @@ type Prompt = z.infer<typeof PromptSchema>;
 if (!process.env.OPENAI_BASE_URL) {
   throw new Error("OPENAI_BASE_URL is not set");
 }
+if (!process.env.OPENAI_DEFAULT_MODEL) {
+  throw new Error("OPENAI_DEFAULT_MODEL is not set");
+}
+
+const DEFAULT_MODEL = process.env.OPENAI_DEFAULT_MODEL;
 
 const openai = createOpenAICompatible({
   name: "openai-compatible",
@@ -219,10 +224,8 @@ Examples:
       }
 Prompt: ${input.prompt}`;
 
-      console.log("Generating icon and title for prompt:", userPrompt);
-
       const result = await generateObject({
-        model: openai("openai/gpt-4o-mini"),
+        model: openai(DEFAULT_MODEL),
         system: systemPrompt,
         prompt: userPrompt,
         schema: z.object({
