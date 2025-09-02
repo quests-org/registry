@@ -4,38 +4,47 @@ This is a foundational template for building React applications. Follow these gu
 
 ## Template Architecture Overview
 
-This template uses a **client-server architecture** with:
+This template uses a client-server architecture with:
 
-- **Primary language**: TypeScript
-- **Frontend**: React 19 + Vite + Tailwind CSS 4
-- **Backend**: Hono server with oRPC for type-safe APIs
-- **Full-stack type safety** between client and server
+- Primary language: TypeScript
+- Frontend: React 19 + Vite + Tailwind CSS 4
+- Backend: Hono server with oRPC for type-safe APIs
+- Full-stack type safety between client and server
 
 ## Critical Dependencies - DO NOT MODIFY
 
-These dependencies are carefully configured and should **NOT** be changed:
+These dependencies are carefully configured and should NOT be changed:
 
-- **Tailwind CSS v4** - Uses the new Vite plugin (`@tailwindcss/vite`)
-- **React 19** - Latest version with new features
-- **oRPC** - Provides type-safe client-server communication
-- **Hono** - Server framework
-- **Vite 7** - Build tool with specific plugins configured
-- **Zod** - Schema validation
+- Tailwind CSS v4 - Uses the new Vite plugin (`@tailwindcss/vite`)
+- React 19 - Latest version with new features
+- oRPC - Provides type-safe client-server communication
+- Hono - Server framework
+- Vite 7 - Build tool with specific plugins configured
+- Zod - Schema validation
 
 ## Important Reminders
 
-- **Main React entry point**: `./src/client/app.tsx`
-- **File naming**: Use lowercase, dash-case (kebab-case) for filenames (e.g. `component-name.tsx`)
-- **Flexbox layouts**: Avoid centering containers that constrain component width in `app.tsx`
-- **Persistent Storage**: The `.storage/` directory is ignored by git and can be used for persistent data.
+- Main React entry point: `./src/client/app.tsx`
+- File naming: Use lowercase, dash-case (kebab-case) for filenames (e.g. `component-name.tsx`)
+- Flexbox layouts: Avoid centering containers that constrain component width in `app.tsx`
+- Persistent Storage: The `.storage/` directory is ignored by git and can be used for persistent data.
 
-## Demo Files
+## Demo Files - Reference Implementations
 
-> [!IMPORTANT] ALWAYS read demo files first - Do not guess implementation based on file names.
+These files provide working examples for common functionality. Use them as templates or reference when implementing similar features:
 
-- **`src/client/components/demo/rpc.tsx`** - Client RPC patterns with TanStack Query
-- **`src/server/rpc/demo/storage.ts`** - Server RPC handlers with key-value storage and live subscriptions
-- **`src/server/lib/create-kv.ts`** - Server-side storage that works well with oRPC
+> [!IMPORTANT] ALWAYS read these demo files first - Do not guess implementation based on file names.
+
+### Client Patterns
+
+- `src/client/components/demo/rpc.tsx` - RPC demo that uses uses `server/rpc/demo/storage.ts`
+- `src/client/components/demo/ai.tsx` - AI mutations using response data directly (no manual state)
+
+### Server Patterns
+
+- `src/server/rpc/demo/storage.ts` - Key-value storage with live subscriptions
+- `src/server/rpc/demo/ai.ts` - AI SDK for chat completion and structured generation
+- `src/server/lib/create-kv.ts` - Simple storage setup for oRPC handlers
 
 ## Adding New Features
 
