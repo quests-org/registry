@@ -4,5 +4,5 @@
       "mode": "auto"
     }
   ],
-  "cSpell.words": ["Flexbox", "jscodeshift", "orpc", "Parseable"]
+  "cSpell.words": ["Flexbox", "jscodeshift", "orpc", "Parseable", "syncpack"]
 }
