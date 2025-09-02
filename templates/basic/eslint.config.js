@@ -24,7 +24,7 @@ export default tseslint.config(
         { allowConstantExport: true },
       ],
       "@typescript-eslint/no-unused-vars": [
-        "error",
+        "warn",
         {
           args: "all",
           argsIgnorePattern: "^_",
@@ -35,6 +35,8 @@ export default tseslint.config(
           ignoreRestSiblings: true,
         },
       ],
+      "no-console": "warn",
+      "no-warning-comments": ["warn", { terms: ["fixme"] }],
     },
   }
 );

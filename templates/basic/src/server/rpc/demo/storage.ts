@@ -37,9 +37,7 @@ const list = os.handler(async () => {
 const live = {
   list: os.handler(async function* ({ signal }) {
     yield call(list, {}, { signal });
-    for await (const _ of kv.publisher.subscribe("storage", {
-      signal,
-    })) {
+    for await (const _ of kv.subscribe()) {
       yield call(list, {}, { signal });
     }
   }),
