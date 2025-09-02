@@ -48,6 +48,8 @@ These files provide working examples for common functionality. Use them as templ
 
 ## Adding New Features
 
+- **Do NOT create new files in demo folders** - Demo files are reference implementations only
+
 ### UI Components
 
 1. Create in `src/client/components/` (organize by feature)
