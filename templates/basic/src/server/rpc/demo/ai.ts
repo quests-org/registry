@@ -1,7 +1,8 @@
 import OpenAI from "openai";
-import { zodResponseFormat } from "openai/helpers/zod";
 import { os } from "@orpc/server";
 import { z } from "zod";
+
+import { zodResponseFormat } from "../../lib/repaired-zod-response-format";
 
 if (!process.env.OPENAI_BASE_URL) {
   throw new Error("OPENAI_BASE_URL is not set");

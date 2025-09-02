@@ -12,10 +12,5 @@ export default {
       dependencies: ["@types/node"],
       pinVersion: "^22",
     },
-    {
-      // Allow Zod 3 and 4 due to OpenAI's SDK requiring 3 for now
-      dependencies: ["zod"],
-      isIgnored: true,
-    },
   ],
 } satisfies import("syncpack").RcFile;

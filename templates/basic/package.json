@@ -18,12 +18,13 @@
     "@tailwindcss/vite": "^4.1.12",
     "@tanstack/react-query": "^5.85.5",
     "hono": "^4.9.4",
+    "jsonrepair": "^3.13.0",
     "openai": "^5.17.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "tailwindcss": "^4",
     "unstorage": "^1.16.1",
-    "zod": "^3"
+    "zod": "^4.0.17"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.0",
