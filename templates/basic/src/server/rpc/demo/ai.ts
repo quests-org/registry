@@ -45,7 +45,6 @@ const complete = os
 
     return {
       response: result.text,
-      usage: result.usage,
     };
   });
 
@@ -81,7 +80,6 @@ Respond only with the JSON object, no additional text or formatting.`;
 
       return {
         person: validatedPerson,
-        usage: result.usage,
       };
     } catch (error) {
       throw new Error(
