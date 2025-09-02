@@ -43,6 +43,7 @@ function App() {
   );
   const [isOverlayVisible, setIsOverlayVisible] = useState(true);
   const [hasInitialized, setHasInitialized] = useState(false);
+  const [aiMoveError, setAiMoveError] = useState<string | null>(null);
 
   const handleNewGame = useCallback(() => {
     const randomColor: "white" | "black" =
@@ -66,6 +67,7 @@ function App() {
     resetGame();
     setLastMove(null);
     setIsOverlayVisible(true);
+    setAiMoveError(null);
   }, [resetGame]);
 
   useEffect(() => {
@@ -91,6 +93,7 @@ function App() {
     (data: { move?: string } | null) => {
       setThinking(false);
       aiMoveInProgressRef.current = false;
+      setAiMoveError(null);
 
       if (data?.move) {
         console.log(`🤖 AI MOVE: ${data.move}`);
@@ -115,9 +118,11 @@ function App() {
           );
         } else {
           console.log(`❌ AI move failed`);
+          setAiMoveError("The AI made an invalid move. Please try again.");
         }
       } else {
         console.log(`❌ AI move generation failed - no move returned`);
+        setAiMoveError("The AI failed to generate a move. Please try again.");
       }
     },
     [chess, makeMoveFromNotation, setThinking, currentPlayer]
@@ -128,7 +133,9 @@ function App() {
       onSuccess: handleAIMoveComplete,
       onError: (error) => {
         console.error("Error generating AI move:", error);
-        handleAIMoveComplete(null);
+        setThinking(false);
+        aiMoveInProgressRef.current = false;
+        setAiMoveError("Failed to connect to the AI. Please try again.");
       },
     })
   );
@@ -136,7 +143,7 @@ function App() {
   useEffect(() => {
     if (gameStatus === "checkmate" || gameStatus === "draw") return;
 
-    if (aiMoveInProgressRef.current || isThinking) return;
+    if (aiMoveInProgressRef.current || isThinking || aiMoveError) return;
 
     const isAITurn =
       (playerColor === "white" && currentPlayer === "black") ||
@@ -145,7 +152,7 @@ function App() {
     if (!isAITurn || !selectedModel) return;
 
     const timer = setTimeout(() => {
-      if (aiMoveInProgressRef.current || isThinking) {
+      if (aiMoveInProgressRef.current || isThinking || aiMoveError) {
         return;
       }
 
@@ -195,6 +202,7 @@ function App() {
     chess,
     difficulty,
     setThinking,
+    aiMoveError,
   ]);
 
   const handleSquareClick = (square: Square) => {
@@ -243,6 +251,11 @@ function App() {
     console.log("🎮 Starting new game from dialog...");
     handleNewGame();
     setIsOverlayVisible(true);
+  };
+
+  const handleRetryAIMove = () => {
+    console.log("🔄 Retrying AI move...");
+    setAiMoveError(null);
   };
 
   const isPlayerTurn =
@@ -306,6 +319,21 @@ function App() {
               }
               difficulty={difficulty}
             />
+
+            {aiMoveError && (
+              <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                <p className="text-sm text-red-700 dark:text-red-300 mb-2">
+                  {aiMoveError}
+                </p>
+                <Button
+                  onClick={handleRetryAIMove}
+                  size="sm"
+                  className="bg-red-600 hover:bg-red-700 text-white text-xs"
+                >
+                  Try Again
+                </Button>
+              </div>
+            )}
 
             {moveHistory.length > 0 && (
               <div className="space-y-2 pt-2">
