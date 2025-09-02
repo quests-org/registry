@@ -12,19 +12,18 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@ai-sdk/openai-compatible": "^1.0.11",
     "@orpc/client": "^1.8.3",
     "@orpc/server": "^1.8.3",
     "@orpc/tanstack-query": "^1.8.3",
     "@tailwindcss/vite": "^4.1.12",
     "@tanstack/react-query": "^5.85.5",
     "hono": "^4.9.4",
-    "ai": "^5.0.22",
+    "openai": "^5.17.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "tailwindcss": "^4",
     "unstorage": "^1.16.1",
-    "zod": "^4.0.17"
+    "zod": "^3"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.0",

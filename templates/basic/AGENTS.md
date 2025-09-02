@@ -42,8 +42,8 @@ These files provide working examples for common functionality. Use them as templ
 
 ### Server Patterns
 
-- `src/server/rpc/demo/storage.ts` - Key-value storage with live subscriptions
-- `src/server/rpc/demo/ai.ts` - AI SDK for chat completion and structured generation
+- `src/server/rpc/demo/storage.ts` - key-value storage with live subscriptions
+- `src/server/rpc/demo/ai.ts` - AI chat completion and structured generation
 - `src/server/lib/create-kv.ts` - Simple storage setup for oRPC handlers
 
 ## Adding New Features

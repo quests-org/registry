@@ -19,25 +19,29 @@ export function AIDemo() {
     isPending: isGenerating,
   } = useMutation(queryClient.demo.ai.generate.mutationOptions());
 
+  // When using this demo, remove any UI below that is not relevant for the user
   return (
-    <div>
-      <h2>AI Demo</h2>
+    <div className="max-w-4xl mx-auto p-6 space-y-8">
+      <h2 className="text-2xl font-bold">AI Demo</h2>
 
-      <div>
-        <h3>Chat Completion</h3>
+      <div className="space-y-6">
+        <h3 className="text-xl font-semibold">Chat Completion</h3>
 
-        <div>
+        <div className="space-y-4">
           <input
+            className="w-full p-3 border border-gray-300 rounded-md"
             placeholder="System prompt (optional)"
             value={systemPrompt}
             onChange={(e) => setSystemPrompt(e.target.value)}
           />
           <input
+            className="w-full p-3 border border-gray-300 rounded-md"
             placeholder="Your message"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
           />
           <button
+            className="px-6 py-3 border border-gray-300 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
             onClick={() => {
               if (message) {
                 complete({
@@ -53,23 +57,25 @@ export function AIDemo() {
         </div>
 
         {completionData && (
-          <div>
-            <h4>Response:</h4>
-            <p>{completionData.response}</p>
+          <div className="p-4 border border-gray-200 rounded-md">
+            <h4 className="font-medium mb-2">Response:</h4>
+            <p className="leading-relaxed">{completionData.response}</p>
           </div>
         )}
       </div>
 
-      <div>
-        <h3>Generate Person</h3>
+      <div className="space-y-6">
+        <h3 className="text-xl font-semibold">Generate Person</h3>
 
-        <div>
+        <div className="space-y-4">
           <input
+            className="w-full p-3 border border-gray-300 rounded-md"
             placeholder="Describe the person you want to generate"
             value={personPrompt}
             onChange={(e) => setPersonPrompt(e.target.value)}
           />
           <button
+            className="px-6 py-3 border border-gray-300 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
             onClick={() => {
               if (personPrompt) {
                 generatePerson({ prompt: personPrompt });
@@ -82,9 +88,9 @@ export function AIDemo() {
         </div>
 
         {personData && (
-          <div>
-            <h4>Generated Person:</h4>
-            <div>
+          <div className="p-4 border border-gray-200 rounded-md">
+            <h4 className="font-medium mb-3">Generated Person:</h4>
+            <div className="space-y-2">
               <p>
                 <strong>Name:</strong> {personData.person.name}
               </p>
