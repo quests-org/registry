@@ -27,6 +27,7 @@ These dependencies are carefully configured and should **NOT** be changed:
 - **Main React entry point**: `./src/client/app.tsx`
 - **File naming**: Use lowercase, dash-case (kebab-case) for filenames (e.g. `component-name.tsx`)
 - **Flexbox layouts**: Avoid centering containers that constrain component width in `app.tsx`
+- **Persistent Storage**: The `.storage/` directory is ignored by git and can be used for persistent data.
 
 ## Demo Files
 
