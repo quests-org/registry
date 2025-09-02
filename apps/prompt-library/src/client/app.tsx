@@ -133,13 +133,11 @@ function AppHeader() {
   return (
     <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex items-center justify-between py-3 px-4">
-        {/* App Title */}
         <div className="flex items-center gap-2">
           <Library className="h-5 w-5 text-primary" />
           <span className="font-semibold text-lg">Prompt Library</span>
         </div>
 
-        {/* Theme Toggle */}
         <ModeToggle />
       </div>
     </div>
@@ -197,8 +195,6 @@ ${instructions}
 
 ${input}`;
 }
-
-// Icon mapping for dynamic icon rendering
 const iconMap = {
   Mail,
   NotebookPen,
@@ -306,15 +302,11 @@ function App() {
   const { completion, isLoading, complete } = useCompletion({
     api: "/api/chat",
   });
-
-  // Load prompts from API on component mount
   useEffect(() => {
     const loadPrompts = async () => {
       try {
         setIsLoadingPrompts(true);
         const data = await rpcClient.prompts.loadPrompts();
-
-        // Transform API data to include React components for icons
         const transformedPrompts: PromptTemplate[] = data.map((prompt) => ({
           ...prompt,
           icon: iconMap[prompt.icon as keyof typeof iconMap] || FileText,
@@ -323,7 +315,6 @@ function App() {
         setPromptTemplates(transformedPrompts);
       } catch (error) {
         console.error("Failed to load prompts:", error);
-        // Fallback to empty array on error
         setPromptTemplates([]);
       } finally {
         setIsLoadingPrompts(false);
@@ -336,12 +327,8 @@ function App() {
   const handlePromptClick = (template: PromptTemplate) => {
     setSelectedPrompt(template);
     setPromptText(template.prompt);
-
-    // Focus the content after a short delay to ensure it's rendered
     contentTextareaRef.current?.focus();
   };
-
-  // Sort prompts based on selected sort option
   const sortedPrompts = [...promptTemplates].sort((a, b) => {
     if (sortBy === "recentlyUsed") {
       const aTime = a.recentlyUsedAt ? new Date(a.recentlyUsedAt).getTime() : 0;
@@ -359,13 +346,9 @@ function App() {
       alert("Please select a prompt first!");
       return;
     }
-
-    // Mark prompt as recently used if there's a selected prompt
     if (selectedPrompt) {
       try {
         await rpcClient.prompts.markPromptAsUsed({ id: selectedPrompt.id });
-
-        // Update local state to reflect the new recentlyUsedAt timestamp
         setPromptTemplates((prev) =>
           prev.map((p) =>
             p.id === selectedPrompt.id
@@ -375,7 +358,6 @@ function App() {
         );
       } catch (error) {
         console.error("Failed to mark prompt as used:", error);
-        // Don't block the UI if this fails
       }
     }
 
@@ -418,8 +400,6 @@ function App() {
           finalTranscript += transcript;
         }
       }
-
-      // Update the input with final results, keeping previous content
       if (finalTranscript) {
         setUserInput((prev) => prev + finalTranscript + " ");
       }
@@ -452,7 +432,6 @@ function App() {
   const copyToClipboard = async () => {
     if (completion) {
       if (navigator.clipboard) {
-        // If normal copy method available, use it
         try {
           await navigator.clipboard.writeText(completion);
         } catch (err) {
@@ -471,7 +450,6 @@ function App() {
 
     try {
       setIsUpdatingPrompt(true);
-      // Find the icon string from the iconMap
       const iconString =
         Object.entries(iconMap).find(
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -485,15 +463,11 @@ function App() {
         color: selectedPrompt.color,
         prompt: promptText,
       });
-
-      // Update the local state
       setPromptTemplates((prev) =>
         prev.map((p) =>
           p.id === selectedPrompt.id ? { ...p, prompt: promptText } : p
         )
       );
-
-      // Update selected prompt
       setSelectedPrompt((prev) =>
         prev ? { ...prev, prompt: promptText } : null
       );
@@ -509,14 +483,10 @@ function App() {
     setEditingPromptId(null);
     setNewPromptText(promptText);
     setNewPromptTitle(selectedPrompt?.title || "");
-
-    // Reset to default icon and color for new prompts
     setDialogIcon("");
     setDialogColor("");
 
     setIsNewPromptDialogOpen(true);
-
-    // Auto-generate style and title if we have prompt text
     if (promptText.trim()) {
       try {
         setIsGeneratingIconColor(true);
@@ -528,14 +498,11 @@ function App() {
 
         setDialogIcon(result.icon);
         setDialogColor(result.color);
-
-        // Set generated title if no existing title
         if (result.title && !(selectedPrompt?.title || "").trim()) {
           setNewPromptTitle(result.title);
         }
       } catch (error) {
         console.error("Failed to generate initial style:", error);
-        // Keep default values on error
       } finally {
         setIsGeneratingIconColor(false);
       }
@@ -552,7 +519,6 @@ function App() {
       setIsSavingNewPrompt(true);
 
       if (editingPromptId) {
-        // Update existing prompt
         const existingPrompt = promptTemplates.find(
           (p) => p.id === editingPromptId
         );
@@ -568,8 +534,6 @@ function App() {
           prompt: newPromptText,
           updatedAt: new Date().toISOString(),
         });
-
-        // Update local state
         const DialogIconComponent =
           iconMap[dialogIcon as keyof typeof iconMap] || Sparkles;
         const now = new Date().toISOString();
@@ -587,8 +551,6 @@ function App() {
               : p
           )
         );
-
-        // Update selected prompt if it's the one being edited
         if (selectedPrompt?.id === editingPromptId) {
           const DialogIconComponent =
             iconMap[dialogIcon as keyof typeof iconMap] || Sparkles;
@@ -607,7 +569,6 @@ function App() {
           setPromptText(newPromptText);
         }
       } else {
-        // Create new prompt using dialog's icon and color
         const id = `prompt-${Date.now()}`;
         const now = new Date().toISOString();
 
@@ -622,25 +583,17 @@ function App() {
         };
 
         await rpcClient.prompts.addPrompt(newPrompt);
-
-        // Get the React component for the icon
         const IconComponent =
           iconMap[dialogIcon as keyof typeof iconMap] || Sparkles;
-
-        // Add to local state
         const newPromptTemplate: PromptTemplate = {
           ...newPrompt,
           icon: IconComponent,
         };
 
         setPromptTemplates((prev) => [...prev, newPromptTemplate]);
-
-        // Select the newly created prompt
         setSelectedPrompt(newPromptTemplate);
         setPromptText(newPromptTemplate.prompt);
       }
-
-      // Close dialog and reset form
       setIsNewPromptDialogOpen(false);
       setEditingPromptId(null);
       setNewPromptTitle("");
@@ -668,7 +621,6 @@ function App() {
   const handleNewPrompt = () => {
     setSelectedPrompt(null);
     setPromptText("");
-    // Focus the prompt textarea after a short delay to ensure it's rendered
     setTimeout(() => {
       promptTextareaRef.current?.focus();
     }, 0);
@@ -676,12 +628,9 @@ function App() {
 
   const handleTitleClick = () => {
     if (selectedPrompt) {
-      // Pre-populate dialog with existing prompt data
       setEditingPromptId(selectedPrompt.id);
       setNewPromptTitle(selectedPrompt.title);
       setNewPromptText(promptText);
-
-      // Set existing icon and color for editing
       const iconString =
         Object.entries(iconMap).find(
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -709,8 +658,6 @@ function App() {
 
       setDialogIcon(result.icon);
       setDialogColor(result.color);
-
-      // Update title if one was generated and we don't have a title yet
       if (result.title && !newPromptTitle.trim()) {
         setNewPromptTitle(result.title);
       }
@@ -729,11 +676,7 @@ function App() {
 
     try {
       await rpcClient.prompts.deletePrompt({ id: promptId });
-
-      // Remove from local state
       setPromptTemplates((prev) => prev.filter((p) => p.id !== promptId));
-
-      // Clear selection if the deleted prompt was selected
       if (selectedPrompt?.id === promptId) {
         setSelectedPrompt(null);
         setPromptText("");
@@ -745,12 +688,9 @@ function App() {
   };
 
   const handleEditPrompt = (template: PromptTemplate) => {
-    // Pre-populate dialog with existing prompt data
     setEditingPromptId(template.id);
     setNewPromptTitle(template.title);
     setNewPromptText(template.prompt);
-
-    // Set existing icon and color for editing
     const iconString =
       Object.entries(iconMap).find(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -764,12 +704,9 @@ function App() {
 
   return (
     <div className="flex h-screen bg-background overflow-hidden flex-col">
-      {/* App Header */}
       <AppHeader />
 
-      {/* Main Content */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Left Column - Prompts */}
         <div className="w-72 border-r bg-background flex flex-col min-h-0 relative">
           <ColumnHeader
             icon={Send}
@@ -848,12 +785,10 @@ function App() {
                     `}
                     onClick={() => handlePromptClick(template)}
                   >
-                    {/* Icon in top-left */}
                     <div className="absolute top-3 left-3">
                       <IconComponent className="h-5 w-5 text-white/90 group-hover:text-white transition-colors" />
                     </div>
 
-                    {/* Menu in top-right */}
                     <div
                       className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10"
                       onClick={(e) => e.stopPropagation()}
@@ -896,14 +831,12 @@ function App() {
                       </DropdownMenu>
                     </div>
 
-                    {/* Title overlay at bottom */}
                     <div className="absolute bottom-0 left-0 right-0 p-3">
                       <h3 className="font-semibold text-xs text-white leading-tight">
                         {template.title}
                       </h3>
                     </div>
 
-                    {/* Subtle overlay for better text readability */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-60" />
                   </div>
                 );
@@ -912,13 +845,11 @@ function App() {
           </div>
         </div>
 
-        {/* Center Column - Input */}
         <div className="w-120 border-r flex flex-col min-h-0 relative">
           <ColumnHeader icon={Sparkles} title="Input" />
           <Arrow className="left-[480px]" />
 
           <div className="flex-1 p-6 flex flex-col gap-4 min-h-0">
-            {/* Prompt Textarea - 1/4 height */}
             <div className="min-h-0 flex flex-col">
               <div className="flex items-center gap-2 mb-2">
                 {selectedPrompt ? (
@@ -954,7 +885,6 @@ function App() {
                 className="w-full h-full min-h-20"
               />
 
-              {/* Action buttons */}
               <div className="flex justify-end gap-2 mt-2">
                 {selectedPrompt && (
                   <Button
@@ -1126,7 +1056,6 @@ function App() {
               </div>
             </div>
 
-            {/* Input Textarea - 3/4 height */}
             <div className="flex-1 min-h-0 relative flex flex-col">
               <label className="text-xs font-medium text-muted-foreground mb-2 block">
                 <div className="flex items-center gap-2">
@@ -1146,7 +1075,6 @@ function App() {
                 className={`h-full w-full ${isSpeechSupported ? "pr-12" : ""}`}
               />
 
-              {/* Voice Recording Button Overlay - only show if supported */}
               {isSpeechSupported && (
                 <div className="absolute bottom-3 right-3">
                   {!isListening ? (
@@ -1171,7 +1099,6 @@ function App() {
                 </div>
               )}
 
-              {/* Listening Status */}
               {isListening && (
                 <div className="absolute top-8 left-3">
                   <div className="flex items-center gap-2 bg-red-500/10 text-red-600 px-2 py-1 rounded-md text-xs">
@@ -1182,7 +1109,6 @@ function App() {
               )}
             </div>
 
-            {/* Generate Button */}
             <Button
               onClick={handleGenerate}
               disabled={!promptText.trim() || isLoading}
@@ -1203,7 +1129,6 @@ function App() {
           </div>
         </div>
 
-        {/* Right Column - Output */}
         <div className="flex-1 flex flex-col bg-background min-h-0">
           <div className="py-2 px-4 border-b flex-shrink-0 bg-background/50">
             <div className="flex items-center justify-between">
@@ -1277,7 +1202,7 @@ function App() {
           </div>
         </div>
       </div>
-      {/* Tailwind colors - ensure they are included in the build */}
+
       <div className="invisible">
         <div className="bg-gradient-to-br from-blue-500 to-blue-600"></div>
         <div className="bg-gradient-to-br from-emerald-500 to-emerald-600"></div>

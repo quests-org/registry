@@ -33,8 +33,6 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
 }) => {
   const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
   const ranks = ["8", "7", "6", "5", "4", "3", "2", "1"];
-
-  // Flip board orientation when player is black
   const displayFiles = playerColor === "black" ? [...files].reverse() : files;
   const displayRanks = playerColor === "black" ? [...ranks].reverse() : ranks;
   const displayBoard =
@@ -44,7 +42,6 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
 
   const getSquareName = (rank: number, file: number): Square => {
     if (playerColor === "black") {
-      // When flipped, we need to map the visual position back to actual chess coordinates
       const actualRank = 7 - rank;
       const actualFile = 7 - file;
       return `${files[actualFile]}${ranks[actualRank]}` as Square;
@@ -69,9 +66,6 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
       ? lastMove.from === square || lastMove.to === square
       : false;
   };
-
-  // Determine which player is on top/bottom based on board orientation
-  // User is always at the bottom, AI is always at the top
   const topPlayer = {
     name: aiOpponent,
     color: playerColor === "white" ? "black" : "white",
@@ -82,14 +76,11 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
     color: playerColor,
     isAI: false,
   };
-
-  // Determine if it's each player's turn
   const isTopPlayerTurn = topPlayer.color === currentPlayer;
   const isBottomPlayerTurn = bottomPlayer.color === currentPlayer;
 
   return (
     <div className="relative">
-      {/* Top Player Indicator */}
       <div className="flex justify-center mb-2">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg">
@@ -123,7 +114,6 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
         </div>
       </div>
 
-      {/* File labels (a-h) */}
       <div className="flex justify-center mb-3">
         <div className="grid grid-cols-8 gap-0 w-[480px]">
           {displayFiles.map((file) => (
@@ -138,7 +128,6 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
       </div>
 
       <div className="flex items-center gap-3">
-        {/* Rank labels (8-1) */}
         <div className="flex flex-col gap-0">
           {displayRanks.map((rank) => (
             <div
@@ -150,7 +139,6 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
           ))}
         </div>
 
-        {/* Chess Board */}
         <div className="grid grid-cols-8 gap-0 rounded-lg overflow-hidden border-4 border-slate-700 w-[480px] h-[480px] chess-board shadow-2xl">
           {displayBoard.map((rank, rankIndex) =>
             rank.map((piece, fileIndex) => {
@@ -179,7 +167,6 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
                   onClick={() => isPlayerTurn && onSquareClick(square)}
                   disabled={!isPlayerTurn}
                 >
-                  {/* Chess piece */}
                   {piece && (
                     <ChessPiece
                       piece={piece}
@@ -193,7 +180,6 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
           )}
         </div>
 
-        {/* Rank labels (8-1) repeated on right side */}
         <div className="flex flex-col gap-0">
           {displayRanks.map((rank) => (
             <div
@@ -206,7 +192,6 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
         </div>
       </div>
 
-      {/* File labels (a-h) repeated at bottom */}
       <div className="flex justify-center mt-3">
         <div className="grid grid-cols-8 gap-0 w-[480px]">
           {displayFiles.map((file) => (
@@ -220,7 +205,6 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
         </div>
       </div>
 
-      {/* Bottom Player Indicator */}
       <div className="flex justify-center mt-2">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg">
@@ -254,7 +238,6 @@ const ChessBoard: React.FC<ChessBoardProps> = ({
         </div>
       </div>
 
-      {/* Overlay for game over state */}
       {children}
     </div>
   );

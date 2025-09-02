@@ -21,10 +21,8 @@ export const GameOverOverlay: React.FC<GameOverOverlayProps> = ({
 }) => {
   const isGameOver = gameStatus === "checkmate" || gameStatus === "draw";
 
-  // Determine winner for checkmate scenarios
   const getWinner = () => {
     if (gameStatus === "checkmate") {
-      // If it's checkmate, the player who just moved won (opposite of current turn)
       const winner = currentPlayer === "white" ? "black" : "white";
       return winner === playerColor ? "player" : "ai";
     }
@@ -78,7 +76,6 @@ export const GameOverOverlay: React.FC<GameOverOverlayProps> = ({
       <div
         className={`relative rounded-xl p-6 border-2 shadow-2xl max-w-sm mx-4 ${gameOverInfo.bgColor} ${gameOverInfo.borderColor} animate-in zoom-in-95 duration-300`}
       >
-        {/* Dismiss button */}
         <button
           onClick={onDismiss}
           className={`absolute top-3 right-3 p-1 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-colors ${gameOverInfo.textColor}`}
@@ -86,7 +83,6 @@ export const GameOverOverlay: React.FC<GameOverOverlayProps> = ({
           <X className="h-4 w-4" />
         </button>
 
-        {/* Content */}
         <div className="text-center">
           <div className={`flex justify-center mb-4 ${gameOverInfo.textColor}`}>
             {gameOverInfo.icon}

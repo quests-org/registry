@@ -3,8 +3,6 @@ import { Chess, Square, Move } from "chess.js";
 
 export type GameStatus = "playing" | "checkmate" | "draw" | "check";
 export type PlayerColor = "white" | "black";
-
-// Define the piece type that chess.js returns
 type ChessPiece = {
   square: Square;
   type: string;
@@ -30,8 +28,6 @@ interface ChessGameActions {
   setThinking: (thinking: boolean) => void;
   makeMoveFromNotation: (move: string) => boolean;
 }
-
-// Helper function to convert chess.js piece objects to string format
 const convertBoardToStringFormat = (
   chessBoardData: ChessPiece[][]
 ): (string | null)[][] => {
@@ -138,7 +134,6 @@ export function useChessGame(): ChessGameState & ChessGameActions {
   const selectSquare = useCallback(
     (square: Square) => {
       if (gameState.selectedSquare === square) {
-        // Deselect if clicking the same square
         updateGameState(() => ({
           selectedSquare: null,
           legalMoves: [],
@@ -147,10 +142,8 @@ export function useChessGame(): ChessGameState & ChessGameActions {
       }
 
       if (gameState.selectedSquare) {
-        // Try to make a move
         const moveSuccess = makeMove(gameState.selectedSquare, square);
         if (!moveSuccess) {
-          // If move failed, select the new square
           const piece = gameState.chess.get(square);
           if (piece && piece.color === gameState.chess.turn()) {
             const moves = gameState.chess.moves({ square, verbose: true });
@@ -168,7 +161,6 @@ export function useChessGame(): ChessGameState & ChessGameActions {
           }
         }
       } else {
-        // Select square if it has a piece of the current player
         const piece = gameState.chess.get(square);
         if (piece && piece.color === gameState.chess.turn()) {
           const moves = gameState.chess.moves({ square, verbose: true });

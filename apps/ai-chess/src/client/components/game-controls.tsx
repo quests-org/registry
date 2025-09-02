@@ -38,7 +38,6 @@ export const GameControls: React.FC<GameControlsProps> = ({
 
   return (
     <div className="space-y-4 pt-4">
-      {/* Game Info */}
       <div className="space-y-1">
         <div className="flex items-center h-6">
           <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide w-20">

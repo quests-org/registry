@@ -5,17 +5,11 @@ import fsDriver from "unstorage/drivers/fs";
 import { promises as fs } from "fs";
 import { generateObject } from "ai";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
-
-// Initialize storage with filesystem driver for user data
 const storage = createStorage({
   driver: fsDriver({ base: "./.storage" }),
 });
-
-// Paths for seed data and user storage
 const SEED_FILE_PATH = "./data/prompts.json";
 const USER_FILE_KEY = "prompts.json";
-
-// Prompt schema
 const PromptSchema = z.object({
   id: z.string(),
   title: z.string(),
@@ -33,8 +27,6 @@ const openai = createOpenAICompatible({
   baseURL: process.env.OPENAI_BASE_URL!,
   apiKey: process.env.OPENAI_API_KEY,
 });
-
-// Available colors for prompt templates
 const COLORS = [
   "red",
   "orange",
@@ -59,29 +51,19 @@ const COLORS = [
   "neutral",
   "stone",
 ];
-
-// Function to select a random color
 function getRandomColor(): string {
   const randomIndex = Math.floor(Math.random() * COLORS.length);
   return COLORS[randomIndex];
 }
-
-// Ensure user storage exists and seed if needed
 async function ensureUserStorage(): Promise<void> {
   try {
-    // Check if user file exists
     const userPrompts = await storage.getItem<Prompt[]>(USER_FILE_KEY);
 
     if (!userPrompts) {
-      // User file doesn't exist, seed from data file
       try {
         const seedData = await fs.readFile(SEED_FILE_PATH, "utf-8");
         const parsedSeedData = JSON.parse(seedData) as Prompt[];
-
-        // Create .storage directory if it doesn't exist
         await fs.mkdir("./.storage", { recursive: true });
-
-        // Save seed data to user storage
         await storage.setItem(USER_FILE_KEY, parsedSeedData);
         console.log("Seeded user prompts from data file");
       } catch (seedError) {
@@ -89,7 +71,6 @@ async function ensureUserStorage(): Promise<void> {
           "Could not seed from data file, creating empty prompts:",
           seedError
         );
-        // If seed file doesn't exist, create empty array
         await storage.setItem(USER_FILE_KEY, []);
       }
     }
@@ -97,8 +78,6 @@ async function ensureUserStorage(): Promise<void> {
     console.error("Error ensuring user storage:", error);
   }
 }
-
-// Load all prompts
 const loadPrompts = os.handler(async () => {
   try {
     await ensureUserStorage();
@@ -109,8 +88,6 @@ const loadPrompts = os.handler(async () => {
     return [];
   }
 });
-
-// Save all prompts
 const savePrompts = os
   .input(z.array(PromptSchema))
   .handler(async ({ input }) => {
@@ -123,14 +100,10 @@ const savePrompts = os
       throw new Error("Failed to save prompts");
     }
   });
-
-// Add a new prompt
 const addPrompt = os.input(PromptSchema).handler(async ({ input }) => {
   try {
     await ensureUserStorage();
     const prompts = (await storage.getItem<Prompt[]>(USER_FILE_KEY)) || [];
-
-    // Check if prompt with same ID already exists
     if (prompts.some((p) => p.id === input.id)) {
       throw new Error("Prompt with this ID already exists");
     }
@@ -150,8 +123,6 @@ const addPrompt = os.input(PromptSchema).handler(async ({ input }) => {
     throw new Error("Failed to add prompt");
   }
 });
-
-// Update an existing prompt
 const updatePrompt = os.input(PromptSchema).handler(async ({ input }) => {
   try {
     await ensureUserStorage();
@@ -165,7 +136,6 @@ const updatePrompt = os.input(PromptSchema).handler(async ({ input }) => {
     const updatedPrompt = {
       ...input,
       updatedAt: new Date().toISOString(),
-      // Preserve existing recentlyUsedAt if it exists
       recentlyUsedAt: prompts[index].recentlyUsedAt || new Date().toISOString(),
     };
 
@@ -177,8 +147,6 @@ const updatePrompt = os.input(PromptSchema).handler(async ({ input }) => {
     throw new Error("Failed to update prompt");
   }
 });
-
-// Delete a prompt
 const deletePrompt = os
   .input(z.object({ id: z.string() }))
   .handler(async ({ input }) => {
@@ -198,8 +166,6 @@ const deletePrompt = os
       throw new Error("Failed to delete prompt");
     }
   });
-
-// Mark a prompt as recently used
 const markPromptAsUsed = os
   .input(z.object({ id: z.string() }))
   .handler(async ({ input }) => {
@@ -224,8 +190,6 @@ const markPromptAsUsed = os
       throw new Error("Failed to mark prompt as used");
     }
   });
-
-// Generate icon and color suggestions
 const generateIconAndTitle = os
   .input(
     z.object({

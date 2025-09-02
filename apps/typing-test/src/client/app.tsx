@@ -137,11 +137,8 @@ function App() {
   };
 
   const restartTest = () => {
-    // Always pick a new random text
     const randomIndex = Math.floor(Math.random() * sampleTexts.length);
     setCurrentText(sampleTexts[randomIndex]);
-
-    // Reset all state
     setUserInput("");
     setCurrentCharIndex(0);
     setStartTime(null);

@@ -7,18 +7,12 @@ interface ModelOption {
   name: string;
   provider: string;
 }
-
-// Helper function to parse model info from model name
 const parseModelInfo = (modelName: string): ModelOption => {
   const id = modelName;
   let name = modelName;
   let provider = "Unknown";
-
-  // Parse provider and name from common patterns
   if (modelName.includes("/")) {
     const [providerPrefix, modelPart] = modelName.split("/", 2);
-
-    // Map provider prefixes to display names
     const providerMap: Record<string, string> = {
       openai: "OpenAI",
       anthropic: "Anthropic",
@@ -30,8 +24,6 @@ const parseModelInfo = (modelName: string): ModelOption => {
     };
 
     provider = providerMap[providerPrefix] || providerPrefix;
-
-    // Clean up model names
     name = modelPart
       .replace(/-/g, " ")
       .replace(/\b\w/g, (l) => l.toUpperCase())
@@ -42,8 +34,6 @@ const parseModelInfo = (modelName: string): ModelOption => {
 
   return { id, name, provider };
 };
-
-// Hook to get available models
 export const useAvailableModels = () => {
   const {
     data: modelsData,

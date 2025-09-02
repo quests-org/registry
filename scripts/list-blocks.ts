@@ -16,8 +16,6 @@ async function getBlockInfo(blockPath: AbsolutePath) {
   try {
     const content = await fs.readFile(packageJsonPath, "utf-8");
     const packageJson = JSON.parse(content);
-
-    // Check what files are in the block
     const srcPath = absolutePathJoin(blockPath, "src");
     const files: string[] = [];
 
@@ -42,11 +40,7 @@ async function getBlockInfo(blockPath: AbsolutePath) {
 
         await findFiles(srcPath);
       }
-    } catch {
-      // src directory doesn't exist or is not accessible
-    }
-
-    // Check what codemods are available
+    } catch {}
     const codemodsPath = absolutePathJoin(blockPath, "codemods");
     const codemods: string[] = [];
 
@@ -60,9 +54,7 @@ async function getBlockInfo(blockPath: AbsolutePath) {
           }
         }
       }
-    } catch {
-      // codemods directory doesn't exist or is not accessible
-    }
+    } catch {}
 
     return {
       name: packageJson.name,

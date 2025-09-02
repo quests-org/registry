@@ -142,10 +142,8 @@ async function runCodemods(
     console.log(`   Running ${codemodFile}...`);
 
     try {
-      // Check if jscodeshift is available
       let jscodeshiftPath: string;
       try {
-        // Try to use the block's local jscodeshift first
         const blockNodeModules = absolutePathJoin(
           blockPath,
           "node_modules/.bin/jscodeshift"
@@ -153,14 +151,11 @@ async function runCodemods(
         if (await fileExists(blockNodeModules)) {
           jscodeshiftPath = blockNodeModules;
         } else {
-          // Fall back to npx
           jscodeshiftPath = "npx jscodeshift";
         }
       } catch {
         jscodeshiftPath = "npx jscodeshift";
       }
-
-      // Find all TypeScript files in the target project that might need transformation
       const srcDir = absolutePathJoin(targetProjectDir, "src");
       if (await fileExists(srcDir)) {
         const command = `${jscodeshiftPath} -t "${codemodPath}" --parser=tsx --extensions=ts,tsx "${srcDir}" || true`;
@@ -180,7 +175,6 @@ async function runCodemods(
           error instanceof Error ? error.message : String(error)
         }`
       );
-      // Continue with other codemods even if one fails
     }
   }
 }
@@ -224,8 +218,6 @@ async function main(): Promise<void> {
   const targetDir = path.isAbsolute(targetProjectPath)
     ? (targetProjectPath as AbsolutePath)
     : absolutePathJoin(projectRoot, targetProjectPath);
-
-  // Check if block exists
   if (!(await fileExists(blockDir))) {
     console.error(`❌ Block '${blockName}' does not exist in blocks directory`);
     console.error("Available blocks:");
@@ -240,14 +232,10 @@ async function main(): Promise<void> {
     }
     process.exit(1);
   }
-
-  // Check if target directory exists
   if (!(await fileExists(targetDir))) {
     console.error(`❌ Target directory does not exist: ${targetDir}`);
     process.exit(1);
   }
-
-  // Check if it's a valid project (has src directory)
   const srcDir = absolutePathJoin(targetDir, "src");
   if (!(await fileExists(srcDir))) {
     console.error(
@@ -259,11 +247,8 @@ async function main(): Promise<void> {
   console.log(`🚀 Applying '${blockName}' block to: ${targetDir}`);
 
   try {
-    // Get block information
     const blockInfo = await getBlockInfo(blockDir);
     console.log(`📦 Block: ${blockInfo.name}`);
-
-    // Copy src files from block to target project
     const blockSrcDir = absolutePathJoin(blockDir, "src");
     if (await fileExists(blockSrcDir)) {
       console.log("\n📂 Copying source files...");
@@ -274,14 +259,10 @@ async function main(): Promise<void> {
     } else {
       console.log("📂 No src directory found in block, skipping file copy");
     }
-
-    // Add dependencies
     if (Object.keys(blockInfo.dependencies).length > 0) {
       console.log("\n📦 Adding dependencies...");
       await addDependencies(targetDir, blockInfo.dependencies, "dependencies");
     }
-
-    // Run codemods
     console.log("\n🔧 Running codemods...");
     await runCodemods(blockDir, targetDir);
 
@@ -294,8 +275,6 @@ async function main(): Promise<void> {
       console.log(`  cd ${targetProjectPath}`);
       console.log("  pnpm install  # to install new dependencies");
     }
-
-    // Show any environment variables that might be needed
     if (blockName === "ai") {
       console.log("\nEnvironment variables needed:");
       console.log("  OPENAI_API_KEY=your_openai_api_key");

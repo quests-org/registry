@@ -101,8 +101,6 @@ const Chat = () => {
       },
     },
   });
-
-  // Load messages from localStorage on mount
   useEffect(() => {
     const savedMessages = localStorage.getItem("ai-chat-messages");
     if (savedMessages) {
@@ -115,8 +113,6 @@ const Chat = () => {
       }
     }
   }, [setMessages]);
-
-  // Save messages to localStorage whenever they change
   useEffect(() => {
     if (messages.length > 0) {
       localStorage.setItem("ai-chat-messages", JSON.stringify(messages));

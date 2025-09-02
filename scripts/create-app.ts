@@ -1,4 +1,3 @@
-// @ts-expect-error
 import nodeIgnore from "ignore";
 import { promises as fs } from "node:fs";
 import * as path from "node:path";

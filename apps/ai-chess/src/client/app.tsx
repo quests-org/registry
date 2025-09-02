@@ -12,7 +12,6 @@ import { useMutation } from "@tanstack/react-query";
 import { queryClient } from "./rpc-client";
 
 function App() {
-  // Game state
   const {
     chess,
     board,
@@ -29,12 +28,9 @@ function App() {
     makeMoveFromNotation,
   } = useChessGame();
 
-  // Get available models
   const { models } = useAvailableModels();
 
-  // Settings state
   const [selectedModel, setSelectedModel] = useState(() => {
-    // Use first available model or empty string if none available
     return models.length > 0 ? models[0].id : "";
   });
   const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard">(
@@ -48,9 +44,7 @@ function App() {
   const [isOverlayVisible, setIsOverlayVisible] = useState(true);
   const [hasInitialized, setHasInitialized] = useState(false);
 
-  // Handle new game with random color assignment
   const handleNewGame = useCallback(() => {
-    // Randomly assign player color
     const randomColor: "white" | "black" =
       Math.random() < 0.5 ? "white" : "black";
 
@@ -74,7 +68,6 @@ function App() {
     setIsOverlayVisible(true);
   }, [resetGame]);
 
-  // Update selected model when models are loaded
   useEffect(() => {
     if (
       models.length > 0 &&
@@ -84,7 +77,6 @@ function App() {
     }
   }, [models, selectedModel]);
 
-  // Auto-start a new game when the app first loads and models are available
   useEffect(() => {
     if (models.length > 0 && !hasInitialized) {
       console.log("🚀 Auto-starting initial game...");
@@ -93,10 +85,8 @@ function App() {
     }
   }, [models, hasInitialized, handleNewGame]);
 
-  // Use ref to track if AI move is in progress to prevent multiple simultaneous moves
   const aiMoveInProgressRef = useRef(false);
 
-  // Stable function to handle AI move completion
   const handleAIMoveComplete = useCallback(
     (data: { move?: string } | null) => {
       setThinking(false);
@@ -106,7 +96,6 @@ function App() {
         console.log(`🤖 AI MOVE: ${data.move}`);
         console.log(`🎯 Current player: ${currentPlayer}`);
 
-        // Get move details before making the move
         const moves = chess.moves({ verbose: true });
         const moveDetail = moves.find(
           (m) => m.san === data.move || m.lan === data.move
@@ -134,7 +123,6 @@ function App() {
     [chess, makeMoveFromNotation, setThinking, currentPlayer]
   );
 
-  // AI move generation using ORPC
   const generateMoveMutation = useMutation(
     queryClient.chess.generateMove.mutationOptions({
       onSuccess: handleAIMoveComplete,
@@ -145,15 +133,11 @@ function App() {
     })
   );
 
-  // Effect to trigger AI moves - only depends on core game state
   useEffect(() => {
-    // Don't generate move if game is over
     if (gameStatus === "checkmate" || gameStatus === "draw") return;
 
-    // Don't generate move if AI move already in progress
     if (aiMoveInProgressRef.current || isThinking) return;
 
-    // Check if it's AI's turn
     const isAITurn =
       (playerColor === "white" && currentPlayer === "black") ||
       (playerColor === "black" && currentPlayer === "white");
@@ -161,12 +145,10 @@ function App() {
     if (!isAITurn || !selectedModel) return;
 
     const timer = setTimeout(() => {
-      // Double-check conditions before making the move to prevent race conditions
       if (aiMoveInProgressRef.current || isThinking) {
         return;
       }
 
-      // Re-check game status to avoid race conditions
       const currentGameStatus = chess.isCheckmate()
         ? "checkmate"
         : chess.isDraw()
@@ -200,11 +182,9 @@ function App() {
           difficulty,
         });
       }
-    }, 500); // Small delay for better UX
+    }, 500);
 
     return () => clearTimeout(timer);
-    // Note: Intentionally not including generateMoveMutation in dependencies
-    // to avoid infinite re-renders. The mutation function is stable enough for this use case.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     currentPlayer,
@@ -217,7 +197,6 @@ function App() {
     setThinking,
   ]);
 
-  // Handle player moves
   const handleSquareClick = (square: Square) => {
     const isPlayerTurn =
       (playerColor === "white" && currentPlayer === "white") ||
@@ -226,7 +205,6 @@ function App() {
     if (!isPlayerTurn || isThinking) return;
 
     if (selectedSquare && selectedSquare !== square) {
-      // Attempt to make a move
       const moves = chess.moves({ verbose: true });
       const moveDetail = moves.find(
         (m) => m.from === selectedSquare && m.to === square
@@ -250,7 +228,6 @@ function App() {
           console.log(`❌ Move failed`);
         }
       } else {
-        // If not a valid move, try to select the new square
         selectSquare(square);
       }
     } else {
@@ -258,12 +235,10 @@ function App() {
     }
   };
 
-  // Handle dismissing the game over overlay
   const handleDismissOverlay = () => {
     setIsOverlayVisible(false);
   };
 
-  // Handle starting a new game from the dialog
   const handleStartNewGame = () => {
     console.log("🎮 Starting new game from dialog...");
     handleNewGame();
@@ -277,7 +252,6 @@ function App() {
   return (
     <div className="min-h-screen bg-green-50 dark:bg-slate-900">
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-5xl font-bold mb-3 text-green-700 dark:text-green-400">
             AI Chess
@@ -373,7 +347,6 @@ function App() {
         </div>
       </div>
 
-      {/* New Game Dialog */}
       <NewGameDialog
         open={isNewGameOpen}
         onOpenChange={setIsNewGameOpen}
