@@ -4,9 +4,13 @@ import { call } from "@orpc/server";
 import { fileRouter, UploadedFile } from "@/server/rpc/file";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 
+if (!process.env.OPENAI_BASE_URL) {
+  throw new Error("OPENAI_BASE_URL is not set");
+}
+
 const openai = createOpenAICompatible({
   name: "openai",
-  baseURL: process.env.OPENAI_BASE_URL!,
+  baseURL: process.env.OPENAI_BASE_URL,
   apiKey: process.env.OPENAI_API_KEY,
 });
 
