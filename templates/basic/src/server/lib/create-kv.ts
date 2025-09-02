@@ -12,7 +12,6 @@ export function createKV<T extends StorageValue>(name: string) {
     storage: { event: WatchEvent; key: string };
   }>();
   storage.watch((event, key) => {
-    console.log("storage", event, key);
     publisher.publish("storage", { event, key });
   });
   return {
