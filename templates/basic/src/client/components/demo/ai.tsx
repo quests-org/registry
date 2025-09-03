@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { queryClient } from "../../rpc-client";
+import { queryClient } from "@/client/rpc-client";
 
 export function AIDemo() {
   const [message, setMessage] = useState("");

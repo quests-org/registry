@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { queryClient, rpcClient } from "../../rpc-client";
+import { queryClient, rpcClient } from "@/client/rpc-client";
 
 export function RPCDemo() {
   const [value, setValue] = useState("");

@@ -1,7 +1,7 @@
 import { call, os } from "@orpc/server";
 import { z } from "zod";
 import { randomUUID } from "crypto";
-import { createKV } from "../../lib/create-kv";
+import { createKV } from "@/server/lib/create-kv";
 
 const DemoSchema = z.object({
   id: z.string(),
