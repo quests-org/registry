@@ -4,7 +4,7 @@ import { createStorage } from "unstorage";
 import fsDriver from "unstorage/drivers/fs";
 import { promises as fs } from "fs";
 import { generateObject } from "ai";
-import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
+import { OpenAICompatibleChatLanguageModel } from "@ai-sdk/openai-compatible";
 const storage = createStorage({
   driver: fsDriver({ base: "./.storage" }),
 });
@@ -31,11 +31,18 @@ if (!process.env.OPENAI_DEFAULT_MODEL) {
 
 const DEFAULT_MODEL = process.env.OPENAI_DEFAULT_MODEL;
 
-const openai = createOpenAICompatible({
-  name: "openai-compatible",
-  baseURL: process.env.OPENAI_BASE_URL,
-  apiKey: process.env.OPENAI_API_KEY,
+const model = new OpenAICompatibleChatLanguageModel(DEFAULT_MODEL, {
+  provider: "openai-compatible",
+  url: ({ path }) => {
+    const url = new URL(`${process.env.OPENAI_BASE_URL}${path}`);
+    return url.toString();
+  },
+  headers: () => ({
+    Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+  }),
+  supportsStructuredOutputs: true,
 });
+
 const COLORS = [
   "red",
   "orange",
@@ -225,7 +232,7 @@ Examples:
 Prompt: ${input.prompt}`;
 
       const result = await generateObject({
-        model: openai(DEFAULT_MODEL),
+        model,
         system: systemPrompt,
         prompt: userPrompt,
         schema: z.object({
