@@ -6,7 +6,7 @@ export default {
     },
     {
       dependencies: ["@orpc/client", "@orpc/server"],
-      pinVersion: "^1.8.3",
+      pinVersion: "^1.8.8",
     },
     {
       dependencies: ["@types/node"],
