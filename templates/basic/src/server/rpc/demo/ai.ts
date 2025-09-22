@@ -52,11 +52,17 @@ const complete = os
     };
   });
 
+// Object generation schemas only support nullability, not optionality.
+// Use .nullable() instead of .optional() for fields that may not have values.
 const DemoSchema = z.object({
   name: z.string().describe("The name of the person"),
   age: z.number().describe("The age of the person"),
   occupation: z.string().describe("The occupation of the person"),
   bio: z.string().describe("The bio of the person"),
+  nickname: z
+    .string()
+    .nullable()
+    .describe("The person's nickname, if they have one"),
 });
 
 const generate = os

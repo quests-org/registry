@@ -103,6 +103,11 @@ export function AIDemo() {
               <p>
                 <strong>Bio:</strong> {personData.person.bio}
               </p>
+              {personData.person.nickname && (
+                <p>
+                  <strong>Nickname:</strong> {personData.person.nickname}
+                </p>
+              )}
             </div>
           </div>
         )}
