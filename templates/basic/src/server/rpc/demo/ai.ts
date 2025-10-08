@@ -4,22 +4,24 @@ import { z } from "zod";
 
 import { zodResponseFormat } from "@/server/lib/openai";
 
-if (!process.env.OPENAI_BASE_URL) {
-  throw new Error("OPENAI_BASE_URL is not set");
-}
+const REQUIRED_ENV_VARS = [
+  "OPENAI_BASE_URL",
+  "OPENAI_API_KEY",
+  "OPENAI_DEFAULT_MODEL",
+] as const;
 
-if (!process.env.OPENAI_API_KEY) {
-  throw new Error("OPENAI_API_KEY is not set");
+for (const envVar of REQUIRED_ENV_VARS) {
+  if (!process.env[envVar]) {
+    console.warn(
+      `Warning: ${envVar} is not set. AI features will fail at runtime. If running outside of Quests, create a .env file with the required environment variables.`
+    );
+  }
 }
 
 const openai = new OpenAI({
   baseURL: process.env.OPENAI_BASE_URL,
   apiKey: process.env.OPENAI_API_KEY,
 });
-
-if (!process.env.OPENAI_DEFAULT_MODEL) {
-  throw new Error("OPENAI_DEFAULT_MODEL is not set");
-}
 
 const DEFAULT_MODEL = process.env.OPENAI_DEFAULT_MODEL;
 
@@ -36,6 +38,10 @@ const complete = os
   .input(ChatCompletionInputSchema)
   .handler(async ({ input }) => {
     const { message, systemPrompt } = input;
+
+    if (!DEFAULT_MODEL) {
+      throw new Error("OPENAI_DEFAULT_MODEL is not set");
+    }
 
     const completion = await openai.chat.completions.create({
       model: DEFAULT_MODEL,
@@ -68,6 +74,10 @@ const DemoSchema = z.object({
 const generate = os
   .input(GeneratePersonInputSchema)
   .handler(async ({ input }) => {
+    if (!DEFAULT_MODEL) {
+      throw new Error("OPENAI_DEFAULT_MODEL is not set");
+    }
+
     const completion = await openai.chat.completions.parse({
       model: DEFAULT_MODEL,
       messages: [
