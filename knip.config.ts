@@ -20,6 +20,12 @@ const config: KnipConfig = {
         "src/client/components/*",
       ],
     },
+    "templates/nextjs": {
+      entry: [
+        "src/app/page.tsx",
+        "src/app/layout.tsx",
+      ],
+    },
     "apps/*": {
       entry: [
         "src/server/index.ts",
@@ -31,7 +37,7 @@ const config: KnipConfig = {
     },
   },
   ignore: ["blocks/**"],
-  ignoreDependencies: ["jscodeshift"],
+  ignoreDependencies: ["jscodeshift", "eslint-config-next", "postcss"],
   compilers: {
     css: (text: string) =>
       [...text.matchAll(/(?<=@)(import|plugin)[^;]+/g)]
