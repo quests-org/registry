@@ -26,7 +26,7 @@ const config: KnipConfig = {
         "src/app/layout.tsx",
       ],
     },
-    "apps/*": {
+    "templates/*": {
       entry: [
         "src/server/index.ts",
         "src/client/main.tsx",

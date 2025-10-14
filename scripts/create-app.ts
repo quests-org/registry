@@ -146,7 +146,7 @@ async function main(): Promise<void> {
     "templates",
     templateName
   ) as AbsolutePath;
-  const targetDir = path.join(projectRoot, "apps", appName) as AbsolutePath;
+  const targetDir = path.join(projectRoot, "templates", appName) as AbsolutePath;
 
   try {
     await fs.access(templateDir);
@@ -160,7 +160,7 @@ async function main(): Promise<void> {
 
   try {
     await fs.access(targetDir);
-    console.error(`App directory already exists: apps/${appName}`);
+    console.error(`App directory already exists: templates/${appName}`);
     process.exit(1);
   } catch {}
 
@@ -172,9 +172,9 @@ async function main(): Promise<void> {
     await copyTemplate({ templateDir, targetDir });
     await updatePackageJson(targetDir, appName);
 
-    console.log(`✅ Successfully created app: apps/${appName}`);
+    console.log(`✅ Successfully created app: templates/${appName}`);
     console.log("\nNext steps:");
-    console.log(`  cd apps/${appName}`);
+    console.log(`  cd templates/${appName}`);
     console.log("  pnpm install");
     console.log("  pnpm dev");
   } catch (error) {

@@ -24,10 +24,10 @@ npx tsx scripts/apply-block.ts <block-name> <target-project-path>
 
 ```bash
 # Apply AI block to an app
-npx tsx scripts/apply-block.ts ai apps/my-app
+npx tsx scripts/apply-block.ts ai templates/my-app
 
 # Skip existing files (won't overwrite)
-npx tsx scripts/apply-block.ts ai apps/my-app --skip-existing
+npx tsx scripts/apply-block.ts ai templates/my-app --skip-existing
 ```
 
 ## Creating New Blocks

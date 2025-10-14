@@ -121,8 +121,8 @@ async function main(): Promise<void> {
     );
     console.log("");
     console.log("   Examples:");
-    console.log("   tsx scripts/apply-block.ts ai apps/my-app");
-    console.log("   tsx scripts/apply-block.ts ai apps/my-app --skip-existing");
+    console.log("   tsx scripts/apply-block.ts ai templates/my-app");
+    console.log("   tsx scripts/apply-block.ts ai templates/my-app --skip-existing");
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") {
       console.log(

@@ -186,7 +186,7 @@ function parseArguments() {
     console.error(
       "Usage: tsx scripts/apply-block.ts <block-name> <target-project-path>"
     );
-    console.error("Example: tsx scripts/apply-block.ts ai apps/my-app");
+    console.error("Example: tsx scripts/apply-block.ts ai templates/my-app");
     console.error("\nAvailable blocks:");
     console.error("  ai - AI models and utilities");
     process.exit(1);
@@ -197,7 +197,7 @@ function parseArguments() {
     console.error(
       "Usage: tsx scripts/apply-block.ts <block-name> <target-project-path>"
     );
-    console.error("Example: tsx scripts/apply-block.ts ai apps/my-app");
+    console.error("Example: tsx scripts/apply-block.ts ai templates/my-app");
     process.exit(1);
   }
 
