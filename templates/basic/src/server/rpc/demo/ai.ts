@@ -18,10 +18,12 @@ for (const envVar of REQUIRED_ENV_VARS) {
   }
 }
 
-const openai = new OpenAI({
-  baseURL: process.env.OPENAI_BASE_URL,
-  apiKey: process.env.OPENAI_API_KEY,
-});
+function getOpenAIClient() {
+  return new OpenAI({
+    baseURL: process.env.OPENAI_BASE_URL,
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+}
 
 const DEFAULT_MODEL = process.env.OPENAI_DEFAULT_MODEL;
 
@@ -42,6 +44,8 @@ const complete = os
     if (!DEFAULT_MODEL) {
       throw new Error("OPENAI_DEFAULT_MODEL is not set");
     }
+
+    const openai = getOpenAIClient();
 
     const completion = await openai.chat.completions.create({
       model: DEFAULT_MODEL,
@@ -77,6 +81,8 @@ const generate = os
     if (!DEFAULT_MODEL) {
       throw new Error("OPENAI_DEFAULT_MODEL is not set");
     }
+
+    const openai = getOpenAIClient();
 
     const completion = await openai.chat.completions.parse({
       model: DEFAULT_MODEL,
