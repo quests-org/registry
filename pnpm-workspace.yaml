@@ -1,6 +1,7 @@
 packages:
   - "templates/*"
   - "blocks/*"
+  - "tools/*"
 sharedWorkspaceLockfile: false
 onlyBuiltDependencies:
   - esbuild
