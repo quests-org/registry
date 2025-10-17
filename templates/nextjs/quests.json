@@ -1,8 +1,7 @@
 {
-  "name": "Next.js Starter",
+  "name": "Next.js",
   "description": "Get started with Next.js",
   "icon": {
-    "lucide": "box",
-    "background": "conic-gradient(from 42deg at 50% 50%, #18181b, #27272a)"
+    "lucide": "package"
   }
 }

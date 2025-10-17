@@ -2,3 +2,6 @@ packages:
   - "templates/*"
   - "blocks/*"
 sharedWorkspaceLockfile: false
+onlyBuiltDependencies:
+  - esbuild
+  - '@tailwindcss/oxide'
