@@ -33,6 +33,9 @@ const config: KnipConfig = {
     "templates/angular": {
       entry: [...DEFAULT_ENTRY, "src/app/app.css", "src/styles.css"],
     },
+    "templates/htmx": {
+      entry: [...DEFAULT_ENTRY, "public/htmx.min.js", "public/styles.css"],
+    },
   },
   ignore: ["blocks/**"],
   ignoreDependencies: [
