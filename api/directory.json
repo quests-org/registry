@@ -1,0 +1,36 @@
+{
+  "apps": [
+    {
+      "path": "templates/micro-chatbot"
+    },
+    {
+      "path": "templates/chat-with-files"
+    },
+    {
+      "path": "templates/prompt-library"
+    },
+    {
+      "path": "templates/typing-test"
+    },
+    {
+      "path": "templates/ai-chess"
+    }
+  ],
+  "templates": [
+    {
+      "path": "templates/basic"
+    },
+    {
+      "path": "templates/nextjs"
+    },
+    {
+      "path": "templates/nuxt"
+    },
+    {
+      "path": "templates/shadcn"
+    },
+    {
+      "path": "templates/svelte-kit"
+    }
+  ]
+}
