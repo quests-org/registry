@@ -36,6 +36,9 @@
       "path": "templates/solid"
     },
     {
+      "path": "templates/htmx"
+    },
+    {
       "path": "templates/shadcn"
     },
     {
