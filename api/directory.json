@@ -18,19 +18,28 @@
   ],
   "templates": [
     {
-      "path": "templates/basic"
-    },
-    {
       "path": "templates/nextjs"
     },
     {
       "path": "templates/nuxt"
     },
     {
+      "path": "templates/svelte-kit"
+    },
+    {
+      "path": "templates/astro"
+    },
+    {
+      "path": "templates/angular"
+    },
+    {
+      "path": "templates/solid"
+    },
+    {
       "path": "templates/shadcn"
     },
     {
-      "path": "templates/svelte-kit"
+      "path": "templates/basic"
     }
   ]
 }

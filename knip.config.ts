@@ -11,6 +11,12 @@ const DEFAULT_ENTRY = [
   "src/app/layout.tsx",
   "src/client/components/demo/*.tsx",
   "src/lib/index.ts",
+  "src/app.css",
+  "src/app.tsx",
+  "app.config.ts",
+  "src/entry-client.tsx",
+  "src/entry-server.tsx",
+  "src/routes/*",
 ];
 
 const config: KnipConfig = {
@@ -24,6 +30,9 @@ const config: KnipConfig = {
     "templates/nuxt": {
       entry: [...DEFAULT_ENTRY, "app/app.vue"],
     },
+    "templates/angular": {
+      entry: [...DEFAULT_ENTRY, "src/app/app.css", "src/styles.css"],
+    },
   },
   ignore: ["blocks/**"],
   ignoreDependencies: [
@@ -32,6 +41,9 @@ const config: KnipConfig = {
     "postcss",
     "vue",
     "vue-router",
+    "@angular/forms",
+    "@solidjs/meta",
+    "@solidjs/router",
   ],
   compilers: {
     css: (text: string) =>

@@ -1,0 +1,7 @@
+{
+  "name": "Astro",
+  "description": "Get started with Astro",
+  "icon": {
+    "lucide": "package"
+  }
+}
