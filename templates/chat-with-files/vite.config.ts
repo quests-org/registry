@@ -2,15 +2,14 @@ import devServer, { defaultOptions } from "@hono/vite-dev-server";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
-import tsconfigPaths from "vite-tsconfig-paths";
 import { config } from "dotenv";
+import path from "path";
 
 config();
 
 export default defineConfig(() => {
   return {
     plugins: [
-      tsconfigPaths(),
       react(),
       tailwindcss(),
       devServer({
@@ -20,5 +19,10 @@ export default defineConfig(() => {
         entry: "./src/server/index.ts",
       }),
     ],
+    resolve: {
+      alias: {
+        "@": path.resolve(__dirname, "./src"),
+      },
+    },
   };
 });
