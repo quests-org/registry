@@ -1,3 +1,5 @@
+### Quests .gitignore ###
+
 # Logs
 logs
 *.log
@@ -42,6 +44,8 @@ etilqs_*
 
 # TypeScript cache
 *.tsbuildinfo
+
+### End of Quests .gitignore ###
 
 # Angular
 # See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.

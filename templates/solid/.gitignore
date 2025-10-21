@@ -1,3 +1,5 @@
+### Quests .gitignore ###
+
 # Logs
 logs
 *.log
@@ -42,6 +44,8 @@ etilqs_*
 
 # TypeScript cache
 *.tsbuildinfo
+
+### End of Quests .gitignore ###
 
 # Solid
 dist

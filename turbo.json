@@ -28,6 +28,7 @@
       "persistent": true
     },
     "//#syncpack:lint": {},
-    "//#knip": {}
+    "//#knip": {},
+    "//#check-gitignore": {}
   }
 }
