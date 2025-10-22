@@ -29,6 +29,8 @@
     },
     "//#syncpack:lint": {},
     "//#knip": {},
-    "//#check-gitignore": {}
+    "//#check-gitignore": {},
+    "//#cspell": {},
+    "//#cspell:unused": {}
   }
 }

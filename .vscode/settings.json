@@ -1,15 +1,3 @@
 {
-  "eslint.workingDirectories": [
-    {
-      "mode": "auto"
-    }
-  ],
-  "cSpell.words": [
-    "Flexbox",
-    "jscodeshift",
-    "jsonrepair",
-    "orpc",
-    "Parseable",
-    "syncpack"
-  ]
+  "eslint.workingDirectories": [ { "mode": "auto" } ],
 }
