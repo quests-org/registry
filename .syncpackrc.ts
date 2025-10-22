@@ -12,5 +12,9 @@ export default {
       dependencies: ["@types/node"],
       pinVersion: "^22",
     },
+    {
+      dependencies: ["lucide-react"],
+      pinVersion: "^0.546.0",
+    },
   ],
 } satisfies import("syncpack").RcFile;
