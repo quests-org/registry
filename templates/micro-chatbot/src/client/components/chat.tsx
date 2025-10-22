@@ -82,7 +82,7 @@ const Chat = () => {
     }
   }, [model]);
 
-  const { messages, sendMessage, status, setMessages } = useChat({
+  const { messages, sendMessage, status, setMessages, stop } = useChat({
     transport: {
       async sendMessages(options) {
         return eventIteratorToStream(
@@ -320,7 +320,11 @@ const Chat = () => {
                 </Popover>
               )}
             </PromptInputTools>
-            <PromptInputSubmit disabled={!input} status={status} />
+            <PromptInputSubmit
+              disabled={!input && status !== "streaming"}
+              status={status}
+              onStop={stop}
+            />
           </PromptInputToolbar>
         </PromptInput>
       </div>
