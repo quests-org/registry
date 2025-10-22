@@ -185,7 +185,7 @@ function createPrompt(instructions: string, input: string) {
 
   return `## Context
 
-Use the following instructions to transoform the user input. Do not include any other text in your response, just the transformed input.
+Use the following instructions to transform the user input. Do not include any other text in your response, just the transformed input.
 
 ## Instructions
 
