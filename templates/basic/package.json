@@ -12,6 +12,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@hono/node-server": "^1.19.6",
     "@orpc/client": "^1.8.8",
     "@orpc/server": "^1.8.8",
     "@orpc/tanstack-query": "^1.8.8",
