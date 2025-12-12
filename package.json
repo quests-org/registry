@@ -39,7 +39,7 @@
     "@cspell/dict-node": "^5.0.8",
     "@cspell/dict-npm": "^5.2.19",
     "@cspell/dict-typescript": "^3.2.3",
-    "@types/node": "^22",
+    "@types/node": "22.19.2",
     "cspell": "^9.2.2",
     "cspell-check-unused-words": "^1.5.4",
     "ignore": "^7.0.5",
@@ -52,7 +52,7 @@
   },
   "packageManager": "pnpm@10.11.0",
   "engines": {
-    "node": "22"
+    "node": ">=22.21.1"
   },
   "publishConfig": {
     "provenance": true

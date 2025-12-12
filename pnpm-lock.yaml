@@ -27,8 +27,8 @@ importers:
         specifier: ^3.2.3
         version: 3.2.3
       '@types/node':
-        specifier: ^22
-        version: 22.17.2
+        specifier: 22.19.2
+        version: 22.19.2
       cspell:
         specifier: ^9.2.2
         version: 9.2.2
@@ -43,7 +43,7 @@ importers:
         version: 17.3.0
       knip:
         specifier: ^5.63.0
-        version: 5.63.0(@types/node@22.17.2)(typescript@5.9.2)
+        version: 5.63.0(@types/node@22.19.2)(typescript@5.9.2)
       syncpack:
         specifier: 14.0.0-alpha.19
         version: 14.0.0-alpha.19
@@ -790,8 +790,8 @@ packages:
   '@tybys/wasm-util@0.10.0':
     resolution: {integrity: sha512-VyyPYFlOMNylG45GoAe0xDoLwWuowvf92F9kySqzYh8vmYm7D2u4iUJKa1tOUpS70Ku13ASrOkS4ScXFsTaCNQ==}
 
-  '@types/node@22.17.2':
-    resolution: {integrity: sha512-gL6z5N9Jm9mhY+U2KXZpteb+09zyffliRkZyZOHODGATyC5B1Jt/7TzuuiLkFsSUMLbS1OLmlj/E+/3KF4Q/4w==}
+  '@types/node@22.19.2':
+    resolution: {integrity: sha512-LPM2G3Syo1GLzXLGJAKdqoU35XvrWzGJ21/7sgZTUpbkBaOasTj8tjwn6w+hCkqaa1TfJ/w67rJSwYItlJ2mYw==}
 
   argparse@2.0.1:
     resolution: {integrity: sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==}
@@ -2168,7 +2168,7 @@ snapshots:
       tslib: 2.8.1
     optional: true
 
-  '@types/node@22.17.2':
+  '@types/node@22.19.2':
     dependencies:
       undici-types: 6.21.0
 
@@ -2590,10 +2590,10 @@ snapshots:
 
   kind-of@6.0.3: {}
 
-  knip@5.63.0(@types/node@22.17.2)(typescript@5.9.2):
+  knip@5.63.0(@types/node@22.19.2)(typescript@5.9.2):
     dependencies:
       '@nodelib/fs.walk': 1.2.8
-      '@types/node': 22.17.2
+      '@types/node': 22.19.2
       fast-glob: 3.3.3
       formatly: 0.3.0
       jiti: 2.5.1
