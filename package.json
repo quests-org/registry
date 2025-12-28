@@ -46,7 +46,7 @@
     "jscodeshift": "^17.3.0",
     "knip": "^5.63.0",
     "syncpack": "14.0.0-alpha.19",
-    "tsx": "^4.20.4",
+    "tsx": "^4.21.0",
     "turbo": "^2.5.8",
     "typescript": "^5"
   },

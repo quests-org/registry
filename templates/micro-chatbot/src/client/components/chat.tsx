@@ -54,27 +54,21 @@ type Body = {
   model: string;
 };
 
-const Chat = () => {
+type Model = {
+  name: string;
+  value: string;
+};
+
+const ChatInner = ({ models }: { models: Model[] }) => {
   const [input, setInput] = useState("");
-  const [model, setModel] = useState<string>("");
   const [open, setOpen] = useState(false);
 
-  const {
-    data: models = [],
-    isLoading: isLoadingModels,
-    error: modelsError,
-  } = useQuery(queryClient.ai.models.queryOptions());
-
-  useEffect(() => {
-    if (models.length > 0 && !model) {
-      const savedModel = localStorage.getItem("ai-chat-selected-model");
-      if (savedModel && models.some((m) => m.value === savedModel)) {
-        setModel(savedModel);
-      } else {
-        setModel(models[0].value);
-      }
-    }
-  }, [models, model]);
+  const [model, setModel] = useState<string>(() => {
+    const savedModel = localStorage.getItem("ai-chat-selected-model");
+    return savedModel && models.some((m) => m.value === savedModel)
+      ? savedModel
+      : models[0].value;
+  });
 
   useEffect(() => {
     if (model) {
@@ -265,60 +259,58 @@ const Chat = () => {
           />
           <PromptInputToolbar>
             <PromptInputTools>
-              {!isLoadingModels && !modelsError && models.length > 0 && (
-                <Popover open={open} onOpenChange={setOpen}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      aria-expanded={open}
-                      className="justify-between text-left font-normal"
-                    >
-                      <span>
-                        {model
-                          ? models.find((m) => m.value === model)?.name
-                          : "Select model..."}
-                      </span>
-                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Command>
-                      <CommandInput
-                        placeholder="Search models..."
-                        className="h-9"
-                      />
-                      <CommandList>
-                        <CommandEmpty>No model found.</CommandEmpty>
-                        <CommandGroup>
-                          {models.map((modelOption) => (
-                            <CommandItem
-                              key={modelOption.value}
-                              value={modelOption.value}
-                              onSelect={(currentValue) => {
-                                setModel(
-                                  currentValue === model ? "" : currentValue
-                                );
-                                setOpen(false);
-                              }}
-                            >
-                              {modelOption.name}
-                              <Check
-                                className={cn(
-                                  "ml-auto",
-                                  model === modelOption.value
-                                    ? "opacity-100"
-                                    : "opacity-0"
-                                )}
-                              />
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-              )}
+              <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={open}
+                    className="justify-between text-left font-normal"
+                  >
+                    <span>
+                      {model
+                        ? models.find((m) => m.value === model)?.name
+                        : "Select model..."}
+                    </span>
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Command>
+                    <CommandInput
+                      placeholder="Search models..."
+                      className="h-9"
+                    />
+                    <CommandList>
+                      <CommandEmpty>No model found.</CommandEmpty>
+                      <CommandGroup>
+                        {models.map((modelOption) => (
+                          <CommandItem
+                            key={modelOption.value}
+                            value={modelOption.value}
+                            onSelect={(currentValue) => {
+                              setModel(
+                                currentValue === model ? "" : currentValue
+                              );
+                              setOpen(false);
+                            }}
+                          >
+                            {modelOption.name}
+                            <Check
+                              className={cn(
+                                "ml-auto",
+                                model === modelOption.value
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              )}
+                            />
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </PromptInputTools>
             <PromptInputSubmit
               disabled={!input && status !== "streaming"}
@@ -330,6 +322,37 @@ const Chat = () => {
       </div>
     </div>
   );
+};
+
+const Chat = () => {
+  const {
+    data: models = [],
+    isLoading: isLoadingModels,
+    error: modelsError,
+  } = useQuery(queryClient.ai.models.queryOptions());
+
+  if (isLoadingModels) {
+    return (
+      <div className="max-w-4xl mx-auto relative size-full h-screen flex items-center justify-center">
+        <Loader />
+      </div>
+    );
+  }
+
+  if (modelsError || models.length === 0) {
+    return (
+      <div className="max-w-4xl mx-auto relative size-full h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-lg text-red-500">Failed to load AI models</p>
+          <p className="text-sm text-zinc-500 mt-2">
+            Please check your configuration
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return <ChatInner models={models} />;
 };
 
 export default Chat;
