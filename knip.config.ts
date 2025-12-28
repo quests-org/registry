@@ -17,6 +17,7 @@ const DEFAULT_ENTRY = [
   "src/entry-client.tsx",
   "src/entry-server.tsx",
   "src/routes/*",
+  "scripts/*",
 ];
 
 const config: KnipConfig = {

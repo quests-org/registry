@@ -62,3 +62,9 @@ These files provide working examples for common functionality. Use them as templ
 1. Add to `src/server/rpc/index.ts` router
 2. Reference `demo/*` for patterns
 3. Use `create-kv.ts` for simple storage
+
+## Scripts
+
+- `tsx` is installed for running scripts, e.g. `tsx scripts/example.ts`.
+- Place scripts in the `scripts/` directory.
+- Use `output/` for output files.
