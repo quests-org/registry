@@ -1,8 +1,10 @@
 packages:
-  - "templates/*"
-  - "blocks/*"
-  - "tools/*"
+  - templates/*
+  - blocks/*
+  - tools/*
+
+allowBuilds:
+  esbuild: true
+  "@tailwindcss/oxide": true
+
 sharedWorkspaceLockfile: false
-onlyBuiltDependencies:
-  - esbuild
-  - '@tailwindcss/oxide'
