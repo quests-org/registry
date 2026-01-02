@@ -8,6 +8,7 @@ const app = new Hono();
 
 app.route("/rpc", rpcApp);
 app.use("/uploads/*", serveStatic({ root: "./" }));
+app.use("/output/*", serveStatic({ root: "./" }));
 app.get("/*", clientEntry);
 
 export default app;
