@@ -27,7 +27,7 @@ These dependencies are carefully configured and should NOT be changed:
 - Main React entry point: `./src/client/app.tsx`
 - File naming: Use lowercase, dash-case (kebab-case) for filenames (e.g. `component-name.tsx`)
 - Flexbox layouts: Avoid centering containers that constrain component width in `app.tsx`
-- Persistent Storage: The `.storage/` directory is ignored by git and can be used for persistent data.
+- Key-Value Storage: Use `unstorage` for persistent key-value data (see demo files). Data is stored in `.storage/` directory which is gitignored.
 - Static Assets: The `uploads/` and `output/` directories are served as static assets at `/uploads/*` and `/output/*` respectively.
 
 ## Demo Files - Reference Implementations
@@ -38,7 +38,7 @@ These files provide working examples for common functionality. Use them as templ
 
 ### Client Patterns
 
-- `src/client/components/demo/rpc.tsx` - RPC demo that uses uses `server/rpc/demo/storage.ts`
+- `src/client/components/demo/rpc.tsx` - RPC demo that uses `server/rpc/demo/storage.ts`
 - `src/client/components/demo/ai.tsx` - AI mutations using response data directly (no manual state)
 
 ### Server Patterns
