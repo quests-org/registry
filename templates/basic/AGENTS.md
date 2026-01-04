@@ -28,7 +28,6 @@ These dependencies are carefully configured and should NOT be changed:
 - File naming: Use lowercase, dash-case (kebab-case) for filenames (e.g. `component-name.tsx`)
 - Flexbox layouts: Avoid centering containers that constrain component width in `app.tsx`
 - Key-Value Storage: Use `unstorage` for persistent key-value data (see demo files). Data is stored in `.storage/` directory which is gitignored.
-- Static Assets: The `uploads/` and `output/` directories are served as static assets at `/uploads/*` and `/output/*` respectively.
 
 ## Demo Files - Reference Implementations
 
@@ -62,9 +61,3 @@ These files provide working examples for common functionality. Use them as templ
 1. Add to `src/server/rpc/index.ts` router
 2. Reference `demo/*` for patterns
 3. Use `create-kv.ts` for simple storage
-
-## Scripts
-
-- `tsx` is installed for running scripts, e.g. `tsx scripts/example.ts`.
-- Place scripts in the `scripts/` directory.
-- Use `output/` for output files.
