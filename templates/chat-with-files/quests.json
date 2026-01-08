@@ -1,8 +1,4 @@
 {
   "name": "Chat with Files",
-  "description": "Upload and chat with your files",
-  "icon": {
-    "lucide": "file-stack",
-    "background": "conic-gradient(from 42deg at 50% 50%, #ffd60a, #26cd41)"
-  }
+  "description": "Upload and chat with your files"
 }

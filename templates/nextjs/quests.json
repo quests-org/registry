@@ -1,7 +1,4 @@
 {
   "name": "Next.js",
-  "description": "Get started with Next.js",
-  "icon": {
-    "lucide": "package"
-  }
+  "description": "Get started with Next.js"
 }

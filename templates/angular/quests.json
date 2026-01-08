@@ -1,7 +1,4 @@
 {
   "name": "Angular",
-  "description": "Get started with Angular",
-  "icon": {
-    "lucide": "package"
-  }
+  "description": "Get started with Angular"
 }

@@ -1,7 +1,4 @@
 {
   "name": "HTMX",
-  "description": "Get started with HTMX",
-  "icon": {
-    "lucide": "package"
-  }
+  "description": "Get started with HTMX"
 }

@@ -1,7 +1,4 @@
 {
   "name": "Nuxt",
-  "description": "Get started with Nuxt",
-  "icon": {
-    "lucide": "package"
-  }
+  "description": "Get started with Nuxt"
 }

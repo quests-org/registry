@@ -1,7 +1,4 @@
 {
   "name": "shadcn/ui",
-  "description": "Quests starter template with shadcn/ui",
-  "icon": {
-    "lucide": "package"
-  }
+  "description": "Quests starter template with shadcn/ui"
 }

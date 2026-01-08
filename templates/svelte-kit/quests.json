@@ -1,7 +1,4 @@
 {
   "name": "SvelteKit",
-  "description": "Get started with SvelteKit",
-  "icon": {
-    "lucide": "package"
-  }
+  "description": "Get started with SvelteKit"
 }

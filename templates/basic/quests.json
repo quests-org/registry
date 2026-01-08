@@ -1,8 +1,4 @@
 {
   "name": "Quests Starter",
-  "description": "Base template for building full-stack apps",
-  "icon": {
-    "lucide": "quests",
-    "background": "conic-gradient(from 42deg at 50% 50%, #18181b, #27272a)"
-  }
+  "description": "Base template for building full-stack apps"
 }

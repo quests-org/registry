@@ -1,8 +1,4 @@
 {
   "name": "AI Chess",
-  "description": "Can you beat an LLM at chess?",
-  "icon": {
-    "lucide": "crown",
-    "background": "conic-gradient(from 42deg at 50% 50%, #32d74b, #00c7be)"
-  }
+  "description": "Can you beat an LLM at chess?"
 }
