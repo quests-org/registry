@@ -1,6 +1,6 @@
 # Agent Guidelines for Basic Template
 
-This is a foundational template for building React applications. Follow these guidelines to help users build apps effectively without breaking the established architecture.
+This is a foundational template for building interactive React applications.
 
 ## Template Architecture Overview
 
@@ -24,7 +24,7 @@ These dependencies are carefully configured and should NOT be changed:
 
 ## Important Reminders
 
-- Main React entry point: `./src/client/app.tsx`
+- Main React entry point: `src/client/app.tsx`
 - File naming: Use lowercase, dash-case (kebab-case) for filenames (e.g. `component-name.tsx`)
 - Flexbox layouts: Avoid centering containers that constrain component width in `app.tsx`
 - Key-Value Storage: Use `unstorage` for persistent key-value data (see demo files). Data is stored in `.storage/` directory which is gitignored.
