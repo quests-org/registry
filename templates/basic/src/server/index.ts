@@ -7,7 +7,7 @@ import { clientEntry } from "./routes/client-entry";
 const app = new Hono();
 
 app.route("/rpc", rpcApp);
-app.use("/uploads/*", serveStatic({ root: "./" }));
+app.use("/input/*", serveStatic({ root: "./" }));
 app.use("/output/*", serveStatic({ root: "./" }));
 app.get("/*", clientEntry);
 
