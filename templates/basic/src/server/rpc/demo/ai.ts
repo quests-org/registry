@@ -10,11 +10,13 @@ const REQUIRED_ENV_VARS = [
   "OPENAI_DEFAULT_MODEL",
 ] as const;
 
-for (const envVar of REQUIRED_ENV_VARS) {
-  if (!process.env[envVar]) {
-    console.warn(
-      `Warning: ${envVar} is not set. AI features will fail at runtime. If running outside of Quests, create a .env file with the required environment variables.`
-    );
+if (process.env.QUESTS_INSIDE_STUDIO !== "true") {
+  for (const envVar of REQUIRED_ENV_VARS) {
+    if (!process.env[envVar]) {
+      console.warn(
+        `Warning: ${envVar} is not set. AI features will fail at runtime. Create an .env file with the required environment variables.`,
+      );
+    }
   }
 }
 
