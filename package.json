@@ -19,6 +19,7 @@
     "typecheck": "turbo run check:types",
     "typecheck:all": "turbo run build --dry-run",
     "check": "turbo run lint check:types syncpack:lint knip check-gitignore cspell cspell:unused",
+    "fix:unused-words": "cspell-check-unused-words --fix",
     "build": "turbo run build",
     "dev": "turbo run dev",
     "create-app": "tsx scripts/create-app.ts",

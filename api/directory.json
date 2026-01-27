@@ -1,21 +1,5 @@
 {
-  "apps": [
-    {
-      "path": "templates/micro-chatbot"
-    },
-    {
-      "path": "templates/chat-with-files"
-    },
-    {
-      "path": "templates/prompt-library"
-    },
-    {
-      "path": "templates/typing-test"
-    },
-    {
-      "path": "templates/ai-chess"
-    }
-  ],
+  "apps": [],
   "templates": [
     {
       "path": "templates/nextjs"
