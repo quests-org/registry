@@ -1,66 +1,28 @@
-import OpenAI from "openai";
+import { createOpenAI } from "@ai-sdk/openai";
+import { generateText, Output } from "ai";
 import { os } from "@orpc/server";
 import { z } from "zod";
 
-import { zodResponseFormat } from "@/server/lib/openai";
-
-const REQUIRED_ENV_VARS = [
-  "OPENAI_BASE_URL",
-  "OPENAI_API_KEY",
-  "OPENAI_DEFAULT_MODEL",
-] as const;
-
-if (process.env.QUESTS_INSIDE_STUDIO !== "true") {
-  for (const envVar of REQUIRED_ENV_VARS) {
-    if (!process.env[envVar]) {
-      console.warn(
-        `Warning: ${envVar} is not set. AI features will fail at runtime. Create an .env file with the required environment variables.`,
-      );
-    }
-  }
-}
-
-function getOpenAIClient() {
-  return new OpenAI({
-    baseURL: process.env.OPENAI_BASE_URL,
-    apiKey: process.env.OPENAI_API_KEY,
-  });
-}
-
-const DEFAULT_MODEL = process.env.OPENAI_DEFAULT_MODEL;
-
-const ChatCompletionInputSchema = z.object({
-  message: z.string(),
-  systemPrompt: z.string().optional(),
-});
-
-const GeneratePersonInputSchema = z.object({
-  prompt: z.string(),
-});
+const MODEL = "gpt-5.2";
 
 const complete = os
-  .input(ChatCompletionInputSchema)
+  .input(
+    z.object({
+      message: z.string(),
+    }),
+  )
   .handler(async ({ input }) => {
-    const { message, systemPrompt } = input;
+    const { message } = input;
+    const openai = createOpenAI();
 
-    if (!DEFAULT_MODEL) {
-      throw new Error("OPENAI_DEFAULT_MODEL is not set");
-    }
-
-    const openai = getOpenAIClient();
-
-    const completion = await openai.chat.completions.create({
-      model: DEFAULT_MODEL,
-      messages: [
-        ...(systemPrompt
-          ? [{ role: "system" as const, content: systemPrompt }]
-          : []),
-        { role: "user" as const, content: message },
-      ],
+    const { text } = await generateText({
+      model: openai(MODEL),
+      system: "You are a helpful assistant.",
+      prompt: message,
     });
 
     return {
-      response: completion.choices[0]?.message?.content || "",
+      response: text,
     };
   });
 
@@ -78,32 +40,24 @@ const DemoSchema = z.object({
 });
 
 const generate = os
-  .input(GeneratePersonInputSchema)
+  .input(
+    z.object({
+      prompt: z.string(),
+    }),
+  )
   .handler(async ({ input }) => {
-    if (!DEFAULT_MODEL) {
-      throw new Error("OPENAI_DEFAULT_MODEL is not set");
-    }
+    const openai = createOpenAI();
 
-    const openai = getOpenAIClient();
-
-    const completion = await openai.chat.completions.parse({
-      model: DEFAULT_MODEL,
-      messages: [
-        {
-          role: "user",
-          content: `Generate a person based on this prompt: ${input.prompt}`,
-        },
-      ],
-      response_format: zodResponseFormat(DemoSchema, "person"),
+    const { output } = await generateText({
+      model: openai(MODEL),
+      output: Output.object({
+        schema: DemoSchema,
+      }),
+      prompt: `Generate a person based on this prompt: ${input.prompt}`,
     });
 
-    const person = completion.choices[0]?.message?.parsed;
-    if (!person) {
-      throw new Error("No parsed data received from OpenAI");
-    }
-
     return {
-      person,
+      person: output,
     };
   });
 

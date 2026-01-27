@@ -4,7 +4,6 @@ import { queryClient } from "@/client/rpc-client";
 
 export function AIDemo() {
   const [message, setMessage] = useState("");
-  const [systemPrompt, setSystemPrompt] = useState("");
   const [personPrompt, setPersonPrompt] = useState("");
 
   const {
@@ -30,12 +29,6 @@ export function AIDemo() {
         <div className="space-y-4">
           <input
             className="w-full p-3 border border-gray-300 rounded-md"
-            placeholder="System prompt (optional)"
-            value={systemPrompt}
-            onChange={(e) => setSystemPrompt(e.target.value)}
-          />
-          <input
-            className="w-full p-3 border border-gray-300 rounded-md"
             placeholder="Your message"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
@@ -44,10 +37,7 @@ export function AIDemo() {
             className="px-6 py-3 border border-gray-300 rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
             onClick={() => {
               if (message) {
-                complete({
-                  message,
-                  systemPrompt: systemPrompt || undefined,
-                });
+                complete({ message });
               }
             }}
             disabled={isCompleting || !message}
