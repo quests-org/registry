@@ -1,44 +1,58 @@
 import type { KnipConfig } from "knip";
 
-const DEFAULT_ENTRY = [
-  "src/server/index.ts",
-  "src/client/main.tsx",
-  "src/client/components/ui/*",
-  "src/client/components/ai-elements/*",
-  "src/client/components/*",
-  "src/client/lib/utils.ts",
-  "src/app/page.tsx",
-  "src/app/layout.tsx",
-  "src/client/components/demo/*.tsx",
-  "src/lib/index.ts",
-  "src/app.css",
-  "src/app.tsx",
-  "app.config.ts",
-  "src/entry-client.tsx",
-  "src/entry-server.tsx",
-  "src/routes/*",
-  "scripts/*",
-];
-
 const config: KnipConfig = {
   workspaces: {
-    "templates/*": {
-      entry: DEFAULT_ENTRY,
+    "templates/basic": {
+      entry: [
+        "src/server/index.ts",
+        "src/client/main.tsx",
+        "src/client/components/demo/*.tsx",
+      ],
     },
-    "tools/*": {
-      entry: DEFAULT_ENTRY,
+    "templates/shadcn": {
+      entry: [
+        "src/server/index.ts",
+        "src/client/main.tsx",
+        "src/client/components/ui/*",
+        "src/client/components/theme-provider.tsx",
+        "src/client/lib/utils.ts",
+      ],
+    },
+    "templates/solid": {
+      entry: [
+        "app.config.ts",
+        "src/app.tsx",
+        "src/entry-client.tsx",
+        "src/entry-server.tsx",
+        "src/routes/**/*.tsx",
+      ],
     },
     "templates/nuxt": {
-      entry: [...DEFAULT_ENTRY, "app/app.vue"],
+      entry: ["app/app.vue"],
     },
     "templates/angular": {
-      entry: [...DEFAULT_ENTRY, "src/app/app.css", "src/styles.css"],
+      entry: ["src/app/app.css", "src/styles.css"],
     },
     "templates/htmx": {
-      entry: [...DEFAULT_ENTRY, "public/htmx.min.js", "public/styles.css"],
+      entry: ["public/htmx.min.js", "public/styles.css", "public/index.html"],
+    },
+    "templates/svelte-kit": {
+      entry: ["src/lib/index.ts", "src/app.css"],
+    },
+    "templates/nextjs": {
+      entry: ["src/app/**/*.tsx"],
+    },
+    "templates/astro": {
+      entry: ["src/**/*.astro"],
+    },
+    "tools/hero-images": {
+      entry: [
+        "src/server/index.ts",
+        "src/client/main.tsx",
+        "src/client/components/*",
+      ],
     },
   },
-  ignore: ["blocks/**"],
   ignoreDependencies: [
     "jscodeshift",
     "eslint-config-next",
@@ -46,8 +60,6 @@ const config: KnipConfig = {
     "vue",
     "vue-router",
     "@angular/forms",
-    "@solidjs/meta",
-    "@solidjs/router",
   ],
   compilers: {
     css: (text: string) =>
