@@ -13,7 +13,10 @@ const complete = os
   )
   .handler(async ({ input }) => {
     const { message } = input;
-    const openai = createOpenAI();
+    const openai = createOpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+      baseURL: process.env.OPENAI_BASE_URL,
+    });
 
     const { text } = await generateText({
       model: openai(MODEL),
