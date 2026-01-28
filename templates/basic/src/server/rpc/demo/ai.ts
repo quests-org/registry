@@ -1,9 +1,9 @@
-import { createOpenAI } from "@ai-sdk/openai";
+import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { generateText, Output } from "ai";
 import { os } from "@orpc/server";
 import { z } from "zod";
 
-const MODEL = "gpt-5.2"; // Just a placeholder, use a known good model
+const MODEL = "openrouter/auto";
 
 const complete = os
   .input(
@@ -13,13 +13,12 @@ const complete = os
   )
   .handler(async ({ input }) => {
     const { message } = input;
-    const openai = createOpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-      baseURL: process.env.OPENAI_BASE_URL,
+    const openrouter = createOpenRouter({
+      apiKey: process.env.OPENROUTER_API_KEY,
     });
 
     const { text } = await generateText({
-      model: openai(MODEL),
+      model: openrouter(MODEL),
       system: "You are a helpful assistant.",
       prompt: message,
     });
@@ -49,10 +48,12 @@ const generate = os
     }),
   )
   .handler(async ({ input }) => {
-    const openai = createOpenAI();
+    const openrouter = createOpenRouter({
+      apiKey: process.env.OPENROUTER_API_KEY,
+    });
 
     const { output } = await generateText({
-      model: openai(MODEL),
+      model: openrouter(MODEL),
       output: Output.object({
         schema: DemoSchema,
       }),

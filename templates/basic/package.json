@@ -12,8 +12,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^3.0.20",
     "@hono/node-server": "^1.19.6",
+    "@openrouter/ai-sdk-provider": "^2.1.1",
     "@orpc/client": "^1.8.8",
     "@orpc/server": "^1.8.8",
     "@orpc/tanstack-query": "^1.8.8",
