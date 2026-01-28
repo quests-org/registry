@@ -3,7 +3,7 @@ import { generateText, Output } from "ai";
 import { os } from "@orpc/server";
 import { z } from "zod";
 
-const MODEL = "gpt-5.2";
+const MODEL = "gpt-5.2"; // Just a placeholder, use a known good model
 
 const complete = os
   .input(
