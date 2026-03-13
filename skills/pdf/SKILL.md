@@ -1,6 +1,6 @@
 ---
 name: pdf
-description: "Work with PDF files. Use whenever the user wants to do anything with a PDF: extracting text content, finding hyperlinks, pulling embedded images, reading document metadata such as author, title, and creation date, creating new PDFs, modifying existing PDFs, or merging multiple PDFs together. Activate whenever the user mentions a .pdf file or asks to read, parse, inspect, create, modify, or merge one."
+description: "Work with PDF files. Use whenever the user wants to do anything with a PDF: extracting text content, finding hyperlinks, pulling embedded images, reading document metadata such as author, title, and creation date, rendering pages as images, creating new PDFs, modifying existing PDFs, or merging multiple PDFs together. Activate whenever the user mentions a .pdf file or asks to read, parse, inspect, render, create, modify, or merge one."
 ---
 
 # PDF
@@ -50,6 +50,19 @@ tsx .agents/skills/pdf/scripts/extract-images.ts <path> [--page <number>] [--out
 - `--page` page number to extract from (default: all pages)
 - `--output` directory to save images (default: `<pdf-name>-images/`)
 - Saves each image as a PNG file named `image-1.png`, `image-2.png`, etc.
+
+### `render-pages.ts` — Render PDF pages as images
+
+Use when you need a visual representation of PDF pages as PNG files.
+
+```bash
+tsx .agents/skills/pdf/scripts/render-pages.ts <path> [--page <number>] [--scale <number>] [--output <dir>]
+```
+
+- `--page` page number to render (default: all pages)
+- `--scale` render scale factor (default: `1.0`; use `2` for higher resolution)
+- `--output` directory to save images (default: `<pdf-name>-pages/`)
+- Saves each page as a PNG file named `page-01.png`, `page-02.png`, etc.
 
 ## Creating and Modifying PDFs
 

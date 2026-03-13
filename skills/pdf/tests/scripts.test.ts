@@ -8,6 +8,7 @@ import { getPdfMeta } from "../scripts/get-meta";
 import { createPdf } from "../scripts/create-pdf";
 import { modifyPdf } from "../scripts/modify-pdf";
 import { mergePdfs } from "../scripts/merge-pdfs";
+import { renderPdfPages } from "../scripts/render-pages";
 
 const FIXTURES_DIR = path.join(import.meta.dirname, "fixtures");
 const samplePdf = path.join(FIXTURES_DIR, "sample.pdf");
@@ -119,6 +120,22 @@ describe("modifyPdf", () => {
 
     const { text } = await extractPdfText({ inputPath: outputPath });
     expect(text).toContain("Appended content");
+  });
+});
+
+describe("renderPdfPages", () => {
+  it("renders all pages by default", async () => {
+    const { numPages, results } = await renderPdfPages({ inputPath: samplePdf });
+    expect(numPages).toBeGreaterThanOrEqual(1);
+    expect(results).toHaveLength(numPages);
+    expect(results[0].buffer).toBeInstanceOf(ArrayBuffer);
+  });
+
+  it("renders a single page when specified", async () => {
+    const { results } = await renderPdfPages({ inputPath: samplePdf, page: 1 });
+    expect(results).toHaveLength(1);
+    expect(results[0].page).toBe(1);
+    expect(results[0].buffer).toBeInstanceOf(ArrayBuffer);
   });
 });
 
