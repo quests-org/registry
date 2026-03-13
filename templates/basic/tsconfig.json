@@ -20,5 +20,5 @@
     "strict": true,
     "target": "ES2022"
   },
-  "include": ["**/*.ts", "src"]
+  "include": ["**/*.ts", "src", ".agents/**/*.ts"]
 }
