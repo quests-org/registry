@@ -1,105 +1,52 @@
 ---
 name: pdf
-description: "Work with PDF files. Use when reading, extracting, or converting PDF content — including converting PDFs to Markdown, extracting text, or processing PDF documents programmatically."
+description: "Work with PDF files. Use whenever the user wants to do anything with a PDF: extracting text content, finding hyperlinks, pulling embedded images, or reading document metadata such as author, title, and creation date. Activate whenever the user mentions a .pdf file or asks to read, parse, or inspect one."
 ---
 
 # PDF
 
-Capabilities for working with PDF files.
+Use the scripts in `.agents/skills/pdf/scripts/` to work with PDF files. Install dependencies with `pnpm add unpdf sharp @napi-rs/canvas` if needed.
 
-## PDF to Markdown
+## Scripts
 
-Convert PDF files to Markdown format.
+### `extract-text.ts` — Extract all text from a PDF
 
-## Important: Use the Provided Script
+Use when you need the full text content of a PDF, e.g. to summarize, search, or process its content.
 
-This skill includes a **ready-to-use, tested conversion script** at `.agents/skills/pdf/scripts/pdf-to-markdown/cli.ts`.
-
-**Do not build your own PDF parsing implementation.** Use this script instead. It handles edge cases, error handling, and proper PDF parsing that you should not recreate from scratch.
-
-## Quick Start - Use This First
-
-1. **Install dependencies:**
-
-   ```bash
-   pnpm add pdf-parse
-   ```
-
-2. **Run the provided script on your PDF:**
-
-   ```bash
-   # Basic conversion
-   tsx .agents/skills/pdf/scripts/pdf-to-markdown/cli.ts --file ./document.pdf
-
-   # Custom output path
-   tsx .agents/skills/pdf/scripts/pdf-to-markdown/cli.ts \
-     --file ./doc.pdf \
-     --output ./output/doc.md
-   ```
-
-3. **For batch conversion,** edit `.agents/skills/pdf/scripts/pdf-to-markdown/cli.ts` directly to add multi-file support. Do not create a new script.
-
-## Understanding the Implementation
-
-The provided script includes:
-
-- **CLI entry point:** `.agents/skills/pdf/scripts/pdf-to-markdown/cli.ts` - argument parsing and orchestration
-- **Core logic:** `.agents/skills/pdf/scripts/pdf-to-markdown/convert.ts` - PDF parsing using `pdf-parse`'s `PDFParse` class
-
-If you need custom behavior (e.g., different output formatting), examine and adapt the `textToMarkdown()` function in `convert.ts` rather than reimplementing the entire PDF parsing pipeline.
-
-## CLI Options
-
-| Option            | Required | Description                                      |
-| ----------------- | -------- | ------------------------------------------------ |
-| `--file <path>`   | Yes      | Input PDF file                                   |
-| `--output <path>` | No       | Output Markdown path (default: input name + .md) |
-| `--help`          | No       | Show usage information                           |
-
-## Output Format (JSON)
-
-The script outputs a JSON result on completion:
-
-```json
-{
-  "success": true,
-  "input": "/path/to/input.pdf",
-  "output": "/path/to/output.md",
-  "wordCount": 1523,
-  "pages": 5,
-  "warnings": ["Tables may not be accurately converted"]
-}
+```bash
+tsx .agents/skills/pdf/scripts/extract-text.ts <path> [--output <path>] [--no-merge]
 ```
 
-**Always check the `success` field** to determine if conversion worked.
+- Merges all pages into a single string by default
+- `--no-merge` returns text per page, separated by `---`
+- `--output` writes to a file instead of stdout
 
-## Batch Converting Multiple PDFs
+### `extract-links.ts` — Extract all URLs from a PDF
 
-Edit `.agents/skills/pdf/scripts/pdf-to-markdown/cli.ts` directly to add support for a `--dir` flag or multiple `--file` arguments. **Do not create a new script.** The existing script is the right place to add this logic.
+Use when you need to find hyperlinks embedded in a PDF.
 
-## Supported Elements
+```bash
+tsx .agents/skills/pdf/scripts/extract-links.ts <path>
+```
 
-- Text extraction from digital PDFs
-- Headings (detected by font size heuristics)
-- Paragraphs
-- Basic lists
-- Links (when embedded in PDF)
+### `get-meta.ts` — Get PDF metadata
 
-## Known Limitations
+Use when you need author, title, creation date, or other document properties.
 
-- **Tables**: Very limited support; may not render correctly
-- **Multi-column layouts**: Text may interleave between columns
-- **Scanned PDFs**: NOT supported (requires OCR - see alternatives below)
-- **Images**: NOT extracted (PDF images are not included in output)
-- **Complex formatting**: May be simplified or lost
-- **Password-protected PDFs**: NOT supported
+```bash
+tsx .agents/skills/pdf/scripts/get-meta.ts <path> [--parse-dates]
+```
 
-## Customization
+- `--parse-dates` parses date strings into structured date objects
 
-If you need to modify how text is converted to Markdown:
+### `extract-images.ts` — Extract images from a PDF
 
-1. **Examine** `.agents/skills/pdf/scripts/pdf-to-markdown/convert.ts`
-2. **Adapt** the `textToMarkdown()` function to suit your needs
-3. **Copy** the modified version into your own script if needed
+Use when you need to save embedded images from a PDF. Extracts all pages by default.
 
-**Do not try to rewrite the PDFParse initialization or buffer handling** - use what's provided as-is.
+```bash
+tsx .agents/skills/pdf/scripts/extract-images.ts <path> [--page <number>] [--output <dir>]
+```
+
+- `--page` page number to extract from (default: all pages)
+- `--output` directory to save images (default: `<pdf-name>-images/`)
+- Saves each image as a PNG file named `image-1.png`, `image-2.png`, etc.

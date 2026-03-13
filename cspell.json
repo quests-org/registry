@@ -15,6 +15,7 @@
   ],
   "dictionaries": ["typescript", "node", "npm", "html", "css", "bash"],
   "words": [
+    "Acro",
     "agentic",
     "Cascadia",
     "cmdk",
@@ -39,6 +40,7 @@
     "openrouter",
     "optimise",
     "orpc",
+    "pdfs",
     "shadcn",
     "Shadcnui",
     "solidjs",
@@ -46,6 +48,7 @@
     "tokenx",
     "turbopack",
     "Turbopack",
+    "unpdf",
     "vaul",
     "vinxi",
     "Vinxi",

@@ -4,10 +4,8 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "pdf-parse": "^2.4.5"
-  },
-  "devDependencies": {
-    "vitest": "^3.2.4"
+    "sharp": "^0.34.5",
+    "unpdf": "^1.4.0"
   },
   "scripts": {
     "test": "vitest run"
