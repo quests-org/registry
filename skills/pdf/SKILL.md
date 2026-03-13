@@ -1,11 +1,11 @@
 ---
 name: pdf
-description: "Work with PDF files. Use whenever the user wants to do anything with a PDF: extracting text content, finding hyperlinks, pulling embedded images, or reading document metadata such as author, title, and creation date. Activate whenever the user mentions a .pdf file or asks to read, parse, or inspect one."
+description: "Work with PDF files. Use whenever the user wants to do anything with a PDF: extracting text content, finding hyperlinks, pulling embedded images, reading document metadata such as author, title, and creation date, creating new PDFs, modifying existing PDFs, or merging multiple PDFs together. Activate whenever the user mentions a .pdf file or asks to read, parse, inspect, create, modify, or merge one."
 ---
 
 # PDF
 
-Use the scripts in `.agents/skills/pdf/scripts/` to work with PDF files. Install dependencies with `pnpm add unpdf sharp @napi-rs/canvas` if needed.
+Use the scripts in `.agents/skills/pdf/scripts/` to work with PDF files.
 
 ## Scripts
 
@@ -50,3 +50,41 @@ tsx .agents/skills/pdf/scripts/extract-images.ts <path> [--page <number>] [--out
 - `--page` page number to extract from (default: all pages)
 - `--output` directory to save images (default: `<pdf-name>-images/`)
 - Saves each image as a PNG file named `image-1.png`, `image-2.png`, etc.
+
+## Creating and Modifying PDFs
+
+### `create-pdf.ts` — Create a new PDF from scratch
+
+Use when you need to generate a new PDF with a title and text content.
+
+```bash
+tsx .agents/skills/pdf/scripts/create-pdf.ts <content> --title <title> --output <path>
+```
+
+- `--title` document title (shown as heading and set as PDF metadata)
+- `--output` path to write the output PDF (required)
+- Multi-line content is supported; new pages are added automatically when content overflows
+
+### `modify-pdf.ts` — Modify an existing PDF
+
+Use when you need to add a watermark to all pages or append a new page with text.
+
+```bash
+tsx .agents/skills/pdf/scripts/modify-pdf.ts <input> --output <path> [--watermark <text>] [--append-text <text>]
+```
+
+- `--output` path to write the modified PDF (required)
+- `--watermark` adds diagonal semi-transparent watermark text to every page
+- `--append-text` appends a new page with the given text content
+
+### `merge-pdfs.ts` — Merge multiple PDFs into one
+
+Use when you need to combine several PDF files into a single document.
+
+```bash
+tsx .agents/skills/pdf/scripts/merge-pdfs.ts <input1> <input2> [...inputs] --output <path>
+```
+
+- Accepts two or more input PDF paths
+- `--output` path to write the merged PDF (required)
+- Pages are appended in the order the inputs are provided
