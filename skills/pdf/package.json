@@ -1,0 +1,15 @@
+{
+  "name": "@quests/pdf-skill",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "pdf-parse": "^2.4.5"
+  },
+  "devDependencies": {
+    "vitest": "^3.2.4"
+  },
+  "scripts": {
+    "test": "vitest run"
+  }
+}

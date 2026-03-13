@@ -2,6 +2,9 @@ import type { KnipConfig } from "knip";
 
 const config: KnipConfig = {
   workspaces: {
+    "skills/*": {
+      entry: ["scripts/**/*.ts"],
+    },
     "templates/basic": {
       entry: [
         "src/server/index.ts",
@@ -26,9 +29,6 @@ const config: KnipConfig = {
         "src/entry-server.tsx",
         "src/routes/**/*.tsx",
       ],
-    },
-    "templates/nuxt": {
-      entry: ["app/app.vue"],
     },
     "templates/angular": {
       entry: ["src/app/app.css", "src/styles.css"],

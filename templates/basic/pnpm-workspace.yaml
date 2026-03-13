@@ -1,4 +1,7 @@
+packages:
+  - .agents/skills/*
+
 configDependencies:
-  '@pnpm/plugin-trusted-deps': 0.2.0+sha512-jqiCC8kyrwOERwMWPo2RB1YlDMMS5WsPSA8Uwi3EXAYwyOSNtqKhrB9bs543JGUiz4yaA9h6nE3q98fG14AEyQ==
+  "@pnpm/plugin-trusted-deps": 0.2.0+sha512-jqiCC8kyrwOERwMWPo2RB1YlDMMS5WsPSA8Uwi3EXAYwyOSNtqKhrB9bs543JGUiz4yaA9h6nE3q98fG14AEyQ==
 dlxCacheMaxAge: 259200 # 180 days in minutes, extended for pnpm dlx jiti
 updateNotifier: false

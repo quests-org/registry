@@ -138,6 +138,9 @@ dist
 # turbo
 .turbo
 
+# pnpm
+.pnpm-store/
+
 # macOS
 .DS_Store
 

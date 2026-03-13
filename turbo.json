@@ -14,6 +14,9 @@
       "dependsOn": ["^build"],
       "outputs": []
     },
+    "test": {
+      "outputs": []
+    },
     "lint:fix": {
       "dependsOn": ["^build"],
       "outputs": [],
@@ -30,6 +33,7 @@
     "//#syncpack:lint": {},
     "//#knip": {},
     "//#check-gitignore": {},
+    "//#validate-skills": {},
     "//#cspell": {},
     "//#cspell:unused": {}
   }
