@@ -6,3 +6,12 @@ alwaysApply: true
 - NEVER add comments unless asked by the user.
 - Seriously, avoid comments unless EXPLICITLY asked by the user.
 - Don't add comments even if there are already comments in the code.
+
+## ⚠️ WARNING: PNPM Install in Sandbox Terminals
+
+**NEVER run `pnpm install` (or any `pnpm add`/`pnpm remove`) from within a sandbox terminal (i.e. Shell tool calls with sandboxing enabled).** Doing so causes a divergence between the sandbox's PNPM store and the main PNPM store, leaving the lockfile and node_modules in an inconsistent state.
+
+If a package installation is needed, either:
+
+1. Ask the user to run the install command themselves, OR
+2. Run the command using `required_permissions: ["all"]` to disable sandboxing
