@@ -13,7 +13,7 @@
   "type": "module",
   "files": [],
   "scripts": {
-    "check": "turbo run check:types test check:syncpack check:knip check:gitignore check:spelling check:unused-words check:skills check:format",
+    "check-and-test": "turbo run check:types test check:syncpack check:knip check:gitignore check:spelling check:unused-words check:skills check:format",
     "check:format": "prettier --check .",
     "check:gitignore": "tsx scripts/check-gitignore.ts",
     "check:knip": "knip",
