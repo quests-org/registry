@@ -21,13 +21,13 @@ export function createKV<T extends StorageValue>(name: string) {
   async function* subscribe() {
     let resolve: (value: { event: WatchEvent; key: string }) => void;
     let promise = new Promise<{ event: WatchEvent; key: string }>(
-      (r) => (resolve = r)
+      (r) => (resolve = r),
     );
 
     const unwatch = await storage.watch((event, key) => {
       resolve({ event, key });
       promise = new Promise<{ event: WatchEvent; key: string }>(
-        (r) => (resolve = r)
+        (r) => (resolve = r),
       );
     });
 

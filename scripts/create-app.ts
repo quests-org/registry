@@ -22,7 +22,7 @@ async function fileExists(filePath: AbsolutePath): Promise<boolean> {
 
 async function getIgnore(
   rootDir: AbsolutePath,
-  options?: { signal?: AbortSignal }
+  options?: { signal?: AbortSignal },
 ) {
   const gitIgnorePath = absolutePathJoin(rootDir, ".gitignore");
   const exists = await fileExists(gitIgnorePath);
@@ -53,21 +53,21 @@ export function copyTemplate({
           return relativePath === "" || !ignore.ignores(relativePath);
         },
         recursive: true,
-      })
+      }),
     )
     .then(() => true)
     .catch((error) => {
       throw new Error(
         `Failed to copy template: ${
           error instanceof Error ? error.message : String(error)
-        }`
+        }`,
       );
     });
 }
 
 async function updatePackageJson(
   appDir: AbsolutePath,
-  appName: string
+  appName: string,
 ): Promise<void> {
   const packageJsonPath = path.join(appDir, "package.json");
   try {
@@ -78,13 +78,13 @@ async function updatePackageJson(
 
     await fs.writeFile(
       packageJsonPath,
-      JSON.stringify(packageJson, null, 2) + "\n"
+      JSON.stringify(packageJson, null, 2) + "\n",
     );
   } catch (error) {
     console.warn(
       `Warning: Could not update package.json: ${
         error instanceof Error ? error.message : String(error)
-      }`
+      }`,
     );
   }
 }
@@ -124,10 +124,10 @@ async function main(): Promise<void> {
 
   if (!appName) {
     console.error(
-      "Usage: tsx scripts/create-app.ts <app-name> [--template <template-name>]"
+      "Usage: tsx scripts/create-app.ts <app-name> [--template <template-name>]",
     );
     console.error(
-      "Example: tsx scripts/create-app.ts my-new-app --template shadcn"
+      "Example: tsx scripts/create-app.ts my-new-app --template shadcn",
     );
     console.error("Available templates: basic, empty, shadcn");
     process.exit(1);
@@ -135,7 +135,7 @@ async function main(): Promise<void> {
 
   if (!/^[a-z0-9-]+$/.test(appName)) {
     console.error(
-      "App name must contain only lowercase letters, numbers, and hyphens"
+      "App name must contain only lowercase letters, numbers, and hyphens",
     );
     process.exit(1);
   }
@@ -144,15 +144,19 @@ async function main(): Promise<void> {
   const templateDir = path.join(
     projectRoot,
     "templates",
-    templateName
+    templateName,
   ) as AbsolutePath;
-  const targetDir = path.join(projectRoot, "templates", appName) as AbsolutePath;
+  const targetDir = path.join(
+    projectRoot,
+    "templates",
+    appName,
+  ) as AbsolutePath;
 
   try {
     await fs.access(templateDir);
   } catch {
     console.error(
-      `Template '${templateName}' not found in templates directory`
+      `Template '${templateName}' not found in templates directory`,
     );
     console.error("Available templates: basic, empty, shadcn");
     process.exit(1);
@@ -181,7 +185,7 @@ async function main(): Promise<void> {
     console.error(
       `❌ Failed to create app: ${
         error instanceof Error ? error.message : String(error)
-      }`
+      }`,
     );
 
     try {

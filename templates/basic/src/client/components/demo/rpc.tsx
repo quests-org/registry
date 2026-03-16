@@ -9,13 +9,13 @@ export function RPCDemo() {
   // Use .experimental_liveOptions() for real-time subscriptions
   // Use .queryOptions() for static data that doesn't need live updates
   const { data: items } = useQuery(
-    queryClient.demo.storage.live.list.experimental_liveOptions()
+    queryClient.demo.storage.live.list.experimental_liveOptions(),
   );
 
   // Mutations handle data changes with loading states
   // Automatically invalidates related queries on success
   const { mutate: createItem, isPending: isCreatingItem } = useMutation(
-    queryClient.demo.storage.create.mutationOptions()
+    queryClient.demo.storage.create.mutationOptions(),
   );
 
   return (

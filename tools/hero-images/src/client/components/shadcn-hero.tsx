@@ -6,7 +6,7 @@ import {
   SiHono,
   SiZod,
   SiOpenai,
-  SiShadcnui
+  SiShadcnui,
 } from "react-icons/si";
 import { FaCode, FaDatabase } from "react-icons/fa";
 
@@ -85,10 +85,14 @@ export function GettingStarted() {
         <div className="flex flex-wrap justify-center items-center gap-6 max-w-5xl mx-auto">
           {dependencies.map((dep, index) => (
             <div key={index} className="flex items-center gap-3">
-              <div className={`inline-flex items-center justify-center size-16 ${dep.bgColor} ${dep.color} rounded-xl`}>
+              <div
+                className={`inline-flex items-center justify-center size-16 ${dep.bgColor} ${dep.color} rounded-xl`}
+              >
                 <dep.icon className="size-8" />
               </div>
-              <span className="text-lg font-medium text-gray-700 dark:text-gray-300">{dep.name}</span>
+              <span className="text-lg font-medium text-gray-700 dark:text-gray-300">
+                {dep.name}
+              </span>
             </div>
           ))}
         </div>

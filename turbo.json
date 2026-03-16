@@ -35,6 +35,7 @@
     "//#check-gitignore": {},
     "//#validate-skills": {},
     "//#cspell": {},
-    "//#cspell:unused": {}
+    "//#cspell:unused": {},
+    "//#check:format": {}
   }
 }

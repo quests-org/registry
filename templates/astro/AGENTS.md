@@ -36,6 +36,7 @@ These dependencies are carefully configured and should NOT be changed:
 ### Component Structure
 
 Astro components use a unique syntax with three parts:
+
 1. **Frontmatter** (between `---`): JavaScript/TypeScript code
 2. **Template**: HTML-like syntax with JSX expressions
 3. **Styles**: Scoped CSS in `<style>` tags

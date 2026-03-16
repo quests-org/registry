@@ -17,9 +17,7 @@ htmx allows you to build modern user interfaces with the simplicity and power of
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.7/dist/htmx.min.js"></script>
-<button hx-post="/clicked" hx-swap="outerHTML">
-  Click Me
-</button>
+<button hx-post="/clicked" hx-swap="outerHTML">Click Me</button>
 ```
 
 This template provides a foundation for building HTMX applications with modern tooling and best practices.

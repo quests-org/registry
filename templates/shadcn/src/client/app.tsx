@@ -7,7 +7,7 @@ function App() {
       input: {
         name: "Quests",
       },
-    })
+    }),
   );
 
   return (

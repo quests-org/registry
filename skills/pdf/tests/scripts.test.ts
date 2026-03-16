@@ -125,7 +125,9 @@ describe("modifyPdf", () => {
 
 describe("renderPdfPages", () => {
   it("renders all pages by default", async () => {
-    const { numPages, results } = await renderPdfPages({ inputPath: samplePdf });
+    const { numPages, results } = await renderPdfPages({
+      inputPath: samplePdf,
+    });
     expect(numPages).toBeGreaterThanOrEqual(1);
     expect(results).toHaveLength(numPages);
     expect(results[0].buffer).toBeInstanceOf(ArrayBuffer);

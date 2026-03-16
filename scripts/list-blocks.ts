@@ -108,7 +108,7 @@ async function main(): Promise<void> {
         console.log("");
       } else {
         console.log(
-          `⚠️  ${block.name} (invalid block - missing or invalid package.json)`
+          `⚠️  ${block.name} (invalid block - missing or invalid package.json)`,
         );
         console.log("");
       }
@@ -117,22 +117,24 @@ async function main(): Promise<void> {
     console.log("📖 Usage:");
     console.log("   Apply any block:");
     console.log(
-      "   tsx scripts/apply-block.ts <block-name> <target-project-path>"
+      "   tsx scripts/apply-block.ts <block-name> <target-project-path>",
     );
     console.log("");
     console.log("   Examples:");
     console.log("   tsx scripts/apply-block.ts ai templates/my-app");
-    console.log("   tsx scripts/apply-block.ts ai templates/my-app --skip-existing");
+    console.log(
+      "   tsx scripts/apply-block.ts ai templates/my-app --skip-existing",
+    );
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") {
       console.log(
-        "❌ Blocks directory not found. Make sure you're in the project root."
+        "❌ Blocks directory not found. Make sure you're in the project root.",
       );
     } else {
       console.error(
         `❌ Error listing blocks: ${
           error instanceof Error ? error.message : String(error)
-        }`
+        }`,
       );
     }
     process.exit(1);

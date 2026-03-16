@@ -1,10 +1,10 @@
 #!/usr/bin/env tsx
 
-import { readFileSync, existsSync, readdirSync } from 'fs';
-import { join } from 'path';
+import { readFileSync, existsSync, readdirSync } from "fs";
+import { join } from "path";
 
-const TEMPLATES_DIR = join(process.cwd(), 'templates');
-const BASIC_GITIGNORE_PATH = join(TEMPLATES_DIR, 'basic', '.gitignore');
+const TEMPLATES_DIR = join(process.cwd(), "templates");
+const BASIC_GITIGNORE_PATH = join(TEMPLATES_DIR, "basic", ".gitignore");
 
 interface CheckResult {
   template: string;
@@ -18,11 +18,11 @@ function getRequiredGitignoreContent(): string {
     throw new Error(`Basic .gitignore not found at ${BASIC_GITIGNORE_PATH}`);
   }
 
-  return readFileSync(BASIC_GITIGNORE_PATH, 'utf-8');
+  return readFileSync(BASIC_GITIGNORE_PATH, "utf-8");
 }
 
 function checkTemplate(templateName: string): CheckResult {
-  const gitignorePath = join(TEMPLATES_DIR, templateName, '.gitignore');
+  const gitignorePath = join(TEMPLATES_DIR, templateName, ".gitignore");
   const hasGitignore = existsSync(gitignorePath);
 
   if (!hasGitignore) {
@@ -30,23 +30,23 @@ function checkTemplate(templateName: string): CheckResult {
       template: templateName,
       hasGitignore: false,
       hasRequiredContent: false,
-      missingLines: ['No .gitignore file found']
+      missingLines: ["No .gitignore file found"],
     };
   }
 
-  const templateContent = readFileSync(gitignorePath, 'utf-8');
+  const templateContent = readFileSync(gitignorePath, "utf-8");
   const requiredContent = getRequiredGitignoreContent();
 
   // Split into lines and normalize whitespace
   const requiredLines = requiredContent
-    .split('\n')
-    .map(line => line.trim())
-    .filter(line => line.length > 0);
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
 
   const templateLines = templateContent
-    .split('\n')
-    .map(line => line.trim())
-    .filter(line => line.length > 0);
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
 
   const missingLines: string[] = [];
 
@@ -60,18 +60,18 @@ function checkTemplate(templateName: string): CheckResult {
     template: templateName,
     hasGitignore: true,
     hasRequiredContent: missingLines.length === 0,
-    missingLines
+    missingLines,
   };
 }
 
 function main() {
-  console.log('🔍 Checking .gitignore files in all templates...\n');
+  console.log("🔍 Checking .gitignore files in all templates...\n");
 
   // Get all template directories (excluding empty template)
   const templates = readdirSync(TEMPLATES_DIR, { withFileTypes: true })
     .filter((dirent: any) => dirent.isDirectory())
     .map((dirent: any) => dirent.name)
-    .filter(name => name !== 'empty')
+    .filter((name) => name !== "empty")
     .sort();
 
   const results: CheckResult[] = [];
@@ -85,12 +85,14 @@ function main() {
     } else {
       console.log(`❌ ${template} - Missing required .gitignore content`);
       if (result.missingLines.length > 0) {
-        console.log(`   Missing lines: ${result.missingLines.slice(0, 3).join(', ')}${result.missingLines.length > 3 ? '...' : ''}`);
+        console.log(
+          `   Missing lines: ${result.missingLines.slice(0, 3).join(", ")}${result.missingLines.length > 3 ? "..." : ""}`,
+        );
       }
     }
   }
 
-  const passed = results.filter(r => r.hasRequiredContent).length;
+  const passed = results.filter((r) => r.hasRequiredContent).length;
   const failed = results.length - passed;
   const total = results.length;
   const percentage = Math.round((passed / total) * 100);

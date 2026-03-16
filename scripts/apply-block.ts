@@ -33,7 +33,7 @@ async function ensureDirectory(dirPath: AbsolutePath): Promise<void> {
 async function copyDirectory(
   sourceDir: AbsolutePath,
   targetDir: AbsolutePath,
-  options: { skipIfExists?: boolean } = {}
+  options: { skipIfExists?: boolean } = {},
 ): Promise<void> {
   const entries = await fs.readdir(sourceDir, { withFileTypes: true });
 
@@ -72,7 +72,7 @@ async function getBlockInfo(blockPath: AbsolutePath) {
     throw new Error(
       `Failed to read block package.json: ${
         error instanceof Error ? error.message : String(error)
-      }`
+      }`,
     );
   }
 }
@@ -80,7 +80,7 @@ async function getBlockInfo(blockPath: AbsolutePath) {
 async function addDependencies(
   targetProjectDir: AbsolutePath,
   dependencies: Record<string, string>,
-  type: "dependencies" | "devDependencies" = "dependencies"
+  type: "dependencies" | "devDependencies" = "dependencies",
 ): Promise<void> {
   const packageJsonPath = absolutePathJoin(targetProjectDir, "package.json");
 
@@ -109,14 +109,14 @@ async function addDependencies(
     packageJson[type] = targetDeps;
     await fs.writeFile(
       packageJsonPath,
-      JSON.stringify(packageJson, null, 2) + "\n"
+      JSON.stringify(packageJson, null, 2) + "\n",
     );
   }
 }
 
 async function runCodemods(
   blockPath: AbsolutePath,
-  targetProjectDir: AbsolutePath
+  targetProjectDir: AbsolutePath,
 ): Promise<void> {
   const codemodsDir = absolutePathJoin(blockPath, "codemods");
 
@@ -127,7 +127,7 @@ async function runCodemods(
 
   const codemodFiles = await fs.readdir(codemodsDir);
   const jsCodemods = codemodFiles.filter(
-    (file) => file.endsWith(".js") || file.endsWith(".ts")
+    (file) => file.endsWith(".js") || file.endsWith(".ts"),
   );
 
   if (jsCodemods.length === 0) {
@@ -146,7 +146,7 @@ async function runCodemods(
       try {
         const blockNodeModules = absolutePathJoin(
           blockPath,
-          "node_modules/.bin/jscodeshift"
+          "node_modules/.bin/jscodeshift",
         );
         if (await fileExists(blockNodeModules)) {
           jscodeshiftPath = blockNodeModules;
@@ -173,7 +173,7 @@ async function runCodemods(
       console.log(
         `   ⚠️  Failed to run ${codemodFile}: ${
           error instanceof Error ? error.message : String(error)
-        }`
+        }`,
       );
     }
   }
@@ -184,7 +184,7 @@ function parseArguments() {
 
   if (args.length === 0) {
     console.error(
-      "Usage: tsx scripts/apply-block.ts <block-name> <target-project-path>"
+      "Usage: tsx scripts/apply-block.ts <block-name> <target-project-path>",
     );
     console.error("Example: tsx scripts/apply-block.ts ai templates/my-app");
     console.error("\nAvailable blocks:");
@@ -195,7 +195,7 @@ function parseArguments() {
   if (args.length === 1) {
     console.error("Please provide a target project path.");
     console.error(
-      "Usage: tsx scripts/apply-block.ts <block-name> <target-project-path>"
+      "Usage: tsx scripts/apply-block.ts <block-name> <target-project-path>",
     );
     console.error("Example: tsx scripts/apply-block.ts ai templates/my-app");
     process.exit(1);
@@ -239,7 +239,7 @@ async function main(): Promise<void> {
   const srcDir = absolutePathJoin(targetDir, "src");
   if (!(await fileExists(srcDir))) {
     console.error(
-      `❌ Target directory is not a valid project (missing src directory): ${targetDir}`
+      `❌ Target directory is not a valid project (missing src directory): ${targetDir}`,
     );
     process.exit(1);
   }
@@ -267,7 +267,7 @@ async function main(): Promise<void> {
     await runCodemods(blockDir, targetDir);
 
     console.log(
-      `\n✅ Successfully applied '${blockName}' block to ${targetProjectPath}`
+      `\n✅ Successfully applied '${blockName}' block to ${targetProjectPath}`,
     );
 
     if (Object.keys(blockInfo.dependencies).length > 0) {
@@ -279,14 +279,14 @@ async function main(): Promise<void> {
       console.log("\nEnvironment variables needed:");
       console.log("  OPENAI_API_KEY=your_openai_api_key");
       console.log(
-        "  OPENAI_BASE_URL=https://api.openai.com/v1  # or your custom endpoint"
+        "  OPENAI_BASE_URL=https://api.openai.com/v1  # or your custom endpoint",
       );
     }
   } catch (error) {
     console.error(
       `❌ Failed to apply '${blockName}' block: ${
         error instanceof Error ? error.message : String(error)
-      }`
+      }`,
     );
     process.exit(1);
   }

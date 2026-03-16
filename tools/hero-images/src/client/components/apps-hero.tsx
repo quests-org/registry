@@ -67,7 +67,9 @@ export function AppsHero() {
       <div className="grid grid-cols-4 gap-20 w-full h-full p-16">
         {/* Row 1 */}
         <div className="flex justify-center items-center">
-          <div className={`inline-flex items-center justify-center size-36 ${apps[0].bgColor} ${apps[0].color} rounded-2xl shadow-lg`}>
+          <div
+            className={`inline-flex items-center justify-center size-36 ${apps[0].bgColor} ${apps[0].color} rounded-2xl shadow-lg`}
+          >
             {(() => {
               const IconComponent = apps[0].icon;
               return <IconComponent className="size-24" />;
@@ -75,7 +77,9 @@ export function AppsHero() {
           </div>
         </div>
         <div className="flex justify-center items-center">
-          <div className={`inline-flex items-center justify-center size-36 ${apps[1].bgColor} ${apps[1].color} rounded-2xl shadow-lg`}>
+          <div
+            className={`inline-flex items-center justify-center size-36 ${apps[1].bgColor} ${apps[1].color} rounded-2xl shadow-lg`}
+          >
             {(() => {
               const IconComponent = apps[1].icon;
               return <IconComponent className="size-24" />;
@@ -83,7 +87,9 @@ export function AppsHero() {
           </div>
         </div>
         <div className="flex justify-center items-center">
-          <div className={`inline-flex items-center justify-center size-36 ${apps[2].bgColor} ${apps[2].color} rounded-2xl shadow-lg`}>
+          <div
+            className={`inline-flex items-center justify-center size-36 ${apps[2].bgColor} ${apps[2].color} rounded-2xl shadow-lg`}
+          >
             {(() => {
               const IconComponent = apps[2].icon;
               return <IconComponent className="size-24" />;
@@ -91,7 +97,9 @@ export function AppsHero() {
           </div>
         </div>
         <div className="flex justify-center items-center">
-          <div className={`inline-flex items-center justify-center size-36 ${apps[3].bgColor} ${apps[3].color} rounded-2xl shadow-lg`}>
+          <div
+            className={`inline-flex items-center justify-center size-36 ${apps[3].bgColor} ${apps[3].color} rounded-2xl shadow-lg`}
+          >
             {(() => {
               const IconComponent = apps[3].icon;
               return <IconComponent className="size-24" />;
@@ -101,7 +109,9 @@ export function AppsHero() {
 
         {/* Row 2 */}
         <div className="flex justify-center items-center">
-          <div className={`inline-flex items-center justify-center size-36 ${apps[4].bgColor} ${apps[4].color} rounded-2xl shadow-lg`}>
+          <div
+            className={`inline-flex items-center justify-center size-36 ${apps[4].bgColor} ${apps[4].color} rounded-2xl shadow-lg`}
+          >
             {(() => {
               const IconComponent = apps[4].icon;
               return <IconComponent className="size-24" />;
@@ -109,7 +119,9 @@ export function AppsHero() {
           </div>
         </div>
         <div className="flex justify-center items-center">
-          <div className={`inline-flex items-center justify-center size-36 ${apps[5].bgColor} ${apps[5].color} rounded-2xl shadow-lg`}>
+          <div
+            className={`inline-flex items-center justify-center size-36 ${apps[5].bgColor} ${apps[5].color} rounded-2xl shadow-lg`}
+          >
             {(() => {
               const IconComponent = apps[5].icon;
               return <IconComponent className="size-24" />;
@@ -117,7 +129,9 @@ export function AppsHero() {
           </div>
         </div>
         <div className="flex justify-center items-center">
-          <div className={`inline-flex items-center justify-center size-36 ${apps[6].bgColor} ${apps[6].color} rounded-2xl shadow-lg`}>
+          <div
+            className={`inline-flex items-center justify-center size-36 ${apps[6].bgColor} ${apps[6].color} rounded-2xl shadow-lg`}
+          >
             {(() => {
               const IconComponent = apps[6].icon;
               return <IconComponent className="size-24" />;
@@ -125,7 +139,9 @@ export function AppsHero() {
           </div>
         </div>
         <div className="flex justify-center items-center">
-          <div className={`inline-flex items-center justify-center size-36 ${apps[7].bgColor} ${apps[7].color} rounded-2xl shadow-lg`}>
+          <div
+            className={`inline-flex items-center justify-center size-36 ${apps[7].bgColor} ${apps[7].color} rounded-2xl shadow-lg`}
+          >
             {(() => {
               const IconComponent = apps[7].icon;
               return <IconComponent className="size-24" />;

@@ -20,7 +20,9 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     process.exit(1);
   }
 
-  const { totalPages, links } = await extractPdfLinks({ inputPath: resolve(filePath) });
+  const { totalPages, links } = await extractPdfLinks({
+    inputPath: resolve(filePath),
+  });
 
   console.log(`Total pages: ${totalPages}`);
   console.log(`Found ${links.length} links:`);

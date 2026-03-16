@@ -1,0 +1,7 @@
+.svelte-kit/
+coverage/
+dist/
+node_modules/
+out/
+pnpm-lock.yaml
+templates/htmx/public/htmx.min.js

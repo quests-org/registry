@@ -45,7 +45,7 @@ import { Component, signal } from '@angular/core';
   selector: 'app-example',
   standalone: true,
   templateUrl: './example.html',
-  styleUrl: './example.css'
+  styleUrl: './example.css',
 })
 export class ExampleComponent {
   protected readonly data = signal('Hello World');

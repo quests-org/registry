@@ -67,7 +67,9 @@ export function TemplatesHero() {
       <div className="grid grid-cols-4 gap-16 w-full h-full p-12">
         {templates.map((template) => (
           <div key={template.name} className="flex justify-center items-center">
-            <div className={`inline-flex items-center justify-center size-32 ${template.bgColor} ${template.color} rounded-2xl shadow-lg`}>
+            <div
+              className={`inline-flex items-center justify-center size-32 ${template.bgColor} ${template.color} rounded-2xl shadow-lg`}
+            >
               {(() => {
                 const IconComponent = template.icon;
                 return <IconComponent className="size-20" />;
