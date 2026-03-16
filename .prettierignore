@@ -5,3 +5,4 @@ node_modules/
 out/
 pnpm-lock.yaml
 templates/htmx/public/htmx.min.js
+_tmp_*
