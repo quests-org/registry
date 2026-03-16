@@ -5,7 +5,7 @@ description: Guide for creating effective Agent Skills. Use when you want to cre
 
 # Creating Skills
 
-Skills are markdown files that teach the agent how to perform specific tasks. They live in `.agents/skills/` and are loaded automatically when relevant.
+Skills are markdown files that teach the agent how to perform specific tasks. They live in `skills/` and are loaded automatically when relevant.
 
 ## Before You Begin: Gather Requirements
 
@@ -24,7 +24,7 @@ If you have previous conversation context, infer the skill from what was discuss
 ### Directory Layout
 
 ```
-.agents/skills/skill-name/
+skills/skill-name/ in the repository root
 ├── SKILL.md              # Required - main instructions
 ├── reference.md          # Optional - detailed documentation
 └── scripts/              # Optional - utility TypeScript scripts
@@ -130,7 +130,7 @@ The runtime environment is always Node.js 22+, so all modern Node.js APIs are av
 `tsx` is the best way to execute scripts. When explaining how to use a script, use the following format:
 
 ```bash
-tsx .agents/skills/skill-name/scripts/my-script.ts ./file.txt
+tsx skills/skill-name/scripts/my-script.ts ./file.txt
 ```
 
 ### Script Structure
@@ -164,8 +164,8 @@ In the SKILL.md, document scripts with their CLI options:
 ## Quick Start
 
 ```bash
-tsx .agents/skills/skill-name/scripts/my-script.ts ./input.txt
-tsx .agents/skills/skill-name/scripts/my-script.ts ./input.txt --output ./output.md
+tsx skills/skill-name/scripts/my-script.ts ./input.txt
+tsx skills/skill-name/scripts/my-script.ts ./input.txt --output ./output.md
 ```
 ````
 
@@ -229,7 +229,7 @@ Gather information about:
 
 ### Phase 3: Implementation
 
-1. Create the directory at `.agents/skills/skill-name/`
+1. Create the directory at `skills/skill-name/` in the repository root
 2. Write the SKILL.md file with frontmatter
 3. Create any supporting reference files
 4. Create any TypeScript utility scripts in `scripts/`
@@ -240,7 +240,7 @@ Gather information about:
 2. Check that the description is specific and includes trigger terms
 3. Ensure consistent terminology throughout
 4. Verify all file references are one level deep
-5. Confirm scripts use `tsx` and are referenced with full `.agents/skills/...` paths
+5. Confirm scripts use `tsx` and are referenced with full `skills/...` paths
 
 ---
 
@@ -249,7 +249,7 @@ Gather information about:
 **Directory structure:**
 
 ```
-.agents/skills/image-resize/
+skills/image-resize/ in the repository root
 ├── SKILL.md
 └── scripts/
     └── resize.ts
@@ -276,8 +276,8 @@ pnpm add sharp
 ## Quick Start
 
 ```bash
-tsx .agents/skills/image-resize/scripts/resize.ts ./photo.jpg
-tsx .agents/skills/image-resize/scripts/resize.ts ./photo.jpg --width 800
+tsx skills/image-resize/scripts/resize.ts ./photo.jpg
+tsx skills/image-resize/scripts/resize.ts ./photo.jpg --width 800
 ```
 
 ## CLI Options
@@ -313,7 +313,7 @@ Before finalizing a skill, verify:
 
 ### Structure
 
-- [ ] Skill is located at `.agents/skills/skill-name/`
+- [ ] Skill is located at `skills/skill-name/` in the repository root
 - [ ] File references are one level deep
 - [ ] Progressive disclosure used appropriately
 - [ ] No time-sensitive information
@@ -322,7 +322,7 @@ Before finalizing a skill, verify:
 
 - [ ] Scripts are TypeScript (`.ts`) files
 - [ ] Scripts are run with `tsx`, never `node` or `python`
-- [ ] Script paths use `.agents/skills/skill-name/scripts/...`
+- [ ] Script paths use `skills/skill-name/scripts/...`
 - [ ] Required packages are documented with `pnpm add`
 - [ ] Scripts output JSON with a `success` field
 - [ ] Error handling is explicit and helpful
