@@ -10,6 +10,7 @@
     "unpdf": "^1.4.0"
   },
   "scripts": {
+    "check:types": "tsc --noEmit",
     "test": "vitest run"
   }
 }

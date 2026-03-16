@@ -6,6 +6,7 @@
     "dev": "ng serve",
     "start": "ng serve",
     "build": "ng build",
+    "check:types": "tsc --noEmit",
     "watch": "ng build --watch --configuration development"
   },
   "prettier": {

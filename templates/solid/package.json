@@ -4,6 +4,7 @@
   "scripts": {
     "dev": "vinxi dev",
     "build": "vinxi build",
+    "check:types": "tsc --noEmit",
     "start": "vinxi start",
     "version": "vinxi version"
   },
