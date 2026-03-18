@@ -1,5 +1,5 @@
 import { readFile, writeFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { relative, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import { PDF } from "@libpdf/core";
@@ -178,9 +178,8 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     flatten: values.flatten,
   });
 
-  console.log(
-    `Filled ${result.filled.length} field(s), saved to ${result.outputPath}`,
-  );
+  const relOutput = relative(process.cwd(), result.outputPath) || ".";
+  console.log(`Filled ${result.filled.length} field(s), saved to ${relOutput}`);
   if (result.skipped.length > 0) {
     console.log(`Skipped (not found): ${result.skipped.join(", ")}`);
   }

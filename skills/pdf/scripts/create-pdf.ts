@@ -1,5 +1,5 @@
 import { writeFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { relative, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import { PDF, rgb } from "@libpdf/core";
@@ -84,7 +84,6 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     outputPath: resolve(values.output),
   });
 
-  console.log(
-    `Created PDF with ${result.pageCount} page(s) at ${result.outputPath}`,
-  );
+  const relOutput = relative(process.cwd(), result.outputPath) || ".";
+  console.log(`Created PDF with ${result.pageCount} page(s) at ${relOutput}`);
 }

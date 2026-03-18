@@ -1,5 +1,5 @@
 import { readFile, writeFile } from "node:fs/promises";
-import { basename, extname, resolve } from "node:path";
+import { basename, extname, relative, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import { PDF } from "@libpdf/core";
@@ -89,5 +89,6 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     pages,
   });
 
-  console.log(`Extracted ${result.pageCount} page(s) to ${result.outputPath}`);
+  const relOutput = relative(process.cwd(), result.outputPath) || ".";
+  console.log(`Extracted ${result.pageCount} page(s) to ${relOutput}`);
 }

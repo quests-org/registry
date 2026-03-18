@@ -1,5 +1,5 @@
 import { readFile, writeFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { relative, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import { PDF, rgb } from "@libpdf/core";
@@ -69,7 +69,8 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     fontSize: values["font-size"] ? parseFloat(values["font-size"]) : undefined,
   });
 
+  const relOutput = relative(process.cwd(), result.outputPath) || ".";
   console.log(
-    `Watermarked ${result.pageCount} page(s) with "${values.text}", saved to ${result.outputPath}`,
+    `Watermarked ${result.pageCount} page(s) with "${values.text}", saved to ${relOutput}`,
   );
 }

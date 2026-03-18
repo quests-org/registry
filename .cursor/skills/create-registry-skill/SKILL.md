@@ -138,8 +138,9 @@ tsx skills/skill-name/scripts/my-script.ts ./file.txt
 When applicable, scripts should accept CLI and parse them using `parseArgs` from `node:util`.
 
 ```typescript
+import { writeFile } from "node:fs/promises";
+import { relative, resolve } from "node:path";
 import { parseArgs } from "node:util";
-import { writeFileSync } from "node:fs";
 
 const { values, positionals } = parseArgs({
   allowPositionals: true,
@@ -149,11 +150,35 @@ const { values, positionals } = parseArgs({
 });
 
 const [filePath] = positionals;
+const outputPath = resolve(values.output ?? "output.txt");
 
 // ... implementation ...
 
-// Clear success output
-console.log(JSON.stringify({ success: true, output: outputPath }));
+const relOutput = relative(process.cwd(), outputPath) || ".";
+console.log(`Saved to ${relOutput}`);
+```
+
+### Output Paths
+
+Scripts run from the project root. Always log paths **relative to `process.cwd()`** so the agent can use them directly — never log absolute paths.
+
+Use `relative()` from `node:path` to convert resolved paths back to relative ones for console output:
+
+```typescript
+import { relative, resolve } from "node:path";
+
+const outputPath = resolve(values.output);
+await writeFile(outputPath, data);
+
+const relOutput = relative(process.cwd(), outputPath) || ".";
+console.log(`Saved to ${relOutput}`);
+```
+
+For scripts that generate an output directory (e.g. rendering pages), log the **full relative path** to each file — not just the filename:
+
+```typescript
+const relDir = relative(process.cwd(), outputDir) || ".";
+console.log(`Saved ${relDir}/page-01.png`);
 ```
 
 ### Documenting Scripts
@@ -289,10 +314,12 @@ tsx skills/image-resize/scripts/resize.ts ./photo.jpg --width 800
 | `--height <px>`   | No       |         | Target height     |
 | `--output <path>` | No       | auto    | Output image path |
 
-## Output Format (JSON)
+## Output
 
-```json
-{ "success": true, "input": "photo.jpg", "output": "photo-resized.jpg" }
+Prints the relative output path on success:
+
+```
+Resized photo.jpg → photo-resized.jpg (800x600)
 ```
 
 ```
@@ -324,7 +351,7 @@ Before finalizing a skill, verify:
 - [ ] Scripts are run with `tsx`, never `node` or `python`
 - [ ] Script paths use `skills/skill-name/scripts/...`
 - [ ] Required packages are documented with `pnpm add`
-- [ ] Scripts output JSON with a `success` field
+- [ ] Scripts log paths relative to `process.cwd()`, never absolute
 - [ ] Error handling is explicit and helpful
 ```
 ````

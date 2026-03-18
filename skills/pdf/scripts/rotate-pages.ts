@@ -1,5 +1,5 @@
 import { readFile, writeFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { relative, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import { PDF } from "@libpdf/core";
@@ -85,7 +85,8 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     pages,
   });
 
+  const relOutput = relative(process.cwd(), result.outputPath) || ".";
   console.log(
-    `Rotated ${result.rotatedCount} page(s) by ${rotation}°, saved to ${result.outputPath}`,
+    `Rotated ${result.rotatedCount} page(s) by ${rotation}°, saved to ${relOutput}`,
   );
 }
