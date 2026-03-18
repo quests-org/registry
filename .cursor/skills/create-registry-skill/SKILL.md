@@ -135,27 +135,36 @@ tsx skills/skill-name/scripts/my-script.ts ./file.txt
 
 ### Script Structure
 
-When applicable, scripts should accept CLI and parse them using `parseArgs` from `node:util`.
+Scripts should export their core logic as a named async function **and** include a CLI entrypoint guarded by an `import.meta.url` check. This lets the agent run the script from the terminal or import the function programmatically.
 
 ```typescript
 import { writeFile } from "node:fs/promises";
 import { relative, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 
-const { values, positionals } = parseArgs({
-  allowPositionals: true,
-  options: {
-    output: { type: "string" },
-  },
-});
+export async function doSomething({ inputPath, outputPath }: { inputPath: string; outputPath: string }) {
+  // ... implementation ...
+  return { outputPath };
+}
 
-const [filePath] = positionals;
-const outputPath = resolve(values.output ?? "output.txt");
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+  const { values, positionals } = parseArgs({
+    allowPositionals: true,
+    options: {
+      output: { type: "string" },
+    },
+  });
 
-// ... implementation ...
+  const [filePath] = positionals;
+  const result = await doSomething({
+    inputPath: resolve(filePath),
+    outputPath: resolve(values.output ?? "output.txt"),
+  });
 
-const relOutput = relative(process.cwd(), outputPath) || ".";
-console.log(`Saved to ${relOutput}`);
+  const relOutput = relative(process.cwd(), result.outputPath) || ".";
+  console.log(`Saved to ${relOutput}`);
+}
 ```
 
 ### Output Paths
@@ -183,24 +192,16 @@ console.log(`Saved ${relDir}/page-01.png`);
 
 ### Documenting Scripts
 
-In the SKILL.md, document scripts with their CLI options:
+In the SKILL.md, document each script's CLI usage **and** its exported function. Add an `Export:` line with the function name and parameter signature right after the script heading so the agent knows both options:
 
 ````markdown
-## Quick Start
+### `my-script.ts` Does something useful
+
+Export: `doSomething({ inputPath, outputPath })`
 
 ```bash
-tsx skills/skill-name/scripts/my-script.ts ./input.txt
 tsx skills/skill-name/scripts/my-script.ts ./input.txt --output ./output.md
 ```
-````
-
-## CLI Options
-
-| Argument          | Required | Default | Description      |
-| ----------------- | -------- | ------- | ---------------- |
-| `<path>`          | Yes      |         | Input file       |
-| `--output <path>` | No       | auto    | Output file path |
-
 ````
 
 Make clear whether the agent should **execute** the script (most common) or **read** it as reference.
@@ -348,6 +349,8 @@ Before finalizing a skill, verify:
 ### If Including Scripts
 
 - [ ] Scripts are TypeScript (`.ts`) files
+- [ ] Scripts export a named async function and guard CLI with `import.meta.url`
+- [ ] Each script's `Export:` line is documented in SKILL.md
 - [ ] Scripts are run with `tsx`, never `node` or `python`
 - [ ] Script paths use `skills/skill-name/scripts/...`
 - [ ] Required packages are documented with `pnpm add`
