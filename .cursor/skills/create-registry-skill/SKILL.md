@@ -26,12 +26,18 @@ If you have previous conversation context, infer the skill from what was discuss
 ```
 skills/skill-name/ in the repository root
 ├── SKILL.md              # Required - main instructions
-├── reference.md          # Optional - detailed documentation
-└── scripts/              # Optional - utility TypeScript scripts
-    ├── my-script.ts
-    └── lib/
-        └── helper.ts
+├── package.json          # Required if scripts use npm packages
+├── pnpm-lock.yaml        # Required if package.json exists
+├── references/           # Optional - documentation
+│   └── REFERENCE.md      # Detailed technical reference
+├── scripts/              # Optional - utility TypeScript scripts
+│   ├── my-script.ts
+│   └── lib/
+│       └── helper.ts
+└── assets/               # Optional - templates, resources
 ```
+
+Dependencies are bundled via `package.json` + `pnpm-lock.yaml`. The skill loader runs `pnpm install` automatically when the skill is loaded — **never** include installation instructions (like `pnpm add`) in the SKILL.md.
 
 ### SKILL.md Structure
 
@@ -100,7 +106,7 @@ Put essential information in SKILL.md; detailed reference material in separate f
 ```markdown
 ## Additional resources
 
-- For complete API details, see [reference.md](reference.md)
+- For complete API details, see [references/REFERENCE.md](references/REFERENCE.md)
 ```
 
 **Keep references one level deep**: link directly from SKILL.md to reference files.
@@ -143,7 +149,13 @@ import { relative, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 
-export async function doSomething({ inputPath, outputPath }: { inputPath: string; outputPath: string }) {
+export async function doSomething({
+  inputPath,
+  outputPath,
+}: {
+  inputPath: string;
+  outputPath: string;
+}) {
   // ... implementation ...
   return { outputPath };
 }
@@ -220,6 +232,7 @@ Provide output format templates:
 Use this template:
 
 \`\`\`markdown
+
 # [Analysis Title]
 
 ## Executive summary
@@ -230,8 +243,8 @@ Use this template:
 
 - Finding 1
 - Finding 2
-\`\`\`
-````
+  \`\`\`
+```
 
 ---
 
@@ -277,6 +290,8 @@ Gather information about:
 ```
 skills/image-resize/ in the repository root
 ├── SKILL.md
+├── package.json
+├── pnpm-lock.yaml
 └── scripts/
     └── resize.ts
 ```
@@ -292,12 +307,6 @@ description: Resize images to specified dimensions. Use when resizing images, th
 # image-resize
 
 Resize images using the `sharp` library.
-
-## Installation Required
-
-```bash
-pnpm add sharp
-```
 
 ## Quick Start
 
@@ -353,7 +362,7 @@ Before finalizing a skill, verify:
 - [ ] Each script's `Export:` line is documented in SKILL.md
 - [ ] Scripts are run with `tsx`, never `node` or `python`
 - [ ] Script paths use `skills/skill-name/scripts/...`
-- [ ] Required packages are documented with `pnpm add`
+- [ ] Dependencies are in `package.json` + `pnpm-lock.yaml` (no install instructions in SKILL.md)
 - [ ] Scripts log paths relative to `process.cwd()`, never absolute
 - [ ] Error handling is explicit and helpful
 ```
