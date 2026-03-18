@@ -9,7 +9,11 @@ Use the scripts in `skills/pdf/scripts/` to work with PDF files.
 
 ## Scripts
 
+Each script can also be used programmatically via its exported function.
+
 ### `extract-text.ts` Extract all text from a PDF
+
+Export: `extractPdfText({ inputPath, mergePages? })`
 
 Use when you need the full text content of a PDF, e.g. to summarize, search, or process its content.
 
@@ -23,6 +27,8 @@ tsx skills/pdf/scripts/extract-text.ts <path> [--output <path>] [--no-merge]
 
 ### `extract-links.ts` Extract all URLs from a PDF
 
+Export: `extractPdfLinks({ inputPath })`
+
 Use when you need to find hyperlinks embedded in a PDF.
 
 ```bash
@@ -30,6 +36,8 @@ tsx skills/pdf/scripts/extract-links.ts <path>
 ```
 
 ### `get-meta.ts` Get PDF metadata
+
+Export: `getPdfMeta({ inputPath, parseDates? })`
 
 Use when you need author, title, creation date, or other document properties.
 
@@ -40,6 +48,8 @@ tsx skills/pdf/scripts/get-meta.ts <path> [--parse-dates]
 - `--parse-dates` parses date strings into structured date objects
 
 ### `extract-images.ts` Extract images from a PDF
+
+Export: `extractPdfImages({ inputPath, page? })`
 
 Use when you need to save embedded images from a PDF. Extracts all pages by default.
 
@@ -52,6 +62,8 @@ tsx skills/pdf/scripts/extract-images.ts <path> [--page <number>] [--output <dir
 - Saves each image as a PNG file named `image-1.png`, `image-2.png`, etc.
 
 ### `render-pages.ts` Render PDF pages as images
+
+Export: `renderPdfPages({ inputPath, page?, scale? })`
 
 Use when you need a visual representation of PDF pages as PNG files.
 
@@ -68,6 +80,8 @@ tsx skills/pdf/scripts/render-pages.ts <path> [--page <number>] [--scale <number
 
 ### `create-pdf.ts` Create a new PDF from scratch
 
+Export: `createPdf({ title, content, outputPath })`
+
 Use when you need to generate a new PDF with a title and text content.
 
 ```bash
@@ -79,6 +93,8 @@ tsx skills/pdf/scripts/create-pdf.ts <content> --title <title> --output <path>
 - Multi-line content is supported; new pages are added automatically when content overflows
 
 ### `watermark-pdf.ts` Add a diagonal watermark to every page
+
+Export: `watermarkPdf({ inputPath, outputPath, text, opacity?, fontSize? })`
 
 Use when you need to mark a document as DRAFT, CONFIDENTIAL, or similar — large diagonal text across each page.
 
@@ -92,6 +108,8 @@ tsx skills/pdf/scripts/watermark-pdf.ts <input> --text <text> --output <path> [-
 
 ### `merge-pdfs.ts` Merge multiple PDFs into one
 
+Export: `mergePdfs({ inputPaths, outputPath })`
+
 Use when you need to combine several PDF files into a single document.
 
 ```bash
@@ -104,6 +122,8 @@ tsx skills/pdf/scripts/merge-pdfs.ts <input1> <input2> [...inputs] --output <pat
 
 ### `split-pdf.ts` Extract pages from a PDF
 
+Export: `splitPdf({ inputPath, outputPath, pages })`
+
 Use when you need a single page or a range of pages from a larger document.
 
 ```bash
@@ -115,6 +135,8 @@ tsx skills/pdf/scripts/split-pdf.ts <input> --output <path> [--page <n>] [--star
 - `--output` path to write the output PDF (default: `<name>-split.pdf`)
 
 ### `fill-form.ts` Fill fields in a PDF form
+
+Export: `fillForm({ inputPath, outputPath, fields, flatten? })`
 
 Use when you need to populate a fillable PDF form. Write field data to a JSON file first, then pass the path with `--fields-file`. This avoids shell-escaping issues with field names that contain spaces or special characters.
 
@@ -130,6 +152,8 @@ tsx skills/pdf/scripts/fill-form.ts <input> --output <path> --fields-file <json>
 
 ### `rotate-pages.ts` Rotate pages in a PDF
 
+Export: `rotatePages({ inputPath, outputPath, rotation, pages? })`
+
 Use when pages are sideways or upside-down (e.g. scanned documents).
 
 ```bash
@@ -140,6 +164,8 @@ tsx skills/pdf/scripts/rotate-pages.ts <input> --output <path> [--rotation <90|1
 - `--pages` comma-separated list of page numbers to rotate (default: all pages)
 
 ### `add-page-numbers.ts` Add page numbers and/or header/footer text to every page
+
+Export: `addPageNumbers({ inputPath, outputPath, startAt?, position?, fontSize?, format?, header?, footer? })`
 
 Use when you need to number pages, add a document title header, or add a label (e.g. "CONFIDENTIAL") as a footer on every page. All options are independent and can be combined.
 
@@ -155,6 +181,8 @@ tsx skills/pdf/scripts/add-page-numbers.ts <input> --output <path> [--start-at <
 - `--footer` centered text drawn at the bottom of every page
 
 ### `set-meta.ts` Set PDF metadata
+
+Export: `setMeta({ inputPath, outputPath, title?, author?, subject?, keywords?, producer?, creator? })`
 
 Use when you need to update the title, author, subject, keywords, producer, or creator fields of a PDF.
 
