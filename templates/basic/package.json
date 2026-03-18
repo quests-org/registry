@@ -1,5 +1,5 @@
 {
-  "name": "quests-template-basic",
+  "name": "@quests/template-basic",
   "private": true,
   "version": "0.0.0",
   "type": "module",

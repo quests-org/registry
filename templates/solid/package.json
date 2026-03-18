@@ -1,5 +1,5 @@
 {
-  "name": "quests-template-solid",
+  "name": "@quests/template-solid",
   "type": "module",
   "scripts": {
     "dev": "vinxi dev",

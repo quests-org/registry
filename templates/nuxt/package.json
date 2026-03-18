@@ -1,5 +1,5 @@
 {
-  "name": "quests-template-nuxt",
+  "name": "@quests/template-nuxt",
   "type": "module",
   "private": true,
   "scripts": {

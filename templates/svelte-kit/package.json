@@ -1,5 +1,5 @@
 {
-  "name": "quests-template-svelte-kit",
+  "name": "@quests/template-svelte-kit",
   "private": true,
   "version": "0.0.1",
   "type": "module",

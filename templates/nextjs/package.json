@@ -1,5 +1,5 @@
 {
-  "name": "quests-template-nextjs",
+  "name": "@quests/template-nextjs",
   "version": "0.0.0",
   "private": true,
   "scripts": {

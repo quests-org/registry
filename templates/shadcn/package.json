@@ -1,5 +1,5 @@
 {
-  "name": "quests-template-shadcn",
+  "name": "@quests/template-shadcn",
   "private": true,
   "version": "0.0.0",
   "type": "module",
