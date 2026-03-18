@@ -20,10 +20,12 @@ export async function fillForm({
   inputPath,
   outputPath,
   fields,
+  flatten = false,
 }: {
   inputPath: string;
   outputPath: string;
   fields: Record<string, string | boolean>;
+  flatten?: boolean;
 }) {
   const bytes = await readFile(inputPath);
   const pdf = await PDF.load(new Uint8Array(bytes));
@@ -77,6 +79,10 @@ export async function fillForm({
     }
   }
 
+  if (flatten) {
+    form.flatten();
+  }
+
   const pdfBytes = await pdf.save();
   await writeFile(outputPath, pdfBytes);
 
@@ -89,6 +95,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     options: {
       "fields-file": { type: "string" },
       field: { type: "string", multiple: true },
+      flatten: { type: "boolean", default: false },
       list: { type: "boolean", default: false },
       output: { type: "string" },
     },
@@ -98,7 +105,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 
   if (!inputPath) {
     console.error(
-      "Usage: tsx scripts/fill-form.ts <input> --output <path> --fields-file <json> [--list]",
+      "Usage: tsx scripts/fill-form.ts <input> --output <path> --fields-file <json> [--flatten] [--list]",
     );
     process.exit(1);
   }
@@ -168,6 +175,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     inputPath: resolve(inputPath),
     outputPath: resolve(values.output),
     fields,
+    flatten: values.flatten,
   });
 
   console.log(

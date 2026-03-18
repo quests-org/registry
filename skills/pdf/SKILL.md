@@ -119,11 +119,12 @@ tsx skills/pdf/scripts/split-pdf.ts <input> --output <path> [--page <n>] [--star
 Use when you need to populate a fillable PDF form. Write field data to a JSON file first, then pass the path with `--fields-file`. This avoids shell-escaping issues with field names that contain spaces or special characters.
 
 ```bash
-tsx skills/pdf/scripts/fill-form.ts <input> --output <path> --fields-file <json> [--list]
+tsx skills/pdf/scripts/fill-form.ts <input> --output <path> --fields-file <json> [--flatten] [--list]
 ```
 
 - `--fields-file` path to a JSON file containing a `{ "FieldName": "value" }` object; use `true`/`false` for checkboxes
 - `--field` alternative: a `key=value` pair to set inline; repeat for each field (only suitable for a small number of simple field names)
+- `--flatten` bake the filled values into the page so the form is no longer editable
 - `--list` print all field names and types in the PDF without modifying it
 - Field names are matched with trimmed whitespace, so trailing spaces in PDF field names are handled automatically
 
