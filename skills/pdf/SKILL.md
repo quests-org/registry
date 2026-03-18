@@ -1,6 +1,6 @@
 ---
 name: pdf
-description: "Work with PDF files. Use whenever the user wants to do anything with a PDF: extracting text content, finding hyperlinks, pulling embedded images, reading document metadata such as author, title, and creation date, rendering pages as images, creating new PDFs, modifying existing PDFs, or merging multiple PDFs together. Activate whenever the user mentions a .pdf file or asks to read, parse, inspect, render, create, modify, or merge one."
+description: "Work with PDF files. Use whenever the user wants to do anything with a PDF: extracting text content, finding hyperlinks, pulling embedded images, reading document metadata such as author, title, and creation date, rendering pages as images, creating new PDFs, merging or splitting PDFs, filling form fields, rotating pages, adding page numbers, adding headers/footers, watermarking, or updating metadata. Activate whenever the user mentions a .pdf file or asks to read, parse, inspect, render, create, modify, merge, split, or fill one."
 ---
 
 # PDF
@@ -78,17 +78,17 @@ tsx skills/pdf/scripts/create-pdf.ts <content> --title <title> --output <path>
 - `--output` path to write the output PDF (required)
 - Multi-line content is supported; new pages are added automatically when content overflows
 
-### `modify-pdf.ts` Modify an existing PDF
+### `watermark-pdf.ts` Add a diagonal watermark to every page
 
-Use when you need to add a watermark to all pages or append a new page with text.
+Use when you need to mark a document as DRAFT, CONFIDENTIAL, or similar — large diagonal text across each page.
 
 ```bash
-tsx skills/pdf/scripts/modify-pdf.ts <input> --output <path> [--watermark <text>] [--append-text <text>]
+tsx skills/pdf/scripts/watermark-pdf.ts <input> --text <text> --output <path> [--opacity <0-1>] [--font-size <n>]
 ```
 
-- `--output` path to write the modified PDF (required)
-- `--watermark` adds diagonal semi-transparent watermark text to every page
-- `--append-text` appends a new page with the given text content
+- `--text` watermark label (required)
+- `--opacity` transparency, 0–1 (default: `0.3`)
+- `--font-size` size of the watermark text in points (default: `60`)
 
 ### `merge-pdfs.ts` Merge multiple PDFs into one
 
@@ -101,3 +101,66 @@ tsx skills/pdf/scripts/merge-pdfs.ts <input1> <input2> [...inputs] --output <pat
 - Accepts two or more input PDF paths
 - `--output` path to write the merged PDF (required)
 - Pages are appended in the order the inputs are provided
+
+### `split-pdf.ts` Extract pages from a PDF
+
+Use when you need a single page or a range of pages from a larger document.
+
+```bash
+tsx skills/pdf/scripts/split-pdf.ts <input> --output <path> [--page <n>] [--start <n> --end <n>]
+```
+
+- `--page` extract a single page by number (1-indexed)
+- `--start` / `--end` extract a range of pages (inclusive, 1-indexed)
+- `--output` path to write the output PDF (default: `<name>-split.pdf`)
+
+### `fill-form.ts` Fill fields in a PDF form
+
+Use when you need to populate a fillable PDF form. Write field data to a JSON file first, then pass the path with `--fields-file`. This avoids shell-escaping issues with field names that contain spaces or special characters.
+
+```bash
+tsx skills/pdf/scripts/fill-form.ts <input> --output <path> --fields-file <json> [--list]
+```
+
+- `--fields-file` path to a JSON file containing a `{ "FieldName": "value" }` object; use `true`/`false` for checkboxes
+- `--field` alternative: a `key=value` pair to set inline; repeat for each field (only suitable for a small number of simple field names)
+- `--list` print all field names and types in the PDF without modifying it
+- Field names are matched with trimmed whitespace, so trailing spaces in PDF field names are handled automatically
+
+### `rotate-pages.ts` Rotate pages in a PDF
+
+Use when pages are sideways or upside-down (e.g. scanned documents).
+
+```bash
+tsx skills/pdf/scripts/rotate-pages.ts <input> --output <path> [--rotation <90|180|270>] [--pages <1,2,3>]
+```
+
+- `--rotation` degrees to rotate clockwise (default: `90`)
+- `--pages` comma-separated list of page numbers to rotate (default: all pages)
+
+### `add-page-numbers.ts` Add page numbers and/or header/footer text to every page
+
+Use when you need to number pages, add a document title header, or add a label (e.g. "CONFIDENTIAL") as a footer on every page. All options are independent and can be combined.
+
+```bash
+tsx skills/pdf/scripts/add-page-numbers.ts <input> --output <path> [--start-at <n>] [--position <pos>] [--font-size <n>] [--format '<text>'] [--header <text>] [--footer <text>]
+```
+
+- `--start-at` first page number (default: `1`)
+- `--position` where to place page numbers: `bottom-center` (default), `bottom-left`, `bottom-right`, `top-center`, `top-left`, `top-right`
+- `--font-size` font size in points (default: `10`)
+- `--format` label template using `{page}` and `{total}` (default: `{page} / {total}`)
+- `--header` centered text drawn at the top of every page
+- `--footer` centered text drawn at the bottom of every page
+
+### `set-meta.ts` Set PDF metadata
+
+Use when you need to update the title, author, subject, keywords, producer, or creator fields of a PDF.
+
+```bash
+tsx skills/pdf/scripts/set-meta.ts <input> --output <path> [--title <t>] [--author <a>] [--subject <s>] [--keywords <k1,k2>] [--producer <p>] [--creator <c>]
+```
+
+- Any combination of metadata fields can be set; unspecified fields are left unchanged
+- `--keywords` accepts a comma-separated list
+- Modification date is automatically updated

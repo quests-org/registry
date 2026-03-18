@@ -3,4 +3,6 @@ configDependencies:
 dlxCacheMaxAge: 259200 # 180 days in minutes, extended for pnpm dlx jiti
 packages:
   - skills/*
+patchedDependencies:
+  "@libpdf/core": skills/pdf/patches/@libpdf__core.patch # Remove when https://github.com/LibPDF-js/core/issues/55 is fixed
 updateNotifier: false

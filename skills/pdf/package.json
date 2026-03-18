@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "dependencies": {
+    "@libpdf/core": "^0.3.3",
     "@napi-rs/canvas": "^0.1.96",
-    "pdf-lib": "^1.17.1",
     "sharp": "^0.34.5",
     "unpdf": "^1.4.0"
   },

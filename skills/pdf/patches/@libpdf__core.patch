@@ -1,0 +1,13 @@
+diff --git a/dist/index.mjs b/dist/index.mjs
+index 17ac26fa16c4697dc0637321a4f31d5f398817c9..f51af9214f59d0eb352f7e8d0a9134e6f4e46270 100644
+--- a/dist/index.mjs
++++ b/dist/index.mjs
+@@ -22994,7 +22994,7 @@ var AcroForm = class AcroForm {
+ 	*/
+ 	getFields() {
+ 		if (this.fieldsCache) return this.fieldsCache;
+-		const fieldsArray = this.dict.getArray("Fields");
++		const fieldsArray = this.dict.getArray("Fields", this.registry.resolve.bind(this.registry));
+ 		if (!fieldsArray) return [];
+ 		const visited = /* @__PURE__ */ new Set();
+ 		const fields = this.collectFields(fieldsArray, visited, "");

@@ -2,7 +2,7 @@ import { writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
-import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import { PDF, rgb } from "@libpdf/core";
 
 export async function createPdf({
   title,
@@ -13,55 +13,51 @@ export async function createPdf({
   content: string;
   outputPath: string;
 }) {
-  const pdfDoc = await PDFDocument.create();
-  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-  const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-
-  const page = pdfDoc.addPage([595, 842]);
-  const { width, height } = page.getSize();
+  const pdf = PDF.create();
+  let page = pdf.addPage({ width: 595, height: 842 });
 
   page.drawText(title, {
     x: 50,
-    y: height - 60,
+    y: 842 - 60,
     size: 24,
-    font: boldFont,
+    font: "Helvetica-Bold",
     color: rgb(0.1, 0.1, 0.4),
   });
 
   page.drawLine({
-    start: { x: 50, y: height - 75 },
-    end: { x: width - 50, y: height - 75 },
+    start: { x: 50, y: 842 - 75 },
+    end: { x: 595 - 50, y: 842 - 75 },
     thickness: 1,
     color: rgb(0.6, 0.6, 0.6),
   });
 
   const lines = content.split("\n");
-  let y = height - 110;
+  let y = 842 - 110;
   const lineHeight = 18;
   const fontSize = 12;
 
   for (const line of lines) {
     if (y < 60) {
-      const newPage = pdfDoc.addPage([595, 842]);
-      y = newPage.getSize().height - 60;
+      page = pdf.addPage({ width: 595, height: 842 });
+      y = 842 - 60;
     }
     page.drawText(line, {
       x: 50,
       y,
       size: fontSize,
-      font,
+      font: "Helvetica",
       color: rgb(0.1, 0.1, 0.1),
     });
     y -= lineHeight;
   }
 
-  pdfDoc.setTitle(title);
-  pdfDoc.setCreationDate(new Date());
+  pdf.setTitle(title);
+  pdf.setCreationDate(new Date());
 
-  const pdfBytes = await pdfDoc.save();
+  const pdfBytes = await pdf.save();
   await writeFile(outputPath, pdfBytes);
 
-  return { pageCount: pdfDoc.getPageCount(), outputPath };
+  return { pageCount: pdf.getPageCount(), outputPath };
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {

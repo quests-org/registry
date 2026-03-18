@@ -2,7 +2,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
-import { PDFDocument } from "pdf-lib";
+import { PDF } from "@libpdf/core";
 
 export async function mergePdfs({
   inputPaths,
@@ -11,22 +11,14 @@ export async function mergePdfs({
   inputPaths: string[];
   outputPath: string;
 }) {
-  const mergedDoc = await PDFDocument.create();
-
-  for (const inputPath of inputPaths) {
-    const bytes = await readFile(inputPath);
-    const doc = await PDFDocument.load(bytes);
-    const indices = doc.getPageIndices();
-    const copiedPages = await mergedDoc.copyPages(doc, indices);
-    for (const page of copiedPages) {
-      mergedDoc.addPage(page);
-    }
-  }
-
-  const pdfBytes = await mergedDoc.save();
+  const sources = await Promise.all(
+    inputPaths.map(async (p) => new Uint8Array(await readFile(p))),
+  );
+  const merged = await PDF.merge(sources);
+  const pdfBytes = await merged.save();
   await writeFile(outputPath, pdfBytes);
 
-  return { pageCount: mergedDoc.getPageCount(), outputPath };
+  return { pageCount: merged.getPageCount(), outputPath };
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {

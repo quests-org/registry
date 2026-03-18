@@ -1,14 +1,21 @@
-import path from "node:path";
+import fs from "node:fs/promises";
 import os from "node:os";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
+import { PDF } from "@libpdf/core";
+import { addPageNumbers } from "../scripts/add-page-numbers";
+import { createPdf } from "../scripts/create-pdf";
 import { extractPdfImages } from "../scripts/extract-images";
 import { extractPdfLinks } from "../scripts/extract-links";
 import { extractPdfText } from "../scripts/extract-text";
+import { fillForm } from "../scripts/fill-form";
 import { getPdfMeta } from "../scripts/get-meta";
-import { createPdf } from "../scripts/create-pdf";
-import { modifyPdf } from "../scripts/modify-pdf";
 import { mergePdfs } from "../scripts/merge-pdfs";
 import { renderPdfPages } from "../scripts/render-pages";
+import { rotatePages } from "../scripts/rotate-pages";
+import { setMeta } from "../scripts/set-meta";
+import { splitPdf } from "../scripts/split-pdf";
+import { watermarkPdf } from "../scripts/watermark-pdf";
 
 const FIXTURES_DIR = path.join(import.meta.dirname, "fixtures");
 const samplePdf = path.join(FIXTURES_DIR, "sample.pdf");
@@ -97,32 +104,6 @@ describe("createPdf", () => {
   });
 });
 
-describe("modifyPdf", () => {
-  it("adds a watermark to all pages", async () => {
-    const outputPath = path.join(os.tmpdir(), "test-watermark.pdf");
-    const result = await modifyPdf({
-      inputPath: samplePdf,
-      outputPath,
-      watermark: "DRAFT",
-    });
-    expect(result.pageCount).toBeGreaterThanOrEqual(1);
-    expect(result.outputPath).toBe(outputPath);
-  });
-
-  it("appends a new page with text", async () => {
-    const outputPath = path.join(os.tmpdir(), "test-append.pdf");
-    const result = await modifyPdf({
-      inputPath: samplePdf,
-      outputPath,
-      appendText: "Appended content",
-    });
-    expect(result.pageCount).toBeGreaterThan(0);
-
-    const { text } = await extractPdfText({ inputPath: outputPath });
-    expect(text).toContain("Appended content");
-  });
-});
-
 describe("renderPdfPages", () => {
   it("renders all pages by default", async () => {
     const { numPages, results } = await renderPdfPages({
@@ -159,5 +140,268 @@ describe("mergePdfs", () => {
     const { totalPages } = await extractPdfText({ inputPath: samplePdf });
     expect(result.pageCount).toBeGreaterThan(totalPages);
     expect(result.outputPath).toBe(outputPath);
+  });
+});
+
+describe("splitPdf", () => {
+  it("extracts a single page", async () => {
+    const sourcePath = path.join(os.tmpdir(), "test-split-source.pdf");
+    await createPdf({
+      title: "Page 1",
+      content: "First page",
+      outputPath: sourcePath,
+    });
+    const sourcePath2 = path.join(os.tmpdir(), "test-split-source2.pdf");
+    await createPdf({
+      title: "Page 2",
+      content: "Second page",
+      outputPath: sourcePath2,
+    });
+    const mergedPath = path.join(os.tmpdir(), "test-split-merged.pdf");
+    await mergePdfs({
+      inputPaths: [sourcePath, sourcePath2],
+      outputPath: mergedPath,
+    });
+
+    const outputPath = path.join(os.tmpdir(), "test-split-out.pdf");
+    const result = await splitPdf({
+      inputPath: mergedPath,
+      outputPath,
+      pages: 1,
+    });
+    expect(result.pageCount).toBe(1);
+
+    const { text } = await extractPdfText({ inputPath: outputPath });
+    expect(text).toContain("First page");
+  });
+
+  it("extracts a page range", async () => {
+    const sourcePaths = await Promise.all(
+      ["A", "B", "C"].map(async (label, i) => {
+        const p = path.join(os.tmpdir(), `test-split-range-${i}.pdf`);
+        await createPdf({
+          title: label,
+          content: `Content ${label}`,
+          outputPath: p,
+        });
+        return p;
+      }),
+    );
+    const mergedPath = path.join(os.tmpdir(), "test-split-range-merged.pdf");
+    await mergePdfs({ inputPaths: sourcePaths, outputPath: mergedPath });
+
+    const outputPath = path.join(os.tmpdir(), "test-split-range-out.pdf");
+    const result = await splitPdf({
+      inputPath: mergedPath,
+      outputPath,
+      pages: { start: 1, end: 2 },
+    });
+    expect(result.pageCount).toBe(2);
+  });
+
+  it("throws on out-of-range page", async () => {
+    const outputPath = path.join(os.tmpdir(), "test-split-oob.pdf");
+    await expect(
+      splitPdf({ inputPath: samplePdf, outputPath, pages: 999 }),
+    ).rejects.toThrow("out of range");
+  });
+});
+
+describe("fillForm", () => {
+  const sampleFormPdf = path.join(FIXTURES_DIR, "sample-form.pdf");
+
+  it("returns empty filled array for a PDF with no form fields", async () => {
+    const outputPath = path.join(os.tmpdir(), "test-fill-noop.pdf");
+    const result = await fillForm({
+      inputPath: samplePdf,
+      outputPath,
+      fields: { nonexistent: "value" },
+    });
+    expect(result.filled).toHaveLength(0);
+    expect(result.skipped).toContain("nonexistent");
+  });
+
+  it("fills text fields and reports filled names", async () => {
+    const outputPath = path.join(os.tmpdir(), "test-fill-out.pdf");
+    const result = await fillForm({
+      inputPath: sampleFormPdf,
+      outputPath,
+      fields: { Name_First: "Alice", Name_Last: "Smith" },
+    });
+
+    expect(result.filled).toContain("Name_First");
+    expect(result.filled).toContain("Name_Last");
+    expect(result.skipped).toHaveLength(0);
+
+    const filledBytes = await fs.readFile(outputPath);
+    const filledDoc = await PDF.load(new Uint8Array(filledBytes));
+    const form = filledDoc.getForm();
+    expect(form?.getTextField("Name_First")?.getValue()).toBe("Alice");
+    expect(form?.getTextField("Name_Last")?.getValue()).toBe("Smith");
+  });
+
+  it("fills checkboxes", async () => {
+    const outputPath = path.join(os.tmpdir(), "test-fill-checkbox.pdf");
+    const result = await fillForm({
+      inputPath: sampleFormPdf,
+      outputPath,
+      fields: { "BACHELORS DEGREE": true, PHD: false },
+    });
+
+    expect(result.filled).toContain("BACHELORS DEGREE");
+    expect(result.filled).toContain("PHD");
+    expect(result.skipped).toHaveLength(0);
+  });
+
+  it("skips fields that do not exist", async () => {
+    const outputPath = path.join(os.tmpdir(), "test-fill-skip.pdf");
+    const result = await fillForm({
+      inputPath: sampleFormPdf,
+      outputPath,
+      fields: { Name_First: "Bob", DoesNotExist: "nope" },
+    });
+
+    expect(result.filled).toContain("Name_First");
+    expect(result.skipped).toContain("DoesNotExist");
+  });
+});
+
+describe("rotatePages", () => {
+  it("rotates all pages by 90 degrees", async () => {
+    const outputPath = path.join(os.tmpdir(), "test-rotate-all.pdf");
+    const result = await rotatePages({
+      inputPath: samplePdf,
+      outputPath,
+      rotation: 90,
+    });
+    expect(result.rotatedCount).toBeGreaterThanOrEqual(1);
+    expect(result.pageCount).toBe(result.rotatedCount);
+
+    const bytes = await fs.readFile(outputPath);
+    const doc = await PDF.load(new Uint8Array(bytes));
+    expect(doc.getPage(0)?.rotation).toBe(90);
+  });
+
+  it("rotates only specified pages", async () => {
+    const twoPagePath = path.join(os.tmpdir(), "test-rotate-source.pdf");
+    const p2 = path.join(os.tmpdir(), "test-rotate-p2.pdf");
+    await createPdf({ title: "P2", content: "page two", outputPath: p2 });
+    await mergePdfs({ inputPaths: [samplePdf, p2], outputPath: twoPagePath });
+
+    const outputPath = path.join(os.tmpdir(), "test-rotate-partial.pdf");
+    const result = await rotatePages({
+      inputPath: twoPagePath,
+      outputPath,
+      rotation: 180,
+      pages: [1],
+    });
+    expect(result.rotatedCount).toBe(1);
+
+    const bytes = await fs.readFile(outputPath);
+    const doc = await PDF.load(new Uint8Array(bytes));
+    expect(doc.getPage(0)?.rotation).toBe(180);
+    expect(doc.getPage(1)?.rotation).toBe(0);
+  });
+});
+
+describe("addPageNumbers", () => {
+  it("adds page numbers to all pages", async () => {
+    const outputPath = path.join(os.tmpdir(), "test-page-numbers.pdf");
+    const result = await addPageNumbers({ inputPath: samplePdf, outputPath });
+    expect(result.pageCount).toBeGreaterThanOrEqual(1);
+    expect(result.outputPath).toBe(outputPath);
+
+    const { text } = await extractPdfText({ inputPath: outputPath });
+    expect(text).toContain("1");
+  });
+
+  it("respects startAt and format options", async () => {
+    const outputPath = path.join(os.tmpdir(), "test-page-numbers-custom.pdf");
+    await addPageNumbers({
+      inputPath: samplePdf,
+      outputPath,
+      startAt: 5,
+      format: "Page {page}",
+    });
+    const { text } = await extractPdfText({ inputPath: outputPath });
+    expect(text).toContain("Page 5");
+  });
+
+  it("adds a centered header to all pages", async () => {
+    const outputPath = path.join(os.tmpdir(), "test-page-numbers-header.pdf");
+    await addPageNumbers({
+      inputPath: samplePdf,
+      outputPath,
+      header: "MY DOCUMENT",
+    });
+    const { text } = await extractPdfText({ inputPath: outputPath });
+    expect(text).toContain("MY DOCUMENT");
+  });
+
+  it("adds a centered footer to all pages", async () => {
+    const outputPath = path.join(os.tmpdir(), "test-page-numbers-footer.pdf");
+    await addPageNumbers({
+      inputPath: samplePdf,
+      outputPath,
+      footer: "CONFIDENTIAL",
+    });
+    const { text } = await extractPdfText({ inputPath: outputPath });
+    expect(text).toContain("CONFIDENTIAL");
+  });
+});
+
+describe("setMeta", () => {
+  it("sets title and author metadata", async () => {
+    const outputPath = path.join(os.tmpdir(), "test-set-meta.pdf");
+    await setMeta({
+      inputPath: samplePdf,
+      outputPath,
+      title: "My Report",
+      author: "Alice",
+    });
+
+    const bytes = await fs.readFile(outputPath);
+    const doc = await PDF.load(new Uint8Array(bytes));
+    expect(doc.getTitle()).toBe("My Report");
+    expect(doc.getAuthor()).toBe("Alice");
+  });
+
+  it("sets keywords as an array", async () => {
+    const outputPath = path.join(os.tmpdir(), "test-set-meta-kw.pdf");
+    await setMeta({
+      inputPath: samplePdf,
+      outputPath,
+      keywords: ["finance", "Q4"],
+    });
+
+    const bytes = await fs.readFile(outputPath);
+    const doc = await PDF.load(new Uint8Array(bytes));
+    const kw = doc.getKeywords();
+    expect(kw).toContain("finance");
+  });
+});
+
+describe("watermarkPdf", () => {
+  it("applies a diagonal watermark to all pages", async () => {
+    const outputPath = path.join(os.tmpdir(), "test-watermark.pdf");
+    const result = await watermarkPdf({
+      inputPath: samplePdf,
+      outputPath,
+      text: "DRAFT",
+    });
+    expect(result.pageCount).toBeGreaterThanOrEqual(1);
+    expect(result.outputPath).toBe(outputPath);
+  });
+
+  it("respects custom opacity and font size", async () => {
+    const outputPath = path.join(os.tmpdir(), "test-watermark-custom.pdf");
+    const result = await watermarkPdf({
+      inputPath: samplePdf,
+      outputPath,
+      text: "CONFIDENTIAL",
+      opacity: 0.1,
+      fontSize: 40,
+    });
+    expect(result.pageCount).toBeGreaterThanOrEqual(1);
   });
 });
