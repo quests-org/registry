@@ -3,6 +3,19 @@ description: General rules for the project.
 alwaysApply: true
 ---
 
+# registry repo
+
+# Repository Context
+
+This is a **skill and template registry**. It is not an application — it provides reusable components consumed by a separate AI workspace repository.
+
+- **`templates/`** — Project starter templates. The workspace uses `basic` as its default initialization folder; other templates (shadcn, nextjs, etc.) are alternatives.
+- **`skills/`** — Agent skills that get installed into the workspace's `skills/` directory on demand. Scripts inside a skill are executed from the workspace project root (not from this registry).
+
+Skills are tested in this repository (each skill has its own `tests/` directory), but keep the consumer context in mind: the agent running the scripts is working inside the workspace project, not inside this registry.
+
+## Code Style
+
 - NEVER add comments unless asked by the user.
 - Seriously, avoid comments unless EXPLICITLY asked by the user.
 - Don't add comments even if there are already comments in the code.
