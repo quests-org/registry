@@ -1,0 +1,17 @@
+{
+  "name": "@quests/skill-spreadsheet",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "papaparse": "^5.5.3",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
+  },
+  "devDependencies": {
+    "@types/papaparse": "^5.5.2"
+  },
+  "scripts": {
+    "check:types": "tsc --noEmit",
+    "test": "vitest run"
+  }
+}

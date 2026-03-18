@@ -1,0 +1,16 @@
+{
+  "name": "@quests/skill-zip",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "adm-zip": "^0.5.16"
+  },
+  "devDependencies": {
+    "@types/adm-zip": "^0.5.7"
+  },
+  "scripts": {
+    "check:types": "tsc --noEmit",
+    "test": "vitest run"
+  }
+}

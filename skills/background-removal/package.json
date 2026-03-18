@@ -1,0 +1,13 @@
+{
+  "name": "@quests/skill-background-removal",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@imgly/background-removal-node": "^1.4.5"
+  },
+  "scripts": {
+    "check:types": "tsc --noEmit",
+    "test": "vitest run"
+  }
+}

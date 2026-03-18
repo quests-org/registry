@@ -1,0 +1,14 @@
+{
+  "name": "@quests/skill-transformers-js",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@huggingface/transformers": "^3.8.1",
+    "sharp": "^0.34.5"
+  },
+  "scripts": {
+    "check:types": "tsc --noEmit",
+    "test": "vitest run"
+  }
+}
