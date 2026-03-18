@@ -12,7 +12,8 @@
     "pnpm-lock.yaml",
     "package-lock.json",
     "yarn.lock",
-    "**/*.tsbuildinfo"
+    "**/*.tsbuildinfo",
+    "*.local/**"
   ],
   "dictionaries": ["typescript", "node", "npm", "html", "css", "bash"],
   "words": [

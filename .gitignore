@@ -146,3 +146,6 @@ dist
 
 # Code Workspace
 *.code-workspace
+
+# Local folders
+*.local/
