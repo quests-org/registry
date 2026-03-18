@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 
-import { readFileSync, readdirSync } from "fs";
+import { existsSync, readFileSync, readdirSync } from "fs";
 import { join } from "path";
 import { estimateTokenCount } from "tokenx";
 
@@ -41,6 +41,101 @@ function parseFrontmatter(content: string): Frontmatter | null {
   }
 
   return result;
+}
+
+function validatePackageJson(folderName: string, skillPath: string): string[] {
+  const errors: string[] = [];
+  const pkgPath = join(skillPath, "package.json");
+
+  if (!existsSync(pkgPath)) return errors;
+
+  let pkg: Record<string, unknown>;
+  try {
+    pkg = JSON.parse(readFileSync(pkgPath, "utf-8"));
+  } catch {
+    errors.push("package.json is not valid JSON");
+    return errors;
+  }
+
+  const expectedName = `@quests/skill-${folderName}`;
+  if (pkg.name !== expectedName) {
+    errors.push(
+      `package.json "name" is "${pkg.name}", expected "${expectedName}"`,
+    );
+  }
+
+  if (pkg.version !== "0.0.0") {
+    errors.push(`package.json "version" is "${pkg.version}", expected "0.0.0"`);
+  }
+
+  if (pkg.private !== true) {
+    errors.push(`package.json "private" must be true`);
+  }
+
+  if (pkg.type !== "module") {
+    errors.push(`package.json "type" is "${pkg.type}", expected "module"`);
+  }
+
+  const scripts = pkg.scripts as Record<string, string> | undefined;
+  if (!scripts?.["check:types"]) {
+    errors.push(`package.json missing "check:types" script`);
+  } else if (scripts["check:types"] !== "tsc --noEmit") {
+    errors.push(
+      `package.json "check:types" script is "${scripts["check:types"]}", expected "tsc --noEmit"`,
+    );
+  }
+
+  return errors;
+}
+
+const CANONICAL_TSCONFIG_COMPILER_OPTIONS = {
+  allowImportingTsExtensions: true,
+  esModuleInterop: true,
+  isolatedModules: true,
+  lib: ["ES2023"],
+  module: "ESNext",
+  moduleResolution: "Bundler",
+  noEmit: true,
+  noUncheckedSideEffectImports: true,
+  skipLibCheck: true,
+  strict: true,
+  target: "ES2022",
+};
+
+const REQUIRED_INCLUDE_ENTRIES = ["scripts/**/*.ts", "tests/**/*.ts"];
+
+function validateTsconfig(skillPath: string): string[] {
+  const tsconfigPath = join(skillPath, "tsconfig.json");
+  if (!existsSync(tsconfigPath)) {
+    return ["Missing tsconfig.json"];
+  }
+
+  let tsconfig: {
+    compilerOptions?: Record<string, unknown>;
+    include?: string[];
+  };
+  try {
+    tsconfig = JSON.parse(readFileSync(tsconfigPath, "utf-8"));
+  } catch {
+    return ["tsconfig.json is not valid JSON"];
+  }
+
+  const errors: string[] = [];
+
+  if (
+    JSON.stringify(tsconfig.compilerOptions) !==
+    JSON.stringify(CANONICAL_TSCONFIG_COMPILER_OPTIONS)
+  ) {
+    errors.push("tsconfig.json compilerOptions do not match canonical config");
+  }
+
+  for (const entry of REQUIRED_INCLUDE_ENTRIES) {
+    if (!tsconfig.include?.includes(entry)) {
+      errors.push(`tsconfig.json include missing "${entry}"`);
+    }
+  }
+
+  return errors;
 }
 
 function validateSkill(folderName: string): string[] {
@@ -114,6 +209,16 @@ function validateSkill(folderName: string): string[] {
       `"compatibility" is ${fm.compatibility.length} characters (max ${COMPATIBILITY_MAX_LENGTH})`,
     );
   }
+
+  const hasScripts = existsSync(join(skillPath, "scripts"));
+  if (hasScripts && !existsSync(join(skillPath, "package.json"))) {
+    errors.push(
+      "Missing package.json (required when scripts/ directory exists)",
+    );
+  }
+
+  errors.push(...validatePackageJson(folderName, skillPath));
+  errors.push(...validateTsconfig(skillPath));
 
   return errors;
 }
