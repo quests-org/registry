@@ -1,8 +1,12 @@
+allowBuilds:
+  ffmpeg-static: true
+  onnxruntime-node: true
+allowUnusedPatches: true # If the skill is not loaded, the patch would fail
 configDependencies:
   "@pnpm/plugin-trusted-deps": 0.2.0+sha512-jqiCC8kyrwOERwMWPo2RB1YlDMMS5WsPSA8Uwi3EXAYwyOSNtqKhrB9bs543JGUiz4yaA9h6nE3q98fG14AEyQ==
 dlxCacheMaxAge: 259200 # 180 days in minutes, extended for pnpm dlx jiti
 packages:
   - skills/*
 patchedDependencies:
-  "@libpdf/core": skills/pdf/patches/@libpdf__core.patch # Remove when https://github.com/LibPDF-js/core/issues/55 is fixed
+  "@libpdf/core": patches/@libpdf__core.patch # Remove when https://github.com/LibPDF-js/core/issues/55 is fixed
 updateNotifier: false

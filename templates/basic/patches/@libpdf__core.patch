@@ -1,0 +1,22 @@
+diff --git a/dist/index.mjs b/dist/index.mjs
+--- a/dist/index.mjs
++++ b/dist/index.mjs
+@@ -22994,7 +22994,7 @@
+ 	*/
+ 	getFields() {
+ 		if (this.fieldsCache) return this.fieldsCache;
+-		const fieldsArray = this.dict.getArray("Fields");
++		const fieldsArray = this.dict.getArray("Fields", this.registry.resolve.bind(this.registry));
+ 		if (!fieldsArray) return [];
+ 		const visited = /* @__PURE__ */ new Set();
+ 		const fields = this.collectFields(fieldsArray, visited, "");
+@@ -22758,7 +22758,8 @@
+ 	* This isolates the original page's graphics state from our additions.
+ 	*/
+ 	wrapAndAppendContent(page, newContent) {
+-		const existing = page.get("Contents");
++		let existing = page.get("Contents");
++		if (existing instanceof PdfRef) existing = this.registry.resolve(existing) ?? existing;
+ 		const prefixBytes = new Uint8Array([113, 10]);
+ 		const prefixStream = new PdfStream(new PdfDict(), prefixBytes);
+ 		const prefixRef = this.registry.register(prefixStream);
