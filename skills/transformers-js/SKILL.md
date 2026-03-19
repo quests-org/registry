@@ -1,6 +1,6 @@
 ---
 name: transformers-js
-description: "On-device AI models via Hugging Face Transformers.js (no API keys). Use when the user wants to remove a background, cut out a subject, detect or identify objects, classify or caption an image, generate a depth map, segment regions, upscale a low-res image, transcribe audio to text, generate speech, classify or embed text, compute semantic similarity, or extract named entities."
+description: "Use when the user wants to remove an image background, detect objects, classify or describe an image, generate a depth map, segment an image, upscale an image, convert text to speech (TTS), transcribe audio to text (STT), classify text, find similar text, or extract names and entities. Runs locally with no API keys. Also use when testing or comparing AI models by ID."
 ---
 
 # Transformers.js
