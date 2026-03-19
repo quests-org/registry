@@ -65,19 +65,31 @@ Clear, step-by-step guidance for the agent.
 
 ## Writing Effective Descriptions
 
-The description is **critical** for skill discovery. The agent uses it to decide when to apply your skill.
+The description carries the entire burden of triggering — the agent only sees `name` + `description` when deciding whether to load a skill. Max 1024 characters.
 
-1. **Write in third person**:
-   - ✅ Good: "Processes Excel files and generates reports"
-   - ❌ Avoid: "I can help you process Excel files"
+### Principles
 
-2. **Be specific and include trigger terms**:
-   - ✅ Good: "Extract text and tables from PDF files. Use when working with PDF files or when the user mentions PDFs, forms, or document extraction."
-   - ❌ Vague: "Helps with documents"
+1. **Focus on user intent, not implementation.** Describe what the user is trying to achieve. "Use when the user wants to remove a background from an image" beats "Runs the RMBG-1.4 model via ONNX Runtime."
 
-3. **Include both WHAT and WHEN**:
-   - WHAT: What the skill does (specific capabilities)
-   - WHEN: When the agent should use it (trigger scenarios)
+2. **Use imperative phrasing.** Frame as an instruction: "Use when..." / "Activate when..." rather than "This skill does..."
+
+3. **Be pushy about when to activate.** Explicitly list trigger scenarios, including cases where the user doesn't name the domain directly: "even if they don't mention 'spreadsheet' or 'CSV'."
+
+4. **Lead with the most ambiguous capabilities.** If another skill shares keywords (e.g. two skills both work with images), put the distinguishing capabilities first so the agent reads them before pattern-matching on shared terms.
+
+5. **Disambiguate from similar skills.** When skills overlap in domain, add explicit negative signals: "Not for X (use other-skill)." Put these at the start — negative signals buried at the end of a long description are weak.
+
+6. **Keep it concise.** A few sentences is right. Long keyword lists dilute signal. Prefer intent-based phrases over exhaustive feature lists.
+
+### Before vs After
+
+```yaml
+# Before — implementation-focused, no trigger guidance
+description: Process CSV files.
+
+# After — intent-focused, pushy, includes non-obvious triggers
+description: Analyze CSV and tabular data files — compute summary statistics, add derived columns, generate charts, and clean messy data. Use when the user has a CSV, TSV, or Excel file and wants to explore, transform, or visualize the data, even if they don't explicitly mention "CSV" or "analysis."
+```
 
 ---
 
@@ -301,7 +313,7 @@ skills/image-resize/ in the repository root
 ````markdown
 ---
 name: image-resize
-description: Resize images to specified dimensions. Use when resizing images, thumbnails, or when the user needs to change image dimensions.
+description: "Resize images to target dimensions or generate thumbnails. Use when the user wants to scale, shrink, enlarge, or change the size of an image."
 ---
 
 # image-resize
@@ -342,9 +354,11 @@ Before finalizing a skill, verify:
 
 ### Core Quality
 
-- [ ] Description is specific and includes key terms
-- [ ] Description includes both WHAT and WHEN
-- [ ] Written in third person
+- [ ] Description focuses on user intent, not implementation
+- [ ] Description leads with the most ambiguous/distinguishing capabilities
+- [ ] Description includes explicit trigger scenarios ("Use when...", "Activate when...")
+- [ ] Description disambiguates from similar skills with negative signals if needed
+- [ ] Description is under 1024 characters
 - [ ] SKILL.md body is under 500 lines
 - [ ] Consistent terminology throughout
 
