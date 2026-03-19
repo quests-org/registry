@@ -3,17 +3,57 @@
   "ui": "tui",
   "tasks": {
     "check:types": {
+      "inputs": [
+        "scripts/**/*.ts",
+        "tests/**/*.ts",
+        "tsconfig.json",
+        "package.json"
+      ],
       "outputs": []
     },
     "test": {
+      "inputs": [
+        "**/*.{test,spec}.{js,jsx,ts,tsx,cjs,cjsx,cts,ctsx,mjs,mjx,mts,mtsx}",
+        "scripts/**",
+        "vitest.config.ts",
+        "tsconfig.json",
+        "package.json"
+      ],
       "outputs": []
     },
-    "//#check:syncpack": {},
-    "//#check:knip": {},
-    "//#check:gitignore": {},
-    "//#check:skills": {},
-    "//#check:spelling": {},
-    "//#check:unused-words": {},
-    "//#check:format": {}
+    "//#check:syncpack": {
+      "inputs": ["**/package.json", ".syncpackrc.ts"],
+      "outputs": []
+    },
+    "//#check:knip": {
+      "inputs": ["$TURBO_DEFAULT$", "knip.config.ts"],
+      "outputs": []
+    },
+    "//#check:gitignore": {
+      "inputs": ["templates/**/.gitignore", "scripts/check-gitignore.ts"],
+      "outputs": []
+    },
+    "//#check:skills": {
+      "inputs": [
+        "skills/**/SKILL.md",
+        "skills/**/package.json",
+        "skills/**/tsconfig.json",
+        "skills/**/scripts/**",
+        "scripts/validate-skills.ts"
+      ],
+      "outputs": []
+    },
+    "//#check:spelling": {
+      "inputs": ["$TURBO_DEFAULT$", "cspell.json"],
+      "outputs": []
+    },
+    "//#check:unused-words": {
+      "inputs": ["$TURBO_DEFAULT$", "cspell.json"],
+      "outputs": []
+    },
+    "//#check:format": {
+      "inputs": ["$TURBO_DEFAULT$", ".prettierignore"],
+      "outputs": []
+    }
   }
 }
