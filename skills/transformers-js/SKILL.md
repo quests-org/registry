@@ -1,6 +1,6 @@
 ---
 name: transformers-js
-description: "Run local AI models via Hugging Face Transformers.js (ONNX Runtime). Use when detecting objects, classifying images or text, generating depth maps, segmenting regions, describing/captioning images, transcribing speech to text, generating speech from text, computing text embeddings/similarity, extracting named entities (people, orgs, locations) from text, or upscaling images. Activate when the user wants on-device AI inference for vision, audio, or NLP tasks — not for pixel-level image editing (use images skill)."
+description: "On-device AI models via Hugging Face Transformers.js (no API keys). Use when the user wants to remove a background, cut out a subject, detect or identify objects, classify or caption an image, generate a depth map, segment regions, upscale a low-res image, transcribe audio to text, generate speech, classify or embed text, compute semantic similarity, or extract named entities."
 ---
 
 # Transformers.js
@@ -161,6 +161,24 @@ tsx skills/transformers-js/scripts/extract-entities.ts <text> [--group] [--model
 Extracts people (PER), organizations (ORG), locations (LOC), and miscellaneous entities (MISC) from text. Use `--group` for a deduplicated summary by type.
 
 Returns `{ entities: [{ type, text, score, start, end }] }`.
+
+### `remove-background.ts` Remove image background
+
+Export: `removeBackground({ inputPath, outputPath, model? })`
+
+```bash
+tsx skills/transformers-js/scripts/remove-background.ts <image> [--output <path>] [--model <id>]
+```
+
+| Argument          | Required | Default            | Description          |
+| ----------------- | -------- | ------------------ | -------------------- |
+| `<image>`         | Yes      |                    | Input image file     |
+| `--output <path>` | No       | `<name>-no-bg.png` | Output image path    |
+| `--model <id>`    | No       | `briaai/RMBG-1.4`  | HuggingFace model ID |
+
+Removes the background from an image using the `background-removal` pipeline, producing a transparent PNG. Uses RMBG-1.4 by default (most popular, general purpose).
+
+Returns `{ outputPath, width, height }`.
 
 ### `upscale-image.ts` Upscale an image (2x super-resolution)
 

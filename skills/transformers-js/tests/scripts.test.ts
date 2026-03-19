@@ -330,6 +330,38 @@ describe("extractEntitiesByType", () => {
   }, 120_000);
 });
 
+describe("removeBackground", () => {
+  it("produces a background-removed output image", async () => {
+    const fakeOutput = {
+      width: 200,
+      height: 150,
+      save: vi.fn(),
+    };
+    vi.doMock("../scripts/lib/pipeline.ts", () => ({
+      pipeline: vi
+        .fn()
+        .mockResolvedValue(vi.fn().mockResolvedValue([fakeOutput])),
+      validateImagePath,
+    }));
+
+    const { removeBackground: removeBgMocked } =
+      await import("../scripts/remove-background.ts");
+
+    const outputPath = path.join(os.tmpdir(), "test-no-bg.png");
+    const result = await removeBgMocked({
+      inputPath: kittenTinyJpg,
+      outputPath,
+    });
+
+    expect(result.outputPath).toBe(outputPath);
+    expect(result.width).toBe(200);
+    expect(result.height).toBe(150);
+    expect(fakeOutput.save).toHaveBeenCalledWith(outputPath);
+
+    vi.doUnmock("../scripts/lib/pipeline.ts");
+  });
+});
+
 // Upscale uses a large super-resolution model that takes 6s+ even on a tiny
 // image. The other image tests already exercise real pipeline() calls, so we
 // mock here to keep CI fast and only verify our wiring (validation, mkdir,
