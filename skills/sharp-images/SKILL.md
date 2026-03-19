@@ -1,6 +1,6 @@
 ---
-name: images
-description: "Manipulate images using sharp. Use when resizing, cropping, rotating, flipping, converting formats (png, jpeg, webp, avif, gif, tiff), compressing, optimizing file size, compositing/watermarking, annotating with bounding boxes/labels, adjusting brightness/saturation/contrast/sharpness, blurring, grayscale, or reading image metadata."
+name: sharp-images
+description: "Pixel-level image manipulation with sharp. Use when the user wants to resize, crop, rotate, flip, convert format (png, jpeg, webp, avif, gif, tiff), compress, optimize file size, watermark, composite, annotate, adjust brightness/saturation/contrast/sharpness, blur, grayscale, or read image metadata."
 ---
 
 # Images
