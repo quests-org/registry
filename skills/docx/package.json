@@ -1,0 +1,14 @@
+{
+  "name": "@quests/skill-docx",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "docx": "^9.6.1",
+    "mammoth": "^1.9.0"
+  },
+  "scripts": {
+    "check:types": "tsc --noEmit",
+    "test": "vitest run"
+  }
+}
