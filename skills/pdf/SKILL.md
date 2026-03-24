@@ -74,7 +74,7 @@ tsx skills/pdf/scripts/render-pages.ts <path> [--page <number>] [--scale <number
 - `--page` page number to render (default: all pages)
 - `--scale` render scale factor (default: `1.0`; use `2` for higher resolution)
 - `--output` directory to save images (default: `<pdf-name>-pages/`)
-- Saves each page as a PNG file named `page-01.png`, `page-02.png`, etc.
+- Saves each page as a PNG file named `page-1.png`, `page-2.png`, etc.; padding width matches total page count (e.g. `page-001.png` for a 100-page PDF)
 
 ## Creating and Modifying PDFs
 
