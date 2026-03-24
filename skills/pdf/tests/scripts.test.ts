@@ -11,6 +11,7 @@ import { extractPdfText } from "../scripts/extract-text";
 import { fillForm } from "../scripts/fill-form";
 import { getPdfMeta } from "../scripts/get-meta";
 import { imageToPdf } from "../scripts/image-to-pdf";
+import { insertImage } from "../scripts/insert-image";
 import { mergePdfs } from "../scripts/merge-pdfs";
 import { renderPdfPages } from "../scripts/render-pages";
 import { rotatePages } from "../scripts/rotate-pages";
@@ -417,6 +418,52 @@ describe("imageToPdf", () => {
     const page = doc.getPage(0);
     expect(page?.width).toBe(595);
     expect(page?.height).toBe(842);
+  });
+});
+
+describe("insertImage", () => {
+  it("inserts an image into the first page of an existing PDF", async () => {
+    const outputPath = path.join(os.tmpdir(), "test-insert-image.pdf");
+    const result = await insertImage({
+      inputPath: samplePdf,
+      outputPath,
+      imagePath: samplePng,
+      x: 50,
+      y: 50,
+      width: 100,
+    });
+    expect(result.pageCount).toBeGreaterThanOrEqual(1);
+    expect(result.outputPath).toBe(outputPath);
+
+    const bytes = await fs.readFile(outputPath);
+    expect(bytes.length).toBeGreaterThan(0);
+  });
+
+  it("inserts an image with custom opacity", async () => {
+    const outputPath = path.join(os.tmpdir(), "test-insert-image-opacity.pdf");
+    const result = await insertImage({
+      inputPath: samplePdf,
+      outputPath,
+      imagePath: samplePng,
+      x: 100,
+      y: 100,
+      opacity: 0.5,
+    });
+    expect(result.pageCount).toBeGreaterThanOrEqual(1);
+  });
+
+  it("throws when the page is out of range", async () => {
+    const outputPath = path.join(os.tmpdir(), "test-insert-image-oob.pdf");
+    await expect(
+      insertImage({
+        inputPath: samplePdf,
+        outputPath,
+        imagePath: samplePng,
+        x: 0,
+        y: 0,
+        page: 999,
+      }),
+    ).rejects.toThrow("out of range");
   });
 });
 

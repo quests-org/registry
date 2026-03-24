@@ -78,6 +78,22 @@ tsx skills/pdf/scripts/render-pages.ts <path> [--page <number>] [--scale <number
 
 ## Creating and Modifying PDFs
 
+### `insert-image.ts` Insert an image into an existing PDF
+
+Export: `insertImage({ inputPath, outputPath, imagePath, x, y, page?, width?, height?, opacity? })`
+
+Use when you need to overlay an image onto a specific page of an existing PDF at given coordinates.
+
+```bash
+tsx skills/pdf/scripts/insert-image.ts <input> --image <path> --x <n> --y <n> --output <path> [--page <n>] [--width <n>] [--height <n>] [--opacity <0-1>]
+```
+
+- `--image` path to the image file to insert (JPEG or PNG)
+- `--x` / `--y` position in PDF points from the bottom-left of the page (required)
+- `--page` 1-indexed page number to insert on (default: `1`)
+- `--width` / `--height` target dimensions in points; if only one is given, aspect ratio is preserved
+- `--opacity` image opacity, 0-1 (default: `1`)
+
 ### `image-to-pdf.ts` Convert images to a PDF
 
 Export: `imageToPdf({ imagePaths, outputPath, size? })`
