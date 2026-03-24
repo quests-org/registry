@@ -33,7 +33,12 @@ export async function fillForm({
 
   if (!form) {
     await writeFile(outputPath, await pdf.save());
-    return { filled: [], skipped: Object.keys(fields), outputPath };
+    return {
+      filled: [],
+      skipped: Object.keys(fields),
+      outputPath,
+      warnings: pdf.warnings,
+    };
   }
 
   const fieldNames = form.getFieldNames();
@@ -80,13 +85,15 @@ export async function fillForm({
   }
 
   if (flatten) {
-    form.flatten();
+    form.flatten({ regenerateAppearances: true });
   }
 
   const pdfBytes = await pdf.save();
   await writeFile(outputPath, pdfBytes);
 
-  return { filled, skipped, outputPath };
+  const warnings = pdf.warnings;
+
+  return { filled, skipped, outputPath, warnings };
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
@@ -182,5 +189,10 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   console.log(`Filled ${result.filled.length} field(s), saved to ${relOutput}`);
   if (result.skipped.length > 0) {
     console.log(`Skipped (not found): ${result.skipped.join(", ")}`);
+  }
+  if (result.warnings.length > 0) {
+    for (const warning of result.warnings) {
+      console.warn(`Warning: ${warning}`);
+    }
   }
 }
