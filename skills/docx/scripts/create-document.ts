@@ -11,6 +11,7 @@ import {
   TableCell,
   TableRow,
   TextRun,
+  WidthType,
 } from "docx";
 
 export interface BlockInput {
@@ -62,14 +63,28 @@ function blockToDocxElement(block: BlockInput) {
 
     case "table": {
       const rows = block.rows ?? [];
+      const colCount = Math.max(0, ...rows.map((r) => r.length));
+      const colWidth = colCount > 0 ? Math.floor(9026 / colCount) : 9026;
       return new Table({
+        width: { size: 100, type: WidthType.PERCENTAGE },
+        columnWidths: Array<number>(colCount).fill(colWidth),
         rows: rows.map(
-          (cells) =>
+          (cells, rowIndex) =>
             new TableRow({
               children: cells.map(
                 (cellText) =>
                   new TableCell({
-                    children: [new Paragraph(cellText)],
+                    width: { size: colWidth, type: WidthType.DXA },
+                    children: [
+                      new Paragraph({
+                        children: [
+                          new TextRun({
+                            text: cellText,
+                            bold: rowIndex === 0,
+                          }),
+                        ],
+                      }),
+                    ],
                   }),
               ),
             }),
