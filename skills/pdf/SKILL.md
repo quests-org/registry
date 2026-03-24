@@ -78,6 +78,20 @@ tsx skills/pdf/scripts/render-pages.ts <path> [--page <number>] [--scale <number
 
 ## Creating and Modifying PDFs
 
+### `image-to-pdf.ts` Convert images to a PDF
+
+Export: `imageToPdf({ imagePaths, outputPath, size? })`
+
+Use when you need to convert one or more images (JPEG or PNG) into a PDF.
+
+```bash
+tsx skills/pdf/scripts/image-to-pdf.ts <image1> [image2 ...] --output <path> [--size letter|a4|legal]
+```
+
+- Accepts one or more JPEG or PNG image paths; each becomes one page
+- `--size` page size: `letter` (default), `a4`, or `legal`
+- Images are centered and scaled to fit the page while preserving aspect ratio
+
 ### `create-pdf.ts` Create a new PDF from scratch
 
 Export: `createPdf({ title, content, outputPath })`
@@ -96,7 +110,7 @@ tsx skills/pdf/scripts/create-pdf.ts <content> --title <title> --output <path>
 
 Export: `watermarkPdf({ inputPath, outputPath, text, opacity?, fontSize? })`
 
-Use when you need to mark a document as DRAFT, CONFIDENTIAL, or similar — large diagonal text across each page.
+Use when you need to add large diagonal text across every page of a document.
 
 ```bash
 tsx skills/pdf/scripts/watermark-pdf.ts <input> --text <text> --output <path> [--opacity <0-1>] [--font-size <n>]
@@ -138,7 +152,7 @@ tsx skills/pdf/scripts/split-pdf.ts <input> --output <path> [--page <n>] [--star
 
 Export: `fillForm({ inputPath, outputPath, fields, flatten? })`
 
-Use when you need to populate a fillable PDF form. Write field data to a JSON file first, then pass the path with `--fields-file`. This avoids shell-escaping issues with field names that contain spaces or special characters.
+Use when you need to populate a fillable PDF form.
 
 ```bash
 tsx skills/pdf/scripts/fill-form.ts <input> --output <path> --fields-file <json> [--flatten] [--list]
@@ -154,7 +168,7 @@ tsx skills/pdf/scripts/fill-form.ts <input> --output <path> --fields-file <json>
 
 Export: `rotatePages({ inputPath, outputPath, rotation, pages? })`
 
-Use when pages are sideways or upside-down (e.g. scanned documents).
+Use when you need to rotate pages in a PDF.
 
 ```bash
 tsx skills/pdf/scripts/rotate-pages.ts <input> --output <path> [--rotation <90|180|270>] [--pages <1,2,3>]
@@ -167,7 +181,7 @@ tsx skills/pdf/scripts/rotate-pages.ts <input> --output <path> [--rotation <90|1
 
 Export: `addPageNumbers({ inputPath, outputPath, startAt?, position?, fontSize?, format?, header?, footer? })`
 
-Use when you need to number pages, add a document title header, or add a label (e.g. "CONFIDENTIAL") as a footer on every page. All options are independent and can be combined.
+Use when you need to add page numbers, a header, or a footer to every page.
 
 ```bash
 tsx skills/pdf/scripts/add-page-numbers.ts <input> --output <path> [--start-at <n>] [--position <pos>] [--font-size <n>] [--format '<text>'] [--header <text>] [--footer <text>]

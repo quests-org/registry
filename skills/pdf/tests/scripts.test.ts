@@ -10,6 +10,7 @@ import { extractPdfLinks } from "../scripts/extract-links";
 import { extractPdfText } from "../scripts/extract-text";
 import { fillForm } from "../scripts/fill-form";
 import { getPdfMeta } from "../scripts/get-meta";
+import { imageToPdf } from "../scripts/image-to-pdf";
 import { mergePdfs } from "../scripts/merge-pdfs";
 import { renderPdfPages } from "../scripts/render-pages";
 import { rotatePages } from "../scripts/rotate-pages";
@@ -378,6 +379,44 @@ describe("setMeta", () => {
     const doc = await PDF.load(new Uint8Array(bytes));
     const kw = doc.getKeywords();
     expect(kw).toContain("finance");
+  });
+});
+
+const samplePng = path.join(FIXTURES_DIR, "sample.png");
+
+describe("imageToPdf", () => {
+  it("creates a single-page PDF from a PNG", async () => {
+    const outputPath = path.join(os.tmpdir(), "test-image-to-pdf.pdf");
+    const result = await imageToPdf({ imagePaths: [samplePng], outputPath });
+    expect(result.pageCount).toBe(1);
+    expect(result.outputPath).toBe(outputPath);
+
+    const bytes = await fs.readFile(outputPath);
+    expect(bytes.length).toBeGreaterThan(0);
+  });
+
+  it("creates a multi-page PDF from multiple images", async () => {
+    const outputPath = path.join(os.tmpdir(), "test-image-to-pdf-multi.pdf");
+    const result = await imageToPdf({
+      imagePaths: [samplePng, samplePng],
+      outputPath,
+    });
+    expect(result.pageCount).toBe(2);
+  });
+
+  it("respects the size option", async () => {
+    const outputPath = path.join(os.tmpdir(), "test-image-to-pdf-a4.pdf");
+    const result = await imageToPdf({
+      imagePaths: [samplePng],
+      outputPath,
+      size: "a4",
+    });
+
+    const bytes = await fs.readFile(outputPath);
+    const doc = await PDF.load(new Uint8Array(bytes));
+    const page = doc.getPage(0);
+    expect(page?.width).toBe(595);
+    expect(page?.height).toBe(842);
   });
 });
 
