@@ -16,6 +16,10 @@ importers:
       svgo:
         specifier: ^4.0.1
         version: 4.0.1
+    devDependencies:
+      '@types/node':
+        specifier: 22.19.2
+        version: 22.19.2
 
 packages:
 
@@ -159,6 +163,9 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@types/node@22.19.2':
+    resolution: {integrity: sha512-LPM2G3Syo1GLzXLGJAKdqoU35XvrWzGJ21/7sgZTUpbkBaOasTj8tjwn6w+hCkqaa1TfJ/w67rJSwYItlJ2mYw==}
+
   boolbase@1.0.0:
     resolution: {integrity: sha512-JZOSA7Mo9sNGB8+UjSgzdLtokWAky1zbztM3WRLCbZ70/3cTANmQmOdR7y2g+J0e2WXywy1yS468tY+IruqEww==}
 
@@ -242,6 +249,9 @@ packages:
 
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
+
+  undici-types@6.21.0:
+    resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
 
 snapshots:
 
@@ -345,6 +355,10 @@ snapshots:
 
   '@img/sharp-win32-x64@0.34.5':
     optional: true
+
+  '@types/node@22.19.2':
+    dependencies:
+      undici-types: 6.21.0
 
   boolbase@1.0.0: {}
 
@@ -455,3 +469,5 @@ snapshots:
 
   tslib@2.8.1:
     optional: true
+
+  undici-types@6.21.0: {}

@@ -7,6 +7,9 @@
     "docx": "^9.6.1",
     "mammoth": "^1.9.0"
   },
+  "devDependencies": {
+    "@types/node": "22.19.2"
+  },
   "scripts": {
     "check:types": "tsc --noEmit",
     "test": "vitest run"

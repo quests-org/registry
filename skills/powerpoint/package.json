@@ -7,6 +7,9 @@
     "officeparser": "^6.0.4",
     "pptxgenjs": "^4.0.1"
   },
+  "devDependencies": {
+    "@types/node": "22.19.2"
+  },
   "scripts": {
     "check:types": "tsc --noEmit",
     "test": "vitest run"

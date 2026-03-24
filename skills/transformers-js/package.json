@@ -7,6 +7,9 @@
     "@huggingface/transformers": "^3.8.1",
     "sharp": "^0.34.5"
   },
+  "devDependencies": {
+    "@types/node": "22.19.2"
+  },
   "scripts": {
     "check:types": "tsc --noEmit",
     "test": "vitest run"

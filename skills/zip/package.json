@@ -7,7 +7,8 @@
     "adm-zip": "^0.5.16"
   },
   "devDependencies": {
-    "@types/adm-zip": "^0.5.7"
+    "@types/adm-zip": "^0.5.7",
+    "@types/node": "22.19.2"
   },
   "scripts": {
     "check:types": "tsc --noEmit",

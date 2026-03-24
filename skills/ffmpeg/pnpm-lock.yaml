@@ -13,6 +13,10 @@ importers:
       ffmpeg-static:
         specifier: ^5.3.0
         version: 5.3.0
+    devDependencies:
+      '@types/node':
+        specifier: 22.19.2
+        version: 22.19.2
 
 packages:
 
@@ -22,6 +26,9 @@ packages:
 
   '@types/node@10.17.60':
     resolution: {integrity: sha512-F0KIgDJfy2nA3zMLmWGKxcH2ZVEtCZXHHdOQs2gSaQ27+lNeEfGxzkIw90aXswATX7AZ33tahPbzy6KAfUreVw==}
+
+  '@types/node@22.19.2':
+    resolution: {integrity: sha512-LPM2G3Syo1GLzXLGJAKdqoU35XvrWzGJ21/7sgZTUpbkBaOasTj8tjwn6w+hCkqaa1TfJ/w67rJSwYItlJ2mYw==}
 
   agent-base@6.0.2:
     resolution: {integrity: sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==}
@@ -87,6 +94,9 @@ packages:
   typedarray@0.0.6:
     resolution: {integrity: sha512-/aCDEGatGvZ2BIk+HmLf4ifCJFwvKFNb9/JeZPMulfgFracn9QFcAf5GO8B/mweUjSoblS5In0cWhqpfs/5PQA==}
 
+  undici-types@6.21.0:
+    resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
+
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
@@ -100,6 +110,10 @@ snapshots:
       parse-cache-control: 1.0.1
 
   '@types/node@10.17.60': {}
+
+  '@types/node@22.19.2':
+    dependencies:
+      undici-types: 6.21.0
 
   agent-base@6.0.2:
     dependencies:
@@ -165,5 +179,7 @@ snapshots:
       safe-buffer: 5.2.1
 
   typedarray@0.0.6: {}
+
+  undici-types@6.21.0: {}
 
   util-deprecate@1.0.2: {}
