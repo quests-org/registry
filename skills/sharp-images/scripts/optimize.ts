@@ -69,7 +69,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 
   if (!filePath) {
     console.error(
-      "Usage: tsx skills/images/scripts/optimize.ts <path> [--quality <1-100>] [--effort <0-10>] [--progressive] [--lossless] [--output <path>]",
+      "Usage: tsx skills/sharp-images/scripts/optimize.ts <path> [--quality <1-100>] [--effort <0-10>] [--progressive] [--lossless] [--output <path>]",
     );
     process.exit(1);
   }

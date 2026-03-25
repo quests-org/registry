@@ -16,7 +16,7 @@ For the complete Sharp API reference, see [references/REFERENCE.md](references/R
 Export: `resizeImage({ inputPath, outputPath, width?, height?, fit?, withoutEnlargement?, background?, kernel?, position? })`
 
 ```bash
-tsx skills/images/scripts/resize.ts <path> [--width <px>] [--height <px>] [--fit <mode>] [--no-enlarge] [--output <path>]
+tsx skills/sharp-images/scripts/resize.ts <path> [--width <px>] [--height <px>] [--fit <mode>] [--no-enlarge] [--output <path>]
 ```
 
 | Argument           | Required | Default | Description                                                      |
@@ -37,7 +37,7 @@ If neither `--width` nor `--height` is given, prints image metadata instead.
 Export: `cropImage({ inputPath, outputPath, width, height, left?, top?, strategy? })`
 
 ```bash
-tsx skills/images/scripts/crop.ts <path> --width <px> --height <px> [--left <px>] [--top <px>] [--strategy <entropy|attention>] [--output <path>]
+tsx skills/sharp-images/scripts/crop.ts <path> --width <px> --height <px> [--left <px>] [--top <px>] [--strategy <entropy|attention>] [--output <path>]
 ```
 
 | Argument          | Required | Default   | Description                             |
@@ -57,7 +57,7 @@ When `--left` and `--top` are given, extracts an exact region. Otherwise, uses s
 Export: `rotateImage({ inputPath, outputPath, angle?, flip?, flop?, background? })`
 
 ```bash
-tsx skills/images/scripts/rotate.ts <path> [--angle <degrees>] [--flip] [--flop] [--background <color>] [--output <path>]
+tsx skills/sharp-images/scripts/rotate.ts <path> [--angle <degrees>] [--flip] [--flop] [--background <color>] [--output <path>]
 ```
 
 | Argument               | Required | Default | Description                                       |
@@ -74,7 +74,7 @@ tsx skills/images/scripts/rotate.ts <path> [--angle <degrees>] [--flip] [--flop]
 Export: `convertImage({ inputPath, outputPath, format, quality? })`
 
 ```bash
-tsx skills/images/scripts/convert.ts <path> --format <fmt> [--quality <1-100>] [--output <path>]
+tsx skills/sharp-images/scripts/convert.ts <path> --format <fmt> [--quality <1-100>] [--output <path>]
 ```
 
 | Argument            | Required | Default        | Description                                                        |
@@ -89,7 +89,7 @@ tsx skills/images/scripts/convert.ts <path> --format <fmt> [--quality <1-100>] [
 Export: `optimizeImage({ inputPath, outputPath, quality?, effort?, progressive?, lossless? })`
 
 ```bash
-tsx skills/images/scripts/optimize.ts <path> [--quality <1-100>] [--effort <0-10>] [--progressive] [--lossless] [--output <path>]
+tsx skills/sharp-images/scripts/optimize.ts <path> [--quality <1-100>] [--effort <0-10>] [--progressive] [--lossless] [--output <path>]
 ```
 
 | Argument            | Required | Default        | Description                           |
@@ -108,7 +108,7 @@ Re-encodes in the same format. Reports original vs optimized size.
 Export: `compositeImages({ inputPath, outputPath, overlayPath, gravity?, top?, left?, blend?, tile?, opacity? })`
 
 ```bash
-tsx skills/images/scripts/composite.ts <base-image> --overlay <image> [--gravity <pos>] [--top <px>] [--left <px>] [--blend <mode>] [--opacity <0-1>] [--tile] [--output <path>]
+tsx skills/sharp-images/scripts/composite.ts <base-image> --overlay <image> [--gravity <pos>] [--top <px>] [--left <px>] [--blend <mode>] [--opacity <0-1>] [--tile] [--output <path>]
 ```
 
 | Argument            | Required | Default  | Description                                   |
@@ -128,7 +128,7 @@ tsx skills/images/scripts/composite.ts <base-image> --overlay <image> [--gravity
 Export: `annotateImage({ inputPath, outputPath, annotations, strokeWidth?, fontSize? })`
 
 ```bash
-tsx skills/images/scripts/annotate.ts <image> --json <annotations> [--stroke-width <px>] [--font-size <px>] [--output <path>]
+tsx skills/sharp-images/scripts/annotate.ts <image> --json <annotations> [--stroke-width <px>] [--font-size <px>] [--output <path>]
 ```
 
 | Argument              | Required | Default | Description                                           |
@@ -148,7 +148,7 @@ Renders SVG shapes directly onto the image — no extra dependencies needed. Use
 Export: `adjustImage({ inputPath, outputPath, brightness?, saturation?, hue?, lightness?, sharpen?, blur?, gamma?, grayscale?, negate?, normalize?, tint?, threshold?, median? })`
 
 ```bash
-tsx skills/images/scripts/adjust.ts <path> [options] [--output <path>]
+tsx skills/sharp-images/scripts/adjust.ts <path> [options] [--output <path>]
 ```
 
 | Argument              | Required | Default | Description                           |
@@ -174,7 +174,7 @@ Multiple adjustments can be combined in a single call.
 Export: `getImageMetadata({ inputPath })`
 
 ```bash
-tsx skills/images/scripts/get-metadata.ts <path>
+tsx skills/sharp-images/scripts/get-metadata.ts <path>
 ```
 
 | Argument | Required | Description      |

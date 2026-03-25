@@ -132,7 +132,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 
   if (!filePath) {
     console.error(
-      "Usage: tsx skills/images/scripts/adjust.ts <path> [--brightness <n>] [--saturation <n>] [--hue <deg>] [--sharpen <sigma>] [--blur <sigma>] [--gamma <n>] [--grayscale] [--negate] [--normalize] [--tint <color>] [--threshold <0-255>] [--median <size>] [--output <path>]",
+      "Usage: tsx skills/sharp-images/scripts/adjust.ts <path> [--brightness <n>] [--saturation <n>] [--hue <deg>] [--sharpen <sigma>] [--blur <sigma>] [--gamma <n>] [--grayscale] [--negate] [--normalize] [--tint <color>] [--threshold <0-255>] [--median <size>] [--output <path>]",
     );
     process.exit(1);
   }

@@ -124,7 +124,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 
   if (!filePath || !values.json) {
     console.error(
-      "Usage: tsx skills/images/scripts/annotate.ts <image> --json <annotations.json> [--stroke-width <px>] [--font-size <px>] [--output <path>]",
+      "Usage: tsx skills/sharp-images/scripts/annotate.ts <image> --json <annotations.json> [--stroke-width <px>] [--font-size <px>] [--output <path>]",
     );
     console.error(
       '\nJSON format: [{ "left": 10, "top": 10, "width": 100, "height": 50, "label": "Cat", "color": "#FF0000" }]',
