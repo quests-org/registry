@@ -1,0 +1,16 @@
+{
+  "name": "@quests/skill-wireframe",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@tailwindcss/browser": "^4.2.2"
+  },
+  "devDependencies": {
+    "@types/node": "22.19.2"
+  },
+  "scripts": {
+    "check:types": "tsc --noEmit",
+    "test": "vitest run"
+  }
+}

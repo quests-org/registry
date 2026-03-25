@@ -1,0 +1,40 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+pnpmfileChecksum: sha256-ZfwGjIvQgPR9mEJg5iihJauZ5iv1Ogj5lI/dgVj7pgI=
+
+importers:
+
+  .:
+    dependencies:
+      '@tailwindcss/browser':
+        specifier: ^4.2.2
+        version: 4.2.2
+    devDependencies:
+      '@types/node':
+        specifier: 22.19.2
+        version: 22.19.2
+
+packages:
+
+  '@tailwindcss/browser@4.2.2':
+    resolution: {integrity: sha512-JVdJBWWtvKxliBI9CtpOrqxgk8aijUWGsn0STxcOcXAYsUFAbOxN5PwawOJ+v0PoQfPcOK9eZoj9LTwvBV0Vmw==}
+
+  '@types/node@22.19.2':
+    resolution: {integrity: sha512-LPM2G3Syo1GLzXLGJAKdqoU35XvrWzGJ21/7sgZTUpbkBaOasTj8tjwn6w+hCkqaa1TfJ/w67rJSwYItlJ2mYw==}
+
+  undici-types@6.21.0:
+    resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
+
+snapshots:
+
+  '@tailwindcss/browser@4.2.2': {}
+
+  '@types/node@22.19.2':
+    dependencies:
+      undici-types: 6.21.0
+
+  undici-types@6.21.0: {}
