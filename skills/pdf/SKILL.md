@@ -117,20 +117,20 @@ Exports:
 fill-form
 
 Usage:
-  $ fill-form form.pdf --field name=John --output filled.pdf
+  $ fill-form form.pdf --json '{"name":"John","agree":true}' --output filled.pdf
 
 Options:
-  --fields-file <json>  JSON file containing field values
-  --field <key=value>   Single field assignment (repeatable)
-  --flatten             Flatten filled fields into static PDF content
-  --list                List available form fields
-  --output <path>       Output PDF file path
-  -h, --help            Display this message
+  --json <inlineJson>  Inline JSON object of field values
+  --json-file <path>   Path to JSON file of field values
+  --flatten            Flatten filled fields into static PDF content
+  --list               List available form fields
+  --output <path>      Output PDF file path
+  -h, --help           Display this message
 ```
 
 > [!NOTE]
-> Use --list to discover available field names before filling
-> Field names are matched with trimmed whitespace, so trailing spaces in PDF field names are handled automatically. Use `true`/`false` strings for checkbox fields.
+> One of --json (inline JSON object) or --json-file (path to JSON file) is required. Each key is a field name; values are strings or booleans (for checkboxes).
+> Use --list to discover available field names before filling. Field names are matched with trimmed whitespace.
 > Use --flatten to bake filled values into the page so the form is no longer editable.
 
 ### `get-meta.ts` Read metadata and document info from a PDF

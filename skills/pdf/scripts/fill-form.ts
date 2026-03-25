@@ -1,7 +1,7 @@
 /**
  * Fill PDF form fields by name and optionally flatten the form
- * @note Use --list to discover available field names before filling
- * @note Field names are matched with trimmed whitespace, so trailing spaces in PDF field names are handled automatically. Use `true`/`false` strings for checkbox fields.
+ * @note One of --json (inline JSON object) or --json-file (path to JSON file) is required. Each key is a field name; values are strings or booleans (for checkboxes).
+ * @note Use --list to discover available field names before filling. Field names are matched with trimmed whitespace.
  * @note Use --flatten to bake filled values into the page so the form is no longer editable.
  */
 import { readFile, writeFile } from "node:fs/promises";
@@ -104,11 +104,11 @@ export async function fillForm({
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("fill-form");
-  cli.usage("form.pdf --field name=John --output filled.pdf");
-  cli.option("--fields-file <json>", "JSON file containing field values");
-  cli.option("--field <key=value>", "Single field assignment (repeatable)", {
-    type: [],
-  });
+  cli.usage(
+    'form.pdf --json \'{"name":"John","agree":true}\' --output filled.pdf',
+  );
+  cli.option("--json <inlineJson>", "Inline JSON object of field values");
+  cli.option("--json-file <path>", "Path to JSON file of field values");
   cli.option("--flatten", "Flatten filled fields into static PDF content");
   cli.option("--list", "List available form fields");
   cli.option("--output <path>", "Output PDF file path");
@@ -141,37 +141,32 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     throw new Error("--output is required");
   }
 
-  let fields: Record<string, string | boolean> = {};
-  if (options.fieldsFile) {
-    const raw = await readFile(resolve(options.fieldsFile), "utf-8");
+  if (!options.json && !options.jsonFile) {
+    cli.outputHelp();
+    process.exit(1);
+  }
+
+  let fields: Record<string, string | boolean>;
+  try {
+    const raw = options.jsonFile
+      ? await readFile(resolve(options.jsonFile), "utf-8")
+      : options.json;
+    if (raw === undefined) {
+      throw new Error("Missing fields JSON");
+    }
     const parsed: unknown = JSON.parse(raw);
     if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
-      throw new Error(
-        "--fields-file must contain a JSON object of key/value pairs",
-      );
+      throw new Error("JSON must be an object of key/value pairs");
     }
+    fields = {};
     for (const [key, val] of Object.entries(parsed)) {
       fields[key] = typeof val === "boolean" ? val : String(val);
     }
+  } catch {
+    console.error("Failed to parse fields JSON");
+    process.exit(1);
   }
-  if (options.field?.length) {
-    for (const entry of options.field) {
-      const eq = entry.indexOf("=");
-      if (eq === -1) {
-        throw new Error(
-          `Invalid --field format (expected key=value): ${entry}`,
-        );
-      }
-      const key = entry.slice(0, eq);
-      const raw = entry.slice(eq + 1);
-      fields[key] = raw === "true" ? true : raw === "false" ? false : raw;
-    }
-  }
-  if (Object.keys(fields).length === 0) {
-    throw new Error(
-      "Provide fields via --fields-file <json> or --field key=value",
-    );
-  }
+
   const result = await fillForm({
     inputPath: resolve(inputPath),
     outputPath: resolve(options.output),
@@ -185,8 +180,9 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     console.log(`Skipped (not found): ${result.skipped.join(", ")}`);
   }
   if (result.warnings.length > 0) {
-    for (const warning of result.warnings) {
-      console.warn(`Warning: ${warning}`);
-    }
+    const counts = new Map<string, number>();
+    for (const w of result.warnings) counts.set(w, (counts.get(w) ?? 0) + 1);
+    for (const [w, n] of counts)
+      console.warn(`Warning: ${w}${n > 1 ? ` (x${n})` : ""}`);
   }
 }
