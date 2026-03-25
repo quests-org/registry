@@ -138,6 +138,51 @@ function validateTsconfig(skillPath: string): string[] {
   return errors;
 }
 
+const SKILL_PATH_RE_CACHE = new Map<string, RegExp>();
+
+function getSkillPathRe(folderName: string): RegExp {
+  let re = SKILL_PATH_RE_CACHE.get(folderName);
+  if (!re) {
+    const escaped = folderName.replace(/[-]/g, "\\-");
+    re = new RegExp(`skills/${escaped}/`);
+    SKILL_PATH_RE_CACHE.set(folderName, re);
+  }
+  return re;
+}
+
+function validateNoAbsoluteSkillPaths(
+  folderName: string,
+  skillPath: string,
+): string[] {
+  const errors: string[] = [];
+  const re = getSkillPathRe(folderName);
+
+  const dirsToCheck = ["scripts"];
+  const filesToCheck: string[] = [join(skillPath, "SKILL.md")];
+
+  for (const dir of dirsToCheck) {
+    const dirPath = join(skillPath, dir);
+    if (!existsSync(dirPath)) continue;
+    const files = readdirSync(dirPath, { withFileTypes: true })
+      .filter((f) => f.isFile())
+      .map((f) => join(dirPath, f.name));
+    filesToCheck.push(...files);
+  }
+
+  for (const filePath of filesToCheck) {
+    if (!existsSync(filePath)) continue;
+    const source = readFileSync(filePath, "utf-8");
+    if (re.test(source)) {
+      const relative = filePath.slice(skillPath.length + 1);
+      errors.push(
+        `${relative}: references "skills/${folderName}/" (use skill-relative paths instead)`,
+      );
+    }
+  }
+
+  return errors;
+}
+
 function validateSkill(folderName: string): string[] {
   const errors: string[] = [];
   const skillPath = join(SKILLS_DIR, folderName);
@@ -219,6 +264,7 @@ function validateSkill(folderName: string): string[] {
 
   errors.push(...validatePackageJson(folderName, skillPath));
   errors.push(...validateTsconfig(skillPath));
+  errors.push(...validateNoAbsoluteSkillPaths(folderName, skillPath));
 
   return errors;
 }
