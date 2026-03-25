@@ -175,7 +175,7 @@ Multiple adjustments can be combined in a single call.
 
 ### `get-metadata.ts` Get image metadata
 
-Export: `getImageMetadata({ inputPath })`
+Export: `getImageMetadata({ inputPath }) → Promise<{ channels, density, format, hasAlpha, height, size, space, width }>`
 
 ```bash
 tsx skills/sharp-images/scripts/get-metadata.ts <path>
