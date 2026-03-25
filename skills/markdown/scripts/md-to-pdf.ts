@@ -1,5 +1,5 @@
 import { readFile, writeFile } from "node:fs/promises";
-import { basename, extname, relative, resolve } from "node:path";
+import { basename, extname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import { markdownToPdf } from "@mdpdf/mdpdf";
@@ -45,6 +45,6 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     outputPath: values.output ? resolve(values.output) : undefined,
   });
 
-  const relOutput = relative(process.cwd(), result.outputPath) || ".";
+  const relOutput = result.outputPath;
   console.log(`Converted ${basename(inputPath)} → ${relOutput}`);
 }

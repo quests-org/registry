@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { readFile } from "node:fs/promises";
-import { basename, extname, relative, resolve } from "node:path";
+import { basename, extname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import sharp from "sharp";
@@ -72,7 +72,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   console.log(`Found ${images.length} image(s) on ${pageLabel}`);
 
   const pad = String(images.length).length;
-  const relDir = relative(process.cwd(), outputDir) || ".";
+  const relDir = outputDir;
   let i = 0;
   for (const img of images) {
     i++;

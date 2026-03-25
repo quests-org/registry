@@ -1,5 +1,5 @@
 import { readFile, writeFile } from "node:fs/promises";
-import { extname, relative, resolve } from "node:path";
+import { extname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import { PDF } from "@libpdf/core";
@@ -94,6 +94,6 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     opacity: values.opacity !== undefined ? Number(values.opacity) : 1,
   });
 
-  const relOutput = relative(process.cwd(), result.outputPath) || ".";
+  const relOutput = result.outputPath;
   console.log(`Saved PDF with image inserted at ${relOutput}`);
 }

@@ -1,5 +1,5 @@
 import { lstatSync } from "node:fs";
-import { basename, relative, resolve } from "node:path";
+import { basename, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import AdmZip from "adm-zip";
@@ -53,6 +53,6 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     inputPaths: positionals,
   });
 
-  const relOutput = relative(process.cwd(), result.outputPath) || ".";
+  const relOutput = result.outputPath;
   console.log(`Created ${relOutput} (${result.entryCount} entries)`);
 }

@@ -1,5 +1,5 @@
 import { mkdir } from "node:fs/promises";
-import { dirname, relative, resolve } from "node:path";
+import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import sharp from "sharp";
@@ -143,7 +143,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
       outputPath: resolve(values.output),
       model: values.model ?? DEFAULT_MODEL,
     });
-    const relOutput = relative(process.cwd(), result.outputPath) || ".";
+    const relOutput = result.outputPath;
     console.log(
       `Segmented ${result.segments.length} regions → ${relOutput} (${result.width}x${result.height})`,
     );

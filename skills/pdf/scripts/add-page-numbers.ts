@@ -1,5 +1,5 @@
 import { readFile, writeFile } from "node:fs/promises";
-import { relative, resolve } from "node:path";
+import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import { PDF, rgb } from "@libpdf/core";
@@ -144,7 +144,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     footer: values.footer,
   });
 
-  const relOutput = relative(process.cwd(), result.outputPath) || ".";
+  const relOutput = result.outputPath;
   console.log(
     `Added page numbers to ${result.pageCount} page(s), saved to ${relOutput}`,
   );

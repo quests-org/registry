@@ -129,16 +129,19 @@ tsx skills/sharp-images/scripts/composite.ts <base-image> --overlay <image> [--g
 Export: `annotateImage({ inputPath, outputPath, annotations, strokeWidth?, fontSize? })`
 
 ```bash
-tsx skills/sharp-images/scripts/annotate.ts <image> --json <annotations> [--stroke-width <px>] [--font-size <px>] [--output <path>]
+tsx skills/sharp-images/scripts/annotate.ts <image> --json <inline-json> [--json-file <path>] [--stroke-width <px>] [--font-size <px>] [--output <path>]
 ```
 
-| Argument              | Required | Default | Description                                           |
-| --------------------- | -------- | ------- | ----------------------------------------------------- |
-| `<image>`             | Yes      |         | Input image file                                      |
-| `--json <data>`       | Yes      |         | Annotations as inline JSON array or path to JSON file |
-| `--stroke-width <px>` | No       | `2`     | Border thickness                                      |
-| `--font-size <px>`    | No       | `14`    | Label text size                                       |
-| `--output <path>`     | No       | auto    | Output path                                           |
+| Argument              | Required | Default | Description                                |
+| --------------------- | -------- | ------- | ------------------------------------------ |
+| `<image>`             | Yes      |         | Input image file                           |
+| `--json <data>`       | Yes\*    |         | Annotations as inline JSON array           |
+| `--json-file <path>`  | Yes\*    |         | Path to a JSON file containing annotations |
+| `--stroke-width <px>` | No       | `2`     | Border thickness                           |
+| `--font-size <px>`    | No       | `14`    | Label text size                            |
+| `--output <path>`     | No       | auto    | Output path                                |
+
+\*One of `--json` or `--json-file` is required.
 
 Each annotation object: `{ left, top, width, height, label?, color? }`. Colors cycle automatically when omitted.
 

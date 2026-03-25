@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
-import { dirname, relative, resolve } from "node:path";
+import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import { buildHtml } from "./lib/template.ts";
@@ -54,6 +54,6 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     theme: values.theme,
   });
 
-  const relOutput = relative(process.cwd(), result.outputPath) || ".";
+  const relOutput = result.outputPath;
   console.log(`Created ${relOutput}`);
 }

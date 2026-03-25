@@ -1,5 +1,5 @@
 import { readFile, writeFile } from "node:fs/promises";
-import { extname, relative, resolve } from "node:path";
+import { extname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import * as XLSX from "xlsx";
@@ -76,6 +76,6 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   });
 
   console.log(
-    `Converted ${relative(process.cwd(), result.inputPath)} -> ${relative(process.cwd(), result.outputPath)} (${result.direction})`,
+    `Converted ${result.inputPath} -> ${result.outputPath} (${result.direction})`,
   );
 }

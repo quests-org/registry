@@ -1,5 +1,5 @@
 import { writeFile } from "node:fs/promises";
-import { relative, resolve } from "node:path";
+import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import { OfficeParser } from "officeparser";
@@ -32,7 +32,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   if (values.output) {
     const outputPath = resolve(values.output);
     await writeFile(outputPath, result.text, "utf-8");
-    const relOutput = relative(process.cwd(), outputPath) || ".";
+    const relOutput = outputPath;
     console.log(`Text written to ${relOutput}`);
   } else {
     console.log(result.text);

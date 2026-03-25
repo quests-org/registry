@@ -1,4 +1,4 @@
-import { basename, dirname, relative, resolve } from "node:path";
+import { basename, dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import AdmZip from "adm-zip";
@@ -52,7 +52,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     outputDir: values.output,
   });
 
-  const relOutput = relative(process.cwd(), result.outputDir) || ".";
+  const relOutput = result.outputDir;
   console.log(`Extracted to ${relOutput}:`);
   for (const file of result.files) {
     console.log(`  ${file}`);

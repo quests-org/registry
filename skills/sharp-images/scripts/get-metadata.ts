@@ -1,5 +1,5 @@
 import { stat } from "node:fs/promises";
-import { relative, resolve } from "node:path";
+import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import sharp from "sharp";
@@ -29,13 +29,14 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const [filePath] = positionals;
 
   if (!filePath) {
-    console.error("Usage: tsx skills/sharp-images/scripts/get-metadata.ts <path>");
+    console.error(
+      "Usage: tsx skills/sharp-images/scripts/get-metadata.ts <path>",
+    );
     process.exit(1);
   }
 
   const inputPath = resolve(filePath);
   const metadata = await getImageMetadata({ inputPath });
-  const relInput = relative(process.cwd(), inputPath) || ".";
-  console.log(`Metadata for ${relInput}:`);
+  console.log(`Metadata for ${filePath}:`);
   console.log(JSON.stringify(metadata, null, 2));
 }

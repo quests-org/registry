@@ -1,5 +1,5 @@
 import { readFile, writeFile } from "node:fs/promises";
-import { parse, relative, resolve } from "node:path";
+import { parse, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import sharp from "sharp";
@@ -148,8 +148,9 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     tile: values.tile,
     top: values.top !== undefined ? Number(values.top) : undefined,
   });
-  const relOutput = relative(process.cwd(), result.outputPath) || ".";
+  const displayOutput =
+    values.output ?? `${parsed.name}-composite${parsed.ext}`;
   console.log(
-    `Composited → ${relOutput} (${result.width}×${result.height}, ${result.bytes} bytes)`,
+    `Composited → ${displayOutput} (${result.width}×${result.height}, ${result.bytes} bytes)`,
   );
 }

@@ -1,6 +1,6 @@
 import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
-import { relative, resolve } from "node:path";
+import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import { getFFmpegPath } from "./lib/ffmpeg.ts";
@@ -112,7 +112,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 
   const inputPath = resolve(filePath);
   const result = probe({ inputPath });
-  const relInput = relative(process.cwd(), inputPath) || filePath;
+  const relInput = filePath;
 
   if (values.json) {
     console.log(JSON.stringify(result, null, 2));

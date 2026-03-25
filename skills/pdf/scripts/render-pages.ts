@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { readFile } from "node:fs/promises";
-import { basename, extname, relative, resolve } from "node:path";
+import { basename, extname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import {
@@ -84,7 +84,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   console.log(`Rendering ${pageLabel}`);
 
   const pad = String(numPages).length;
-  const relDir = relative(process.cwd(), outputDir) || ".";
+  const relDir = outputDir;
   for (const { page: p, buffer } of results) {
     const idx = String(p).padStart(pad, "0");
     const outPath = `${outputDir}/page-${idx}.png`;

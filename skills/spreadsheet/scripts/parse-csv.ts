@@ -1,5 +1,5 @@
 import fs from "node:fs/promises";
-import { relative, resolve } from "node:path";
+import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 
@@ -59,7 +59,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   if (values.output) {
     const outputPath = resolve(values.output);
     await fs.writeFile(outputPath, json, "utf-8");
-    console.log(`Parsed CSV → ${relative(process.cwd(), outputPath)}`);
+    console.log(`Parsed CSV → ${outputPath}`);
   } else {
     console.log(json);
   }

@@ -1,5 +1,5 @@
 import { readFile, writeFile } from "node:fs/promises";
-import { relative, resolve } from "node:path";
+import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 
@@ -74,7 +74,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   });
 
   if (result.outputPath) {
-    const relOutput = relative(process.cwd(), result.outputPath) || ".";
+    const relOutput = result.outputPath;
     console.log(`Converted → ${relOutput}`);
   } else {
     process.stdout.write(result.markdown);

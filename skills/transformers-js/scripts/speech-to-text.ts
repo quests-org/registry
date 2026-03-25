@@ -1,5 +1,5 @@
 import { readFile } from "node:fs/promises";
-import { relative, resolve } from "node:path";
+import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import { pipeline } from "./lib/pipeline.ts";
@@ -138,7 +138,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   }
 
   const inputPath = resolve(filePath);
-  const relInput = relative(process.cwd(), inputPath) || filePath;
+  const relInput = filePath;
 
   const result = await speechToText({
     inputPath,

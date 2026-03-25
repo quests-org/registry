@@ -1,4 +1,4 @@
-import { relative, resolve } from "node:path";
+import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import { pipeline } from "./lib/pipeline.ts";
@@ -127,7 +127,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   } else if (values.file) {
     const { readFile } = await import("node:fs/promises");
     const filePath = resolve(values.file);
-    const relPath = relative(process.cwd(), filePath) || values.file;
+    const relPath = values.file;
     const content = await readFile(filePath, "utf-8");
     const lines = content
       .split("\n")

@@ -1,5 +1,5 @@
 import { mkdir } from "node:fs/promises";
-import { dirname, relative, resolve } from "node:path";
+import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import { pipeline, validateImagePath } from "./lib/pipeline.ts";
@@ -58,7 +58,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     model: values.model ?? DEFAULT_MODEL,
   });
 
-  const relOutput = relative(process.cwd(), result.outputPath) || ".";
+  const relOutput = result.outputPath;
   console.log(
     `Background removed → ${relOutput} (${result.width}x${result.height})`,
   );

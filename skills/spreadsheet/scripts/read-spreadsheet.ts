@@ -1,5 +1,5 @@
 import { readFile, writeFile } from "node:fs/promises";
-import { relative, resolve } from "node:path";
+import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import * as XLSX from "xlsx";
@@ -63,7 +63,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   if (values.output) {
     const outputPath = resolve(values.output);
     await writeFile(outputPath, json, "utf-8");
-    console.log(`Written to ${relative(process.cwd(), outputPath)}`);
+    console.log(`Written to ${outputPath}`);
   } else {
     console.log(json);
   }

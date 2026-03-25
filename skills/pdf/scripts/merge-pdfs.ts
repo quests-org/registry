@@ -1,5 +1,5 @@
 import { readFile, writeFile } from "node:fs/promises";
-import { relative, resolve } from "node:path";
+import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import { PDF } from "@libpdf/core";
@@ -41,7 +41,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     outputPath: resolve(values.output),
   });
 
-  const relOutput = relative(process.cwd(), result.outputPath) || ".";
+  const relOutput = result.outputPath;
   console.log(
     `Merged ${positionals.length} PDFs into ${result.pageCount} page(s) at ${relOutput}`,
   );

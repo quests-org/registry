@@ -1,5 +1,5 @@
 import { existsSync } from "node:fs";
-import { basename, extname, relative, resolve } from "node:path";
+import { basename, extname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import { runFFmpeg } from "./lib/ffmpeg.ts";
@@ -119,6 +119,6 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     });
   }
 
-  const relOutput = relative(process.cwd(), result.outputPath) || ".";
+  const relOutput = result.outputPath;
   console.log(`Converted to ${relOutput}`);
 }

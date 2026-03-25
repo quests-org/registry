@@ -1,5 +1,5 @@
 import { readFile, writeFile } from "node:fs/promises";
-import { parse, relative, resolve } from "node:path";
+import { parse, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import sharp from "sharp";
@@ -85,8 +85,8 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     inputPath,
     outputPath,
   });
-  const relOutput = relative(process.cwd(), result.outputPath) || ".";
+  const displayOutput = values.output ?? `${parsed.name}-rotated${parsed.ext}`;
   console.log(
-    `Rotated → ${relOutput} (${result.width}×${result.height}, ${result.bytes} bytes)`,
+    `Rotated → ${displayOutput} (${result.width}×${result.height}, ${result.bytes} bytes)`,
   );
 }

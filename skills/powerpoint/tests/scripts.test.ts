@@ -9,15 +9,14 @@ import {
 import { extractPptxText } from "../scripts/extract-text.ts";
 
 describe("createPresentation", () => {
-  it("creates a pptx file with only a title slide", async () => {
-    const outputPath = path.join(os.tmpdir(), "test-pptx-title-only.pptx");
+  it("creates a pptx file with no slides", async () => {
+    const outputPath = path.join(os.tmpdir(), "test-pptx-empty.pptx");
     const result = await createPresentation({
-      title: "Title Only",
       slides: [],
       outputPath,
     });
 
-    expect(result.slideCount).toBe(1);
+    expect(result.slideCount).toBe(0);
     expect(result.outputPath).toBe(outputPath);
 
     const stat = await fs.stat(outputPath);
@@ -32,12 +31,11 @@ describe("createPresentation", () => {
     ];
 
     const result = await createPresentation({
-      title: "Bullet Presentation",
       slides,
       outputPath,
     });
 
-    expect(result.slideCount).toBe(3);
+    expect(result.slideCount).toBe(2);
     const stat = await fs.stat(outputPath);
     expect(stat.size).toBeGreaterThan(0);
   });
@@ -49,12 +47,11 @@ describe("createPresentation", () => {
     ];
 
     const result = await createPresentation({
-      title: "Body Presentation",
       slides,
       outputPath,
     });
 
-    expect(result.slideCount).toBe(2);
+    expect(result.slideCount).toBe(1);
   });
 });
 
@@ -62,7 +59,6 @@ describe("extractPptxText", () => {
   it("extracts text from a created pptx file", async () => {
     const outputPath = path.join(os.tmpdir(), "test-pptx-extract.pptx");
     await createPresentation({
-      title: "Extract Test",
       slides: [
         { title: "First Slide", body: "Hello from body" },
         { title: "Second Slide", bullets: ["Bullet one", "Bullet two"] },
@@ -72,7 +68,6 @@ describe("extractPptxText", () => {
 
     const result = await extractPptxText({ inputPath: outputPath });
 
-    expect(result.text).toContain("Extract Test");
     expect(result.text).toContain("First Slide");
     expect(result.text).toContain("Hello from body");
     expect(result.text).toContain("Second Slide");
@@ -80,18 +75,14 @@ describe("extractPptxText", () => {
     expect(result.text).toContain("Bullet two");
   });
 
-  it("returns empty-ish text for a title-only presentation", async () => {
-    const outputPath = path.join(
-      os.tmpdir(),
-      "test-pptx-extract-title-only.pptx",
-    );
+  it("returns empty text for a presentation with no slides", async () => {
+    const outputPath = path.join(os.tmpdir(), "test-pptx-extract-empty.pptx");
     await createPresentation({
-      title: "Only Title Here",
       slides: [],
       outputPath,
     });
 
     const result = await extractPptxText({ inputPath: outputPath });
-    expect(result.text).toContain("Only Title Here");
+    expect(result.text).toBe("");
   });
 });

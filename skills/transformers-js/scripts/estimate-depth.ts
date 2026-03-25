@@ -1,5 +1,5 @@
 import { mkdir } from "node:fs/promises";
-import { dirname, relative, resolve } from "node:path";
+import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import sharp from "sharp";
@@ -125,6 +125,6 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     colorize: !values.grayscale,
   });
 
-  const relOutput = relative(process.cwd(), result.outputPath) || ".";
+  const relOutput = result.outputPath;
   console.log(`Depth map → ${relOutput} (${result.width}x${result.height})`);
 }

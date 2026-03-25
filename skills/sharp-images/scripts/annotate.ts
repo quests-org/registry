@@ -1,5 +1,5 @@
 import { readFile, writeFile } from "node:fs/promises";
-import { parse, relative, resolve } from "node:path";
+import { parse, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import sharp from "sharp";
@@ -115,6 +115,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     options: {
       "font-size": { type: "string" },
       json: { type: "string" },
+      "json-file": { type: "string" },
       output: { type: "string" },
       "stroke-width": { type: "string" },
     },
@@ -122,13 +123,14 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 
   const [filePath] = positionals;
 
-  if (!filePath || !values.json) {
+  if (!filePath || (!values.json && !values["json-file"])) {
     console.error(
-      "Usage: tsx skills/sharp-images/scripts/annotate.ts <image> --json <annotations.json> [--stroke-width <px>] [--font-size <px>] [--output <path>]",
+      "Usage: tsx skills/sharp-images/scripts/annotate.ts <image> --json <inline-json> [--json-file <path>] [--stroke-width <px>] [--font-size <px>] [--output <path>]",
     );
     console.error(
-      '\nJSON format: [{ "left": 10, "top": 10, "width": 100, "height": 50, "label": "Cat", "color": "#FF0000" }]',
+      '\nInline JSON: --json \'[{ "left": 10, "top": 10, "width": 100, "height": 50, "label": "Cat", "color": "#FF0000" }]\'',
     );
+    console.error("File:        --json-file annotations.json");
     process.exit(1);
   }
 
@@ -138,13 +140,15 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     ? resolve(values.output)
     : resolve(parsed.dir, `${parsed.name}-annotated${parsed.ext}`);
 
-  const jsonInput = values.json;
   let annotations: Annotation[];
 
   try {
-    const raw = jsonInput.endsWith(".json")
-      ? await readFile(resolve(jsonInput), "utf-8")
-      : jsonInput;
+    const raw = values["json-file"]
+      ? await readFile(resolve(values["json-file"]), "utf-8")
+      : values.json;
+    if (raw === undefined) {
+      throw new Error("Missing annotations JSON");
+    }
     annotations = JSON.parse(raw);
   } catch {
     console.error("Failed to parse annotations JSON");
@@ -161,8 +165,9 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
       : undefined,
   });
 
-  const relOutput = relative(process.cwd(), result.outputPath) || ".";
+  const displayOutput =
+    values.output ?? `${parsed.name}-annotated${parsed.ext}`;
   console.log(
-    `Annotated → ${relOutput} (${result.width}×${result.height}, ${result.annotationCount} annotations, ${result.bytes} bytes)`,
+    `Annotated → ${displayOutput} (${result.width}×${result.height}, ${result.annotationCount} annotations, ${result.bytes} bytes)`,
   );
 }

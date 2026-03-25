@@ -1,5 +1,5 @@
 import { readFile, writeFile } from "node:fs/promises";
-import { parse, relative, resolve } from "node:path";
+import { parse, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import sharp from "sharp";
@@ -124,8 +124,8 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     width,
     withoutEnlargement: values["no-enlarge"],
   });
-  const relOutput = relative(process.cwd(), result.outputPath) || ".";
+  const displayOutput = values.output ?? `${parsed.name}-resized${parsed.ext}`;
   console.log(
-    `Resized → ${relOutput} (${result.width}×${result.height}, ${result.fit}, ${result.bytes} bytes)`,
+    `Resized → ${displayOutput} (${result.width}×${result.height}, ${result.fit}, ${result.bytes} bytes)`,
   );
 }

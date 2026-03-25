@@ -1,5 +1,5 @@
 import { mkdir, writeFile } from "node:fs/promises";
-import { dirname, relative, resolve } from "node:path";
+import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import { pipeline } from "./lib/pipeline.ts";
@@ -104,7 +104,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     steps: values.steps ? parseInt(values.steps) : 5,
   });
 
-  const relOutput = relative(process.cwd(), result.outputPath) || ".";
+  const relOutput = result.outputPath;
   console.log(
     `Audio → ${relOutput} (voice: ${result.voice}, speed: ${result.speed}x)`,
   );

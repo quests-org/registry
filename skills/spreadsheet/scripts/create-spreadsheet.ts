@@ -1,5 +1,5 @@
 import { readFile, writeFile } from "node:fs/promises";
-import { relative, resolve } from "node:path";
+import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import * as XLSX from "xlsx";
@@ -62,6 +62,6 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   });
 
   console.log(
-    `Created ${relative(process.cwd(), result.outputPath)} with ${result.rowCount} rows in sheet "${result.sheetName}"`,
+    `Created ${result.outputPath} with ${result.rowCount} rows in sheet "${result.sheetName}"`,
   );
 }

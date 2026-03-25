@@ -1,5 +1,5 @@
 import { readFile, stat, writeFile } from "node:fs/promises";
-import { parse, relative, resolve } from "node:path";
+import { parse, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import sharp from "sharp";
@@ -88,8 +88,9 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     progressive: values.progressive,
     quality: values.quality ? Number(values.quality) : undefined,
   });
-  const relOutput = relative(process.cwd(), result.outputPath) || ".";
+  const displayOutput =
+    values.output ?? `${parsed.name}-optimized${parsed.ext}`;
   console.log(
-    `Optimized → ${relOutput} (${result.format}, ${result.width}×${result.height}, ${result.originalBytes} → ${result.bytes} bytes, ${result.savedPercent}% saved)`,
+    `Optimized → ${displayOutput} (${result.format}, ${result.width}×${result.height}, ${result.originalBytes} → ${result.bytes} bytes, ${result.savedPercent}% saved)`,
   );
 }
