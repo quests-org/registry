@@ -152,7 +152,10 @@ describe("toWav", () => {
     const inputPath = path.join(dir, "recording.wav");
     createTestWav(inputPath);
 
-    const result = toWav({ inputPath });
-    expect(path.basename(result.outputPath)).toBe("recording.wav");
+    const result = toWav({
+      inputPath,
+      outputPath: path.join(dir, "recording-out.wav"),
+    });
+    expect(path.basename(result.outputPath)).toBe("recording-out.wav");
   });
 });
