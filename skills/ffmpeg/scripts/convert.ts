@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { basename, extname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
+import { cac } from "cac";
 import { runFFmpeg } from "./lib/ffmpeg.ts";
 
 export function convert({
@@ -67,19 +67,17 @@ export function toWav({
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { values, positionals } = parseArgs({
-    allowPositionals: true,
-    options: {
-      output: { type: "string" },
-      "sample-rate": { type: "string" },
-      channels: { type: "string" },
-      codec: { type: "string" },
-      bitrate: { type: "string" },
-      wav: { type: "boolean" },
-    },
-  });
-
-  const [filePath] = positionals;
+  const cli = cac("convert");
+  cli.option("--output <path>", "Output media file path");
+  cli.option("--sample-rate <n>", "Audio sample rate in Hz");
+  cli.option("--channels <n>", "Audio channel count");
+  cli.option("--codec <name>", "Audio codec name");
+  cli.option("--bitrate <rate>", "Audio bitrate, e.g. 192k");
+  cli.option("--wav", "Convert to WAV with sensible defaults");
+  cli.help();
+  const parsed = cli.parse();
+  const { options } = parsed;
+  const [filePath] = parsed.args;
   if (!filePath) {
     console.error(
       "Usage: tsx scripts/convert.ts <input> --output <path> [--wav] [--sample-rate <n>] [--channels <n>] [--codec <name>] [--bitrate <rate>]",
@@ -91,17 +89,17 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 
   let result: { outputPath: string };
 
-  if (values.wav) {
+  if (options.wav) {
     result = toWav({
       inputPath,
-      outputPath: values.output ? resolve(values.output) : undefined,
-      sampleRate: values["sample-rate"]
-        ? Number(values["sample-rate"])
+      outputPath: options.output ? resolve(options.output) : undefined,
+      sampleRate: options["sampleRate"]
+        ? Number(options["sampleRate"])
         : undefined,
-      channels: values.channels ? Number(values.channels) : undefined,
+      channels: options.channels ? Number(options.channels) : undefined,
     });
   } else {
-    if (!values.output) {
+    if (!options.output) {
       console.error(
         "--output is required (or use --wav for automatic WAV conversion)",
       );
@@ -109,13 +107,13 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     }
     result = convert({
       inputPath,
-      outputPath: resolve(values.output),
-      sampleRate: values["sample-rate"]
-        ? Number(values["sample-rate"])
+      outputPath: resolve(options.output),
+      sampleRate: options["sampleRate"]
+        ? Number(options["sampleRate"])
         : undefined,
-      channels: values.channels ? Number(values.channels) : undefined,
-      codec: values.codec,
-      bitrate: values.bitrate,
+      channels: options.channels ? Number(options.channels) : undefined,
+      codec: options.codec,
+      bitrate: options.bitrate,
     });
   }
 

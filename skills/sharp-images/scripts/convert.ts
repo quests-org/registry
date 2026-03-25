@@ -1,7 +1,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { parse, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
+import { cac } from "cac";
 import sharp from "sharp";
 import type { FormatEnum } from "sharp";
 
@@ -61,50 +61,48 @@ export async function convertImage({
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { values, positionals } = parseArgs({
-    allowPositionals: true,
-    options: {
-      format: { type: "string" },
-      output: { type: "string" },
-      quality: { type: "string" },
-    },
-  });
+  const cli = cac("convert");
+  cli
+    .command("<filePath>")
+    .option("--format <fmt>", "Target output image format")
+    .option("--quality <1-100>", "Encoder quality")
+    .option("--output <path>", "Output image path")
+    .action(async (filePath: string, options) => {
+      if (!options.format) {
+        console.error(
+          "Usage: tsx scripts/convert.ts <path> --format <fmt> [--quality <1-100>] [--output <path>]",
+        );
+        process.exit(1);
+      }
 
-  const [filePath] = positionals;
+      const format = options.format as string;
+      if (!OUTPUT_FORMATS.has(format as OutputFormat)) {
+        console.error(
+          `Invalid format "${format}". Valid: ${[...OUTPUT_FORMATS].join(", ")}`,
+        );
+        process.exit(1);
+      }
 
-  if (!filePath || !values.format) {
-    console.error(
-      "Usage: tsx scripts/convert.ts <path> --format <fmt> [--quality <1-100>] [--output <path>]",
-    );
-    process.exit(1);
-  }
+      const validFormat = format as OutputFormat;
+      const inputPath = resolve(filePath);
+      const quality = options.quality ? Number(options.quality) : undefined;
+      const parsed = parse(inputPath);
+      const ext = FORMAT_EXTENSIONS[validFormat] ?? `.${validFormat}`;
+      const outputPath = options.output
+        ? resolve(options.output)
+        : resolve(parsed.dir, `${parsed.name}${ext}`);
 
-  const format = values.format as string;
-  if (!OUTPUT_FORMATS.has(format as OutputFormat)) {
-    console.error(
-      `Invalid format "${format}". Valid: ${[...OUTPUT_FORMATS].join(", ")}`,
-    );
-    process.exit(1);
-  }
-
-  const validFormat = format as OutputFormat;
-  const inputPath = resolve(filePath);
-  const quality = values.quality ? Number(values.quality) : undefined;
-
-  const parsed = parse(inputPath);
-  const ext = FORMAT_EXTENSIONS[validFormat] ?? `.${validFormat}`;
-  const outputPath = values.output
-    ? resolve(values.output)
-    : resolve(parsed.dir, `${parsed.name}${ext}`);
-
-  const result = await convertImage({
-    format: validFormat,
-    inputPath,
-    outputPath,
-    quality,
-  });
-  const displayOutput = values.output ?? `${parsed.name}${ext}`;
-  console.log(
-    `Converted → ${displayOutput} (${result.format}, ${result.width}×${result.height}, ${result.bytes} bytes)`,
-  );
+      const result = await convertImage({
+        format: validFormat,
+        inputPath,
+        outputPath,
+        quality,
+      });
+      const displayOutput = options.output ?? `${parsed.name}${ext}`;
+      console.log(
+        `Converted → ${displayOutput} (${result.format}, ${result.width}×${result.height}, ${result.bytes} bytes)`,
+      );
+    });
+  cli.help();
+  cli.parse();
 }

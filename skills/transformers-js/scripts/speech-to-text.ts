@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
+import { cac } from "cac";
 import { pipeline } from "./lib/pipeline.ts";
 
 const DEFAULT_MODEL = "onnx-community/whisper-tiny.en";
@@ -119,45 +119,38 @@ function resample(
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { values, positionals } = parseArgs({
-    allowPositionals: true,
-    options: {
-      model: { type: "string" },
-      language: { type: "string" },
-      timestamps: { type: "boolean" },
-      json: { type: "boolean" },
-    },
-  });
+  const cli = cac("speech-to-text");
+  cli
+    .command("<audio>")
+    .option("--model <id>", "Model ID")
+    .option("--language <code>", "Language code hint")
+    .option("--timestamps", "Include timestamp chunks")
+    .option("--json", "Print JSON output")
+    .action(async (filePath: string, options) => {
+      const inputPath = resolve(filePath);
+      const relInput = filePath;
 
-  const [filePath] = positionals;
-  if (!filePath) {
-    console.error(
-      "Usage: tsx scripts/speech-to-text.ts <audio> [--model <id>] [--language <code>] [--timestamps] [--json]",
-    );
-    process.exit(1);
-  }
+      const result = await speechToText({
+        inputPath,
+        model: options.model ?? DEFAULT_MODEL,
+        language: options.language,
+        timestamps: options.timestamps ?? false,
+      });
 
-  const inputPath = resolve(filePath);
-  const relInput = filePath;
-
-  const result = await speechToText({
-    inputPath,
-    model: values.model ?? DEFAULT_MODEL,
-    language: values.language,
-    timestamps: values.timestamps ?? false,
-  });
-
-  if (values.json) {
-    console.log(JSON.stringify(result, null, 2));
-  } else {
-    console.log(`Transcription for ${relInput}:\n  ${result.text}`);
-    if (result.chunks.length > 0) {
-      for (const chunk of result.chunks) {
-        const ts = chunk.timestamp ?? [];
-        console.log(
-          `  [${ts[0]?.toFixed(1) ?? "?"}s - ${ts[1]?.toFixed(1) ?? "?"}s] ${chunk.text}`,
-        );
+      if (options.json) {
+        console.log(JSON.stringify(result, null, 2));
+      } else {
+        console.log(`Transcription for ${relInput}:\n  ${result.text}`);
+        if (result.chunks.length > 0) {
+          for (const chunk of result.chunks) {
+            const ts = chunk.timestamp ?? [];
+            console.log(
+              `  [${ts[0]?.toFixed(1) ?? "?"}s - ${ts[1]?.toFixed(1) ?? "?"}s] ${chunk.text}`,
+            );
+          }
+        }
       }
-    }
-  }
+    });
+  cli.help();
+  cli.parse();
 }

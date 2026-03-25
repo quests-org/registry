@@ -1,7 +1,7 @@
 import { mkdir } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
+import { cac } from "cac";
 import { pipeline, validateImagePath } from "./lib/pipeline.ts";
 
 const DEFAULT_MODEL = "briaai/RMBG-1.4";
@@ -31,35 +31,28 @@ export async function removeBackground({
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { values, positionals } = parseArgs({
-    allowPositionals: true,
-    options: {
-      output: { type: "string" },
-      model: { type: "string" },
-    },
-  });
+  const cli = cac("remove-background");
+  cli
+    .command("<image>")
+    .option("--output <path>", "Output image path")
+    .option("--model <id>", "Model ID")
+    .action(async (filePath: string, options) => {
+      const inputPath = resolve(filePath);
+      const outputPath = resolve(
+        options.output ?? filePath.replace(/(\.[^.]+)$/, "-no-bg.png"),
+      );
 
-  const [filePath] = positionals;
-  if (!filePath) {
-    console.error(
-      "Usage: tsx scripts/remove-background.ts <image> [--output <path>] [--model <id>]",
-    );
-    process.exit(1);
-  }
+      const result = await removeBackground({
+        inputPath,
+        outputPath,
+        model: options.model ?? DEFAULT_MODEL,
+      });
 
-  const inputPath = resolve(filePath);
-  const outputPath = resolve(
-    values.output ?? filePath.replace(/(\.[^.]+)$/, "-no-bg.png"),
-  );
-
-  const result = await removeBackground({
-    inputPath,
-    outputPath,
-    model: values.model ?? DEFAULT_MODEL,
-  });
-
-  const relOutput = result.outputPath;
-  console.log(
-    `Background removed → ${relOutput} (${result.width}x${result.height})`,
-  );
+      const relOutput = result.outputPath;
+      console.log(
+        `Background removed → ${relOutput} (${result.width}x${result.height})`,
+      );
+    });
+  cli.help();
+  cli.parse();
 }

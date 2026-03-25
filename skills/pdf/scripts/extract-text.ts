@@ -1,8 +1,8 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
 import { extractText, getDocumentProxy } from "unpdf";
+import { cac } from "cac";
 
 export async function extractPdfText({
   inputPath,
@@ -24,38 +24,29 @@ export async function extractPdfText({
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { values, positionals } = parseArgs({
-    allowPositionals: true,
-    options: {
-      output: { type: "string" },
-      "no-merge": { type: "boolean" },
-    },
-  });
+  const cli = cac("extract-text");
 
-  const [filePath] = positionals;
+  cli
+    .command("<filePath>")
+    .option("--output <path>", "Write extracted text to a file")
+    .option("--no-merge", "Return text as separate per-page blocks")
+    .action(async (filePath: string, options) => {
+      const result = await extractPdfText({
+        inputPath: resolve(filePath),
+        mergePages: options.merge,
+      });
+      console.log(`Total pages: ${result.totalPages}`);
+      const textContent = Array.isArray(result.text)
+        ? result.text.join("\n\n---\n\n")
+        : result.text;
+      if (options.output) {
+        await writeFile(resolve(options.output), textContent, "utf-8");
+        console.log(`Text written to ${options.output}`);
+      } else {
+        console.log(textContent);
+      }
+    });
 
-  if (!filePath) {
-    console.error(
-      "Usage: tsx scripts/extract-text.ts <path> [--output <path>] [--no-merge]",
-    );
-    process.exit(1);
-  }
-
-  const result = await extractPdfText({
-    inputPath: resolve(filePath),
-    mergePages: !values["no-merge"],
-  });
-
-  console.log(`Total pages: ${result.totalPages}`);
-
-  const textContent = Array.isArray(result.text)
-    ? result.text.join("\n\n---\n\n")
-    : result.text;
-
-  if (values.output) {
-    await writeFile(resolve(values.output), textContent, "utf-8");
-    console.log(`Text written to ${values.output}`);
-  } else {
-    console.log(textContent);
-  }
+  cli.help();
+  await cli.parse();
 }

@@ -1,8 +1,8 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
 import { PDF } from "@libpdf/core";
+import { cac } from "cac";
 
 export async function setMeta({
   inputPath,
@@ -42,42 +42,37 @@ export async function setMeta({
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { values, positionals } = parseArgs({
-    allowPositionals: true,
-    options: {
-      output: { type: "string" },
-      title: { type: "string" },
-      author: { type: "string" },
-      subject: { type: "string" },
-      keywords: { type: "string" },
-      producer: { type: "string" },
-      creator: { type: "string" },
-    },
-  });
+  const cli = cac("set-meta");
 
-  const [inputPath] = positionals;
+  cli
+    .command("<inputPath>")
+    .option("--output <path>", "Output PDF file path")
+    .option("--title <value>", "Document title")
+    .option("--author <value>", "Document author")
+    .option("--subject <value>", "Document subject")
+    .option("--keywords <value>", "Comma-separated document keywords")
+    .option("--producer <value>", "PDF producer metadata value")
+    .option("--creator <value>", "PDF creator metadata value")
+    .action(async (inputPath: string, options) => {
+      if (!options.output) {
+        throw new Error("--output is required");
+      }
+      const keywords = options.keywords
+        ? options.keywords.split(",").map((k: string) => k.trim())
+        : undefined;
+      await setMeta({
+        inputPath: resolve(inputPath),
+        outputPath: resolve(options.output),
+        title: options.title,
+        author: options.author,
+        subject: options.subject,
+        keywords,
+        producer: options.producer,
+        creator: options.creator,
+      });
+      console.log(`Metadata updated, saved to ${options.output}`);
+    });
 
-  if (!inputPath || !values.output) {
-    console.error(
-      "Usage: tsx scripts/set-meta.ts <input> --output <path> [--title <t>] [--author <a>] [--subject <s>] [--keywords <k1,k2>] [--producer <p>] [--creator <c>]",
-    );
-    process.exit(1);
-  }
-
-  const keywords = values.keywords
-    ? values.keywords.split(",").map((k) => k.trim())
-    : undefined;
-
-  await setMeta({
-    inputPath: resolve(inputPath),
-    outputPath: resolve(values.output),
-    title: values.title,
-    author: values.author,
-    subject: values.subject,
-    keywords,
-    producer: values.producer,
-    creator: values.creator,
-  });
-
-  console.log(`Metadata updated, saved to ${values.output}`);
+  cli.help();
+  await cli.parse();
 }

@@ -2,7 +2,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
+import { cac } from "cac";
 import { buildHtml } from "./lib/template.ts";
 
 const require = createRequire(import.meta.url);
@@ -35,23 +35,23 @@ export async function createWireframe({
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { values } = parseArgs({
-    options: {
-      body: { type: "string" },
-      output: { type: "string" },
-      theme: { type: "string" },
-    },
-  });
+  const cli = cac("create-wireframe");
+  cli.option("--output <path>", "Output HTML file path");
+  cli.option("--body <html>", "Inline HTML body content");
+  cli.option("--theme <name>", "Theme name");
+  cli.help();
+  const parsed = cli.parse();
+  const { options } = parsed;
 
-  if (!values.output) {
+  if (!options.output) {
     console.error("--output <path> is required");
     process.exit(1);
   }
 
   const result = await createWireframe({
-    body: values.body,
-    outputPath: resolve(values.output),
-    theme: values.theme,
+    body: options.body,
+    outputPath: resolve(options.output),
+    theme: options.theme,
   });
 
   const relOutput = result.outputPath;

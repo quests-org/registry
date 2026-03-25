@@ -1,6 +1,6 @@
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
+import { cac } from "cac";
 import AdmZip from "adm-zip";
 
 export interface ZipEntryInfo {
@@ -23,12 +23,10 @@ export function listZip({ inputPath }: { inputPath: string }): ZipEntryInfo[] {
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { positionals } = parseArgs({
-    allowPositionals: true,
-    options: {},
-  });
-
-  const [zipFile] = positionals;
+  const cli = cac("list-zip");
+  cli.help();
+  const parsed = cli.parse();
+  const [zipFile] = parsed.args;
 
   if (!zipFile) {
     console.error("Usage: tsx scripts/list-zip.ts <zipfile>");

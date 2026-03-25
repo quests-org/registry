@@ -1,7 +1,7 @@
 import { mkdir } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
+import { cac } from "cac";
 import { pipeline, validateImagePath } from "./lib/pipeline.ts";
 
 const DEFAULT_MODEL = "Xenova/swin2SR-classical-sr-x2-64";
@@ -31,33 +31,26 @@ export async function upscaleImage({
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { values, positionals } = parseArgs({
-    allowPositionals: true,
-    options: {
-      output: { type: "string" },
-      model: { type: "string" },
-    },
-  });
+  const cli = cac("upscale-image");
+  cli
+    .command("<image>")
+    .option("--output <path>", "Output upscaled image path")
+    .option("--model <id>", "Model ID")
+    .action(async (filePath: string, options) => {
+      const inputPath = resolve(filePath);
+      const outputPath = resolve(
+        options.output ?? filePath.replace(/(\.[^.]+)$/, "-upscaled$1"),
+      );
 
-  const [filePath] = positionals;
-  if (!filePath) {
-    console.error(
-      "Usage: tsx scripts/upscale-image.ts <image> [--output <path>] [--model <id>]",
-    );
-    process.exit(1);
-  }
+      const result = await upscaleImage({
+        inputPath,
+        outputPath,
+        model: options.model ?? DEFAULT_MODEL,
+      });
 
-  const inputPath = resolve(filePath);
-  const outputPath = resolve(
-    values.output ?? filePath.replace(/(\.[^.]+)$/, "-upscaled$1"),
-  );
-
-  const result = await upscaleImage({
-    inputPath,
-    outputPath,
-    model: values.model ?? DEFAULT_MODEL,
-  });
-
-  const relOutput = result.outputPath;
-  console.log(`Upscaled → ${relOutput} (${result.width}x${result.height})`);
+      const relOutput = result.outputPath;
+      console.log(`Upscaled → ${relOutput} (${result.width}x${result.height})`);
+    });
+  cli.help();
+  cli.parse();
 }

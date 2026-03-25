@@ -1,7 +1,7 @@
 import { mkdir } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
+import { cac } from "cac";
 import sharp from "sharp";
 import { pipeline, validateImagePath } from "./lib/pipeline.ts";
 
@@ -118,58 +118,51 @@ export async function segmentAndVisualize({
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { values, positionals } = parseArgs({
-    allowPositionals: true,
-    options: {
-      output: { type: "string" },
-      model: { type: "string" },
-      json: { type: "boolean" },
-    },
-  });
+  const cli = cac("segment-image");
+  cli
+    .command("<image>")
+    .option("--output <path>", "Output segmented overlay image path")
+    .option("--model <id>", "Model ID")
+    .option("--json", "Print JSON output")
+    .action(async (filePath: string, options) => {
+      const inputPath = resolve(filePath);
 
-  const [filePath] = positionals;
-  if (!filePath) {
-    console.error(
-      "Usage: tsx scripts/segment-image.ts <image> [--output <path>] [--model <id>] [--json]",
-    );
-    process.exit(1);
-  }
-
-  const inputPath = resolve(filePath);
-
-  if (values.output) {
-    const result = await segmentAndVisualize({
-      inputPath,
-      outputPath: resolve(values.output),
-      model: values.model ?? DEFAULT_MODEL,
-    });
-    const relOutput = result.outputPath;
-    console.log(
-      `Segmented ${result.segments.length} regions → ${relOutput} (${result.width}x${result.height})`,
-    );
-    if (values.json) {
-      console.log(JSON.stringify(result.segments, null, 2));
-    } else {
-      for (const s of result.segments) {
+      if (options.output) {
+        const result = await segmentAndVisualize({
+          inputPath,
+          outputPath: resolve(options.output),
+          model: options.model ?? DEFAULT_MODEL,
+        });
+        const relOutput = result.outputPath;
         console.log(
-          `  ${s.label} (${s.pixelCount} px${s.score !== null ? `, ${(s.score * 100).toFixed(0)}%` : ""})`,
+          `Segmented ${result.segments.length} regions → ${relOutput} (${result.width}x${result.height})`,
         );
+        if (options.json) {
+          console.log(JSON.stringify(result.segments, null, 2));
+        } else {
+          for (const s of result.segments) {
+            console.log(
+              `  ${s.label} (${s.pixelCount} px${s.score !== null ? `, ${(s.score * 100).toFixed(0)}%` : ""})`,
+            );
+          }
+        }
+      } else {
+        const { segments } = await segmentImage({
+          inputPath,
+          model: options.model ?? DEFAULT_MODEL,
+        });
+        console.log(`Found ${segments.length} segments:`);
+        if (options.json) {
+          console.log(JSON.stringify(segments, null, 2));
+        } else {
+          for (const s of segments) {
+            console.log(
+              `  ${s.label} (${s.pixelCount} px${s.score !== null ? `, ${(s.score * 100).toFixed(0)}%` : ""})`,
+            );
+          }
+        }
       }
-    }
-  } else {
-    const { segments } = await segmentImage({
-      inputPath,
-      model: values.model ?? DEFAULT_MODEL,
     });
-    console.log(`Found ${segments.length} segments:`);
-    if (values.json) {
-      console.log(JSON.stringify(segments, null, 2));
-    } else {
-      for (const s of segments) {
-        console.log(
-          `  ${s.label} (${s.pixelCount} px${s.score !== null ? `, ${(s.score * 100).toFixed(0)}%` : ""})`,
-        );
-      }
-    }
-  }
+  cli.help();
+  cli.parse();
 }

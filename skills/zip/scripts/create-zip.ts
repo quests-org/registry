@@ -1,7 +1,7 @@
 import { lstatSync } from "node:fs";
 import { basename, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
+import { cac } from "cac";
 import AdmZip from "adm-zip";
 
 export function createZip({
@@ -9,7 +9,7 @@ export function createZip({
   inputPaths,
 }: {
   outputPath: string;
-  inputPaths: string[];
+  inputPaths: readonly string[];
 }) {
   const zip = new AdmZip();
 
@@ -34,14 +34,14 @@ export function createZip({
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { values, positionals } = parseArgs({
-    allowPositionals: true,
-    options: {
-      output: { type: "string" },
-    },
-  });
+  const cli = cac("create-zip");
+  cli.option("--output <path>", "Output ZIP file path");
+  cli.help();
+  const parsed = cli.parse();
+  const { options } = parsed;
+  const positionals = parsed.args;
 
-  if (!values.output || positionals.length === 0) {
+  if (!options.output || positionals.length === 0) {
     console.error(
       "Usage: tsx scripts/create-zip.ts --output <path> <input...>",
     );
@@ -49,7 +49,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   }
 
   const result = createZip({
-    outputPath: values.output,
+    outputPath: options.output,
     inputPaths: positionals,
   });
 

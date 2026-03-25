@@ -10,6 +10,9 @@ importers:
 
   .:
     dependencies:
+      cac:
+        specifier: ^6.7.14
+        version: 6.7.14
       sharp:
         specifier: ^0.34.5
         version: 0.34.5
@@ -163,6 +166,10 @@ packages:
   '@types/node@22.19.2':
     resolution: {integrity: sha512-LPM2G3Syo1GLzXLGJAKdqoU35XvrWzGJ21/7sgZTUpbkBaOasTj8tjwn6w+hCkqaa1TfJ/w67rJSwYItlJ2mYw==}
 
+  cac@6.7.14:
+    resolution: {integrity: sha512-b6Ilus+c3RrdDk+JhLKUAQfzzgLEPy6wcXqS7f/xe1EETvsDP6GORG7SFuOs6cID5YkqchW/LXZbX5bc8j7ZcQ==}
+    engines: {node: '>=8'}
+
   detect-libc@2.1.2:
     resolution: {integrity: sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ==}
     engines: {node: '>=8'}
@@ -288,6 +295,8 @@ snapshots:
   '@types/node@22.19.2':
     dependencies:
       undici-types: 6.21.0
+
+  cac@6.7.14: {}
 
   detect-libc@2.1.2: {}
 

@@ -1,7 +1,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
+import { cac } from "cac";
 import * as XLSX from "xlsx";
 
 interface SheetData {
@@ -36,15 +36,13 @@ export async function readSpreadsheet({
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { values, positionals } = parseArgs({
-    allowPositionals: true,
-    options: {
-      output: { type: "string" },
-      sheet: { type: "string" },
-    },
-  });
-
-  const [filePath] = positionals;
+  const cli = cac("read-spreadsheet");
+  cli.option("--sheet <name>", "Read only a specific sheet");
+  cli.option("--output <path>", "Write JSON output to file");
+  cli.help();
+  const parsed = cli.parse();
+  const { options } = parsed;
+  const [filePath] = parsed.args;
 
   if (!filePath) {
     console.error(
@@ -55,13 +53,13 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 
   const result = await readSpreadsheet({
     inputPath: resolve(filePath),
-    sheetName: values.sheet,
+    sheetName: options.sheet,
   });
 
   const json = JSON.stringify(result, null, 2);
 
-  if (values.output) {
-    const outputPath = resolve(values.output);
+  if (options.output) {
+    const outputPath = resolve(options.output);
     await writeFile(outputPath, json, "utf-8");
     console.log(`Written to ${outputPath}`);
   } else {

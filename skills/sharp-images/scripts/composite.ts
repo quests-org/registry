@@ -1,7 +1,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { parse, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
+import { cac } from "cac";
 import sharp from "sharp";
 import type { Blend } from "sharp";
 
@@ -100,57 +100,55 @@ export async function compositeImages({
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { values, positionals } = parseArgs({
-    allowPositionals: true,
-    options: {
-      blend: { type: "string" },
-      gravity: { type: "string" },
-      left: { type: "string" },
-      opacity: { type: "string" },
-      output: { type: "string" },
-      overlay: { type: "string" },
-      tile: { type: "boolean" },
-      top: { type: "string" },
-    },
-  });
+  const cli = cac("composite");
+  cli
+    .command("<filePath>")
+    .option("--overlay <image>", "Overlay image path")
+    .option("--gravity <pos>", "Overlay gravity position")
+    .option("--top <px>", "Overlay top offset in pixels")
+    .option("--left <px>", "Overlay left offset in pixels")
+    .option("--blend <mode>", "Sharp blend mode")
+    .option("--opacity <0-1>", "Overlay opacity")
+    .option("--tile", "Tile the overlay image")
+    .option("--output <path>", "Output image path")
+    .action(async (filePath: string, options) => {
+      if (!options.overlay) {
+        console.error(
+          "Usage: tsx scripts/composite.ts <base-image> --overlay <image> [--gravity <pos>] [--top <px>] [--left <px>] [--blend <mode>] [--opacity <0-1>] [--tile] [--output <path>]",
+        );
+        process.exit(1);
+      }
 
-  const [filePath] = positionals;
+      const inputPath = resolve(filePath);
+      if (options.gravity && !VALID_GRAVITIES.has(options.gravity as Gravity)) {
+        console.error(
+          `Invalid gravity "${options.gravity}". Valid: ${[...VALID_GRAVITIES].join(", ")}`,
+        );
+        process.exit(1);
+      }
 
-  if (!filePath || !values.overlay) {
-    console.error(
-      "Usage: tsx scripts/composite.ts <base-image> --overlay <image> [--gravity <pos>] [--top <px>] [--left <px>] [--blend <mode>] [--opacity <0-1>] [--tile] [--output <path>]",
-    );
-    process.exit(1);
-  }
-
-  const inputPath = resolve(filePath);
-
-  if (values.gravity && !VALID_GRAVITIES.has(values.gravity as Gravity)) {
-    console.error(
-      `Invalid gravity "${values.gravity}". Valid: ${[...VALID_GRAVITIES].join(", ")}`,
-    );
-    process.exit(1);
-  }
-
-  const parsed = parse(inputPath);
-  const outputPath = values.output
-    ? resolve(values.output)
-    : resolve(parsed.dir, `${parsed.name}-composite${parsed.ext}`);
-
-  const result = await compositeImages({
-    blend: values.blend as Blend | undefined,
-    gravity: values.gravity as Gravity | undefined,
-    inputPath,
-    left: values.left !== undefined ? Number(values.left) : undefined,
-    opacity: values.opacity !== undefined ? Number(values.opacity) : undefined,
-    outputPath,
-    overlayPath: resolve(values.overlay),
-    tile: values.tile,
-    top: values.top !== undefined ? Number(values.top) : undefined,
-  });
-  const displayOutput =
-    values.output ?? `${parsed.name}-composite${parsed.ext}`;
-  console.log(
-    `Composited → ${displayOutput} (${result.width}×${result.height}, ${result.bytes} bytes)`,
-  );
+      const parsed = parse(inputPath);
+      const outputPath = options.output
+        ? resolve(options.output)
+        : resolve(parsed.dir, `${parsed.name}-composite${parsed.ext}`);
+      const result = await compositeImages({
+        blend: options.blend as Blend | undefined,
+        gravity: options.gravity as Gravity | undefined,
+        inputPath,
+        left: options.left !== undefined ? Number(options.left) : undefined,
+        opacity:
+          options.opacity !== undefined ? Number(options.opacity) : undefined,
+        outputPath,
+        overlayPath: resolve(options.overlay),
+        tile: options.tile,
+        top: options.top !== undefined ? Number(options.top) : undefined,
+      });
+      const displayOutput =
+        options.output ?? `${parsed.name}-composite${parsed.ext}`;
+      console.log(
+        `Composited → ${displayOutput} (${result.width}×${result.height}, ${result.bytes} bytes)`,
+      );
+    });
+  cli.help();
+  cli.parse();
 }

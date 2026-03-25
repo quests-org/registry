@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@tailwindcss/browser": "^4.2.2"
+    "@tailwindcss/browser": "^4.2.2",
+    "cac": "^6.7.14"
   },
   "devDependencies": {
     "@types/node": "22.19.2"

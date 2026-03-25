@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
+import { cac } from "cac";
 
 import Papa from "papaparse";
 
@@ -22,16 +22,14 @@ export function generateCsv({
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { values, positionals } = parseArgs({
-    allowPositionals: true,
-    options: {
-      delimiter: { type: "string", default: "," },
-      header: { type: "boolean", default: true },
-      output: { type: "string" },
-    },
-  });
-
-  const [jsonPath] = positionals;
+  const cli = cac("generate-csv");
+  cli.option("--output <path>", "Write CSV output to file");
+  cli.option("--delimiter <char>", "CSV delimiter character", { default: "," });
+  cli.option("--header", "Include header row", { default: true });
+  cli.help();
+  const parsed = cli.parse();
+  const { options } = parsed;
+  const [jsonPath] = parsed.args;
 
   if (!jsonPath) {
     console.error(
@@ -46,12 +44,12 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 
   const csv = generateCsv({
     data,
-    header: values.header,
-    delimiter: values.delimiter,
+    header: options.header,
+    delimiter: options.delimiter,
   });
 
-  if (values.output) {
-    const outputPath = resolve(values.output);
+  if (options.output) {
+    const outputPath = resolve(options.output);
     await fs.writeFile(outputPath, csv, "utf-8");
     console.log(`Generated CSV → ${outputPath}`);
   } else {

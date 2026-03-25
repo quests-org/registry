@@ -1,6 +1,6 @@
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
+import { cac } from "cac";
 import PptxGenJS from "pptxgenjs";
 
 export interface SlideInput {
@@ -62,27 +62,27 @@ export async function createPresentation({
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { values } = parseArgs({
-    options: {
-      output: { type: "string" },
-      slides: { type: "string" },
-    },
-  });
+  const cli = cac("create-presentation");
+  cli.option("--output <path>", "Output PPTX file path");
+  cli.option("--slides <json>", "Slides JSON array");
+  cli.help();
+  const parsed = cli.parse();
+  const { options } = parsed;
 
-  if (!values.output) {
+  if (!options.output) {
     console.error(
       "Usage: tsx scripts/create-presentation.ts --output <path> [--slides <json>]",
     );
     process.exit(1);
   }
 
-  const slides: SlideInput[] = values.slides
-    ? (JSON.parse(values.slides) as SlideInput[])
+  const slides: SlideInput[] = options.slides
+    ? (JSON.parse(options.slides) as SlideInput[])
     : [];
 
   const result = await createPresentation({
     slides,
-    outputPath: resolve(values.output),
+    outputPath: resolve(options.output),
   });
 
   const relOutput = result.outputPath;

@@ -1,8 +1,8 @@
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
 import { getMeta, getDocumentProxy } from "unpdf";
+import { cac } from "cac";
 
 export async function getPdfMeta({
   inputPath,
@@ -18,27 +18,22 @@ export async function getPdfMeta({
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { values, positionals } = parseArgs({
-    allowPositionals: true,
-    options: {
-      "parse-dates": { type: "boolean" },
-    },
-  });
+  const cli = cac("get-meta");
 
-  const [filePath] = positionals;
+  cli
+    .command("<filePath>")
+    .option("--parse-dates", "Parse PDF date fields into date-like values")
+    .action(async (filePath: string, options) => {
+      const { info, metadata } = await getPdfMeta({
+        inputPath: resolve(filePath),
+        parseDates: options.parseDates,
+      });
+      console.log("Info:");
+      console.log(JSON.stringify(info, null, 2));
+      console.log("\nMetadata:");
+      console.log(JSON.stringify(metadata, null, 2));
+    });
 
-  if (!filePath) {
-    console.error("Usage: tsx scripts/get-meta.ts <path> [--parse-dates]");
-    process.exit(1);
-  }
-
-  const { info, metadata } = await getPdfMeta({
-    inputPath: resolve(filePath),
-    parseDates: values["parse-dates"],
-  });
-
-  console.log("Info:");
-  console.log(JSON.stringify(info, null, 2));
-  console.log("\nMetadata:");
-  console.log(JSON.stringify(metadata, null, 2));
+  cli.help();
+  await cli.parse();
 }

@@ -2,9 +2,9 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { readFile } from "node:fs/promises";
 import { basename, extname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
 import sharp from "sharp";
 import { extractImages, getDocumentProxy } from "unpdf";
+import { cac } from "cac";
 
 export async function extractPdfImages({
   inputPath,
@@ -28,63 +28,50 @@ export async function extractPdfImages({
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { values, positionals } = parseArgs({
-    allowPositionals: true,
-    options: {
-      page: { type: "string" },
-      output: { type: "string" },
-    },
-  });
+  const cli = cac("extract-images");
 
-  const [filePath] = positionals;
+  cli
+    .command("<filePath>")
+    .option("--page <number>", "Only extract images from this page")
+    .option("--output <dir>", "Output directory for extracted images")
+    .action(async (filePath: string, options) => {
+      let page: number | undefined;
+      if (options.page !== undefined) {
+        page = Number(options.page);
+        if (!Number.isInteger(page) || page < 1) {
+          throw new Error("--page must be a positive integer");
+        }
+      }
+      const inputResolved = resolve(filePath);
+      const outputDir = options.output
+        ? resolve(options.output)
+        : resolve(`${basename(filePath, extname(filePath))}-images`);
+      await mkdir(outputDir, { recursive: true });
+      const images = await extractPdfImages({ inputPath: inputResolved, page });
+      const pageLabel = page !== undefined ? `page ${page}` : "all pages";
+      if (images.length === 0) {
+        console.log(`No images found on ${pageLabel}.`);
+        return;
+      }
+      console.log(`Found ${images.length} image(s) on ${pageLabel}`);
+      const pad = String(images.length).length;
+      const relDir = outputDir;
+      let i = 0;
+      for (const img of images) {
+        i++;
+        const idx = String(i).padStart(pad, "0");
+        const outPath = `${outputDir}/image-${idx}.png`;
+        await sharp(img.data, {
+          raw: { width: img.width, height: img.height, channels: img.channels },
+        })
+          .png()
+          .toFile(outPath);
+        console.log(
+          `Saved ${relDir}/image-${idx}.png (${img.width}x${img.height})`,
+        );
+      }
+    });
 
-  if (!filePath) {
-    console.error(
-      "Usage: tsx scripts/extract-images.ts <path> [--page <number>] [--output <dir>]",
-    );
-    process.exit(1);
-  }
-
-  let page: number | undefined;
-  if (values.page !== undefined) {
-    page = Number(values.page);
-    if (!Number.isInteger(page) || page < 1) {
-      console.error("--page must be a positive integer");
-      process.exit(1);
-    }
-  }
-
-  const inputResolved = resolve(filePath);
-  const outputDir = values.output
-    ? resolve(values.output)
-    : resolve(`${basename(filePath, extname(filePath))}-images`);
-
-  await mkdir(outputDir, { recursive: true });
-
-  const images = await extractPdfImages({ inputPath: inputResolved, page });
-  const pageLabel = page !== undefined ? `page ${page}` : "all pages";
-
-  if (images.length === 0) {
-    console.log(`No images found on ${pageLabel}.`);
-    process.exit(0);
-  }
-
-  console.log(`Found ${images.length} image(s) on ${pageLabel}`);
-
-  const pad = String(images.length).length;
-  const relDir = outputDir;
-  let i = 0;
-  for (const img of images) {
-    i++;
-    const idx = String(i).padStart(pad, "0");
-    const outPath = `${outputDir}/image-${idx}.png`;
-    await sharp(img.data, {
-      raw: { width: img.width, height: img.height, channels: img.channels },
-    })
-      .png()
-      .toFile(outPath);
-    console.log(
-      `Saved ${relDir}/image-${idx}.png (${img.width}x${img.height})`,
-    );
-  }
+  cli.help();
+  await cli.parse();
 }

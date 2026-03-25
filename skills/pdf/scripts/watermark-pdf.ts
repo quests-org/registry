@@ -1,8 +1,8 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
 import { PDF, rgb } from "@libpdf/core";
+import { cac } from "cac";
 
 export async function watermarkPdf({
   inputPath,
@@ -42,35 +42,31 @@ export async function watermarkPdf({
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { values, positionals } = parseArgs({
-    allowPositionals: true,
-    options: {
-      output: { type: "string" },
-      text: { type: "string" },
-      opacity: { type: "string" },
-      "font-size": { type: "string" },
-    },
-  });
+  const cli = cac("watermark-pdf");
 
-  const [inputPath] = positionals;
+  cli
+    .command("<inputPath>")
+    .option("--text <text>", "Watermark text")
+    .option("--output <path>", "Output PDF file path")
+    .option("--opacity <n>", "Watermark opacity between 0 and 1")
+    .option("--font-size <n>", "Watermark font size in points")
+    .action(async (inputPath: string, options) => {
+      if (!options.output || !options.text) {
+        throw new Error("--text and --output are required");
+      }
+      const result = await watermarkPdf({
+        inputPath: resolve(inputPath),
+        outputPath: resolve(options.output),
+        text: options.text,
+        opacity: options.opacity ? parseFloat(options.opacity) : undefined,
+        fontSize: options.fontSize ? parseFloat(options.fontSize) : undefined,
+      });
+      const relOutput = result.outputPath;
+      console.log(
+        `Watermarked ${result.pageCount} page(s) with "${options.text}", saved to ${relOutput}`,
+      );
+    });
 
-  if (!inputPath || !values.output || !values.text) {
-    console.error(
-      "Usage: tsx scripts/watermark-pdf.ts <input> --text <text> --output <path> [--opacity <0-1>] [--font-size <n>]",
-    );
-    process.exit(1);
-  }
-
-  const result = await watermarkPdf({
-    inputPath: resolve(inputPath),
-    outputPath: resolve(values.output),
-    text: values.text,
-    opacity: values.opacity ? parseFloat(values.opacity) : undefined,
-    fontSize: values["font-size"] ? parseFloat(values["font-size"]) : undefined,
-  });
-
-  const relOutput = result.outputPath;
-  console.log(
-    `Watermarked ${result.pageCount} page(s) with "${values.text}", saved to ${relOutput}`,
-  );
+  cli.help();
+  await cli.parse();
 }

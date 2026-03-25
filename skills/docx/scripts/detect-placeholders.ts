@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
+import { cac } from "cac";
 import { patchDetector } from "docx";
 
 export async function detectPlaceholders({ inputPath }: { inputPath: string }) {
@@ -11,11 +11,10 @@ export async function detectPlaceholders({ inputPath }: { inputPath: string }) {
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { positionals } = parseArgs({
-    allowPositionals: true,
-  });
-
-  const [filePath] = positionals;
+  const cli = cac("detect-placeholders");
+  cli.help();
+  const parsed = cli.parse();
+  const [filePath] = parsed.args;
 
   if (!filePath) {
     console.error("Usage: tsx scripts/detect-placeholders.ts <path>");

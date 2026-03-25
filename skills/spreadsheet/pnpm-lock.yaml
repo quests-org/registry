@@ -10,6 +10,9 @@ importers:
 
   .:
     dependencies:
+      cac:
+        specifier: ^6.7.14
+        version: 6.7.14
       papaparse:
         specifier: ^5.5.3
         version: 5.5.3
@@ -32,6 +35,10 @@ packages:
   '@types/papaparse@5.5.2':
     resolution: {integrity: sha512-gFnFp/JMzLHCwRf7tQHrNnfhN4eYBVYYI897CGX4MY1tzY9l2aLkVyx2IlKZ/SAqDbB3I1AOZW5gTMGGsqWliA==}
 
+  cac@6.7.14:
+    resolution: {integrity: sha512-b6Ilus+c3RrdDk+JhLKUAQfzzgLEPy6wcXqS7f/xe1EETvsDP6GORG7SFuOs6cID5YkqchW/LXZbX5bc8j7ZcQ==}
+    engines: {node: '>=8'}
+
   papaparse@5.5.3:
     resolution: {integrity: sha512-5QvjGxYVjxO59MGU2lHVYpRWBBtKHnlIAcSe1uNFCkkptUh63NFRj0FJQm7nR67puEruUci/ZkjmEFrjCAyP4A==}
 
@@ -53,6 +60,8 @@ snapshots:
   '@types/papaparse@5.5.2':
     dependencies:
       '@types/node': 22.19.2
+
+  cac@6.7.14: {}
 
   papaparse@5.5.3: {}
 

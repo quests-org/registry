@@ -1,5 +1,5 @@
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
+import { cac } from "cac";
 import { pipeline } from "./lib/pipeline.ts";
 
 const DEFAULT_MODEL = "Xenova/bert-base-NER";
@@ -49,48 +49,44 @@ export async function extractEntitiesByType({
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { values, positionals } = parseArgs({
-    allowPositionals: true,
-    options: {
-      model: { type: "string" },
-      group: { type: "boolean" },
-      json: { type: "boolean" },
-    },
-  });
-
-  const text = positionals.join(" ");
-  if (!text) {
-    console.error(
-      "Usage: tsx scripts/extract-entities.ts <text> [--group] [--model <id>] [--json]",
-    );
-    process.exit(1);
-  }
-
-  if (values.group) {
-    const { grouped } = await extractEntitiesByType({
-      text,
-      model: values.model ?? DEFAULT_MODEL,
-    });
-    if (values.json) {
-      console.log(JSON.stringify(grouped, null, 2));
-    } else {
-      console.log("Entities by type:");
-      for (const [type, items] of Object.entries(grouped)) {
-        console.log(`  ${type}: ${items.join(", ")}`);
+  const cli = cac("extract-entities");
+  cli
+    .command("<text...>")
+    .option("--model <id>", "Model ID")
+    .option("--group", "Group entities by type")
+    .option("--json", "Print JSON output")
+    .action(async (textParts: string[], options) => {
+      const text = textParts.join(" ");
+      if (options.group) {
+        const { grouped } = await extractEntitiesByType({
+          text,
+          model: options.model ?? DEFAULT_MODEL,
+        });
+        if (options.json) {
+          console.log(JSON.stringify(grouped, null, 2));
+        } else {
+          console.log("Entities by type:");
+          for (const [type, items] of Object.entries(grouped)) {
+            console.log(`  ${type}: ${items.join(", ")}`);
+          }
+        }
+      } else {
+        const { entities } = await extractEntities({
+          text,
+          model: options.model ?? DEFAULT_MODEL,
+        });
+        if (options.json) {
+          console.log(JSON.stringify(entities, null, 2));
+        } else {
+          console.log(`Found ${entities.length} entities:`);
+          for (const e of entities) {
+            console.log(
+              `  ${e.type}: ${e.text} (${(e.score * 100).toFixed(0)}%)`,
+            );
+          }
+        }
       }
-    }
-  } else {
-    const { entities } = await extractEntities({
-      text,
-      model: values.model ?? DEFAULT_MODEL,
     });
-    if (values.json) {
-      console.log(JSON.stringify(entities, null, 2));
-    } else {
-      console.log(`Found ${entities.length} entities:`);
-      for (const e of entities) {
-        console.log(`  ${e.type}: ${e.text} (${(e.score * 100).toFixed(0)}%)`);
-      }
-    }
-  }
+  cli.help();
+  cli.parse();
 }

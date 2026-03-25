@@ -1,7 +1,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
+import { cac } from "cac";
 import * as XLSX from "xlsx";
 
 export async function createSpreadsheet({
@@ -27,16 +27,16 @@ export async function createSpreadsheet({
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { values } = parseArgs({
-    options: {
-      data: { type: "string" },
-      "data-file": { type: "string" },
-      output: { type: "string" },
-      sheet: { type: "string" },
-    },
-  });
+  const cli = cac("create-spreadsheet");
+  cli.option("--output <path>", "Output spreadsheet path");
+  cli.option("--sheet <name>", "Sheet name");
+  cli.option("--data <json>", "Inline JSON array data");
+  cli.option("--data-file <path>", "Path to JSON array data file");
+  cli.help();
+  const parsed = cli.parse();
+  const { options } = parsed;
 
-  if (!values.output) {
+  if (!options.output) {
     console.error(
       "Usage: tsx scripts/create-spreadsheet.ts --output <path> [--sheet <name>] [--data <json>] [--data-file <path>]",
     );
@@ -45,11 +45,11 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 
   let data: Record<string, unknown>[];
 
-  if (values["data-file"]) {
-    const raw = await readFile(resolve(values["data-file"]), "utf-8");
+  if (options["dataFile"]) {
+    const raw = await readFile(resolve(options["dataFile"]), "utf-8");
     data = JSON.parse(raw);
-  } else if (values.data) {
-    data = JSON.parse(values.data);
+  } else if (options.data) {
+    data = JSON.parse(options.data);
   } else {
     console.error("Provide --data or --data-file");
     process.exit(1);
@@ -57,8 +57,8 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 
   const result = await createSpreadsheet({
     data,
-    outputPath: resolve(values.output),
-    sheetName: values.sheet,
+    outputPath: resolve(options.output),
+    sheetName: options.sheet,
   });
 
   console.log(

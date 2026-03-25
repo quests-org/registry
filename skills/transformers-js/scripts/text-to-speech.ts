@@ -1,7 +1,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
+import { cac } from "cac";
 import { pipeline } from "./lib/pipeline.ts";
 
 const DEFAULT_MODEL = "onnx-community/Supertonic-TTS-ONNX";
@@ -75,37 +75,31 @@ function encodeWav(samples: Float32Array, sampleRate: number): Buffer {
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { values, positionals } = parseArgs({
-    allowPositionals: true,
-    options: {
-      output: { type: "string" },
-      model: { type: "string" },
-      voice: { type: "string" },
-      speed: { type: "string" },
-      steps: { type: "string" },
-    },
-  });
+  const cli = cac("text-to-speech");
+  cli
+    .command("<text...>")
+    .option("--output <path>", "Output WAV path")
+    .option("--model <id>", "Model ID")
+    .option("--voice <F1|M1>", "Voice embedding ID")
+    .option("--speed <n>", "Speech speed multiplier")
+    .option("--steps <n>", "Inference step count")
+    .action(async (textParts: string[], options) => {
+      const text = textParts.join(" ");
+      const outputPath = resolve(options.output ?? "output.wav");
+      const result = await textToSpeech({
+        text,
+        outputPath,
+        model: options.model ?? DEFAULT_MODEL,
+        voice: options.voice ?? DEFAULT_VOICE,
+        speed: options.speed ? parseFloat(options.speed) : 1.0,
+        steps: options.steps ? parseInt(options.steps) : 5,
+      });
 
-  const text = positionals.join(" ");
-  if (!text) {
-    console.error(
-      "Usage: tsx scripts/text-to-speech.ts <text> --output <path> [--model <id>] [--voice <F1|M1>] [--speed <n>] [--steps <n>]",
-    );
-    process.exit(1);
-  }
-
-  const outputPath = resolve(values.output ?? "output.wav");
-  const result = await textToSpeech({
-    text,
-    outputPath,
-    model: values.model ?? DEFAULT_MODEL,
-    voice: values.voice ?? DEFAULT_VOICE,
-    speed: values.speed ? parseFloat(values.speed) : 1.0,
-    steps: values.steps ? parseInt(values.steps) : 5,
-  });
-
-  const relOutput = result.outputPath;
-  console.log(
-    `Audio → ${relOutput} (voice: ${result.voice}, speed: ${result.speed}x)`,
-  );
+      const relOutput = result.outputPath;
+      console.log(
+        `Audio → ${relOutput} (voice: ${result.voice}, speed: ${result.speed}x)`,
+      );
+    });
+  cli.help();
+  cli.parse();
 }

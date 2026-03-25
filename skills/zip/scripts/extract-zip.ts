@@ -1,6 +1,6 @@
 import { basename, dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
+import { cac } from "cac";
 import AdmZip from "adm-zip";
 
 export function extractZip({
@@ -31,14 +31,12 @@ export function extractZip({
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { values, positionals } = parseArgs({
-    allowPositionals: true,
-    options: {
-      output: { type: "string" },
-    },
-  });
-
-  const [zipFile] = positionals;
+  const cli = cac("extract-zip");
+  cli.option("--output <dir>", "Output directory for extracted files");
+  cli.help();
+  const parsed = cli.parse();
+  const { options } = parsed;
+  const [zipFile] = parsed.args;
 
   if (!zipFile) {
     console.error(
@@ -49,7 +47,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 
   const result = extractZip({
     inputPath: zipFile,
-    outputDir: values.output,
+    outputDir: options.output,
   });
 
   const relOutput = result.outputDir;

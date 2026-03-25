@@ -1,7 +1,7 @@
 import { stat } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
+import { cac } from "cac";
 import sharp from "sharp";
 
 export async function getImageMetadata({ inputPath }: { inputPath: string }) {
@@ -21,20 +21,13 @@ export async function getImageMetadata({ inputPath }: { inputPath: string }) {
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { positionals } = parseArgs({
-    allowPositionals: true,
-    options: {},
+  const cli = cac("get-metadata");
+  cli.command("<filePath>").action(async (filePath: string) => {
+    const inputPath = resolve(filePath);
+    const metadata = await getImageMetadata({ inputPath });
+    console.log(`Metadata for ${filePath}:`);
+    console.log(JSON.stringify(metadata, null, 2));
   });
-
-  const [filePath] = positionals;
-
-  if (!filePath) {
-    console.error("Usage: tsx scripts/get-metadata.ts <path>");
-    process.exit(1);
-  }
-
-  const inputPath = resolve(filePath);
-  const metadata = await getImageMetadata({ inputPath });
-  console.log(`Metadata for ${filePath}:`);
-  console.log(JSON.stringify(metadata, null, 2));
+  cli.help();
+  cli.parse();
 }

@@ -1,8 +1,8 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
 import { PDF, rgb } from "@libpdf/core";
+import { cac } from "cac";
 
 export async function addPageNumbers({
   inputPath,
@@ -96,56 +96,51 @@ export async function addPageNumbers({
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { values, positionals } = parseArgs({
-    allowPositionals: true,
-    options: {
-      output: { type: "string" },
-      "start-at": { type: "string" },
-      position: { type: "string" },
-      "font-size": { type: "string" },
-      format: { type: "string" },
-      header: { type: "string" },
-      footer: { type: "string" },
-    },
-  });
+  const cli = cac("add-page-numbers");
 
-  const [inputPath] = positionals;
+  cli
+    .command("<inputPath>")
+    .option("--output <path>", "Output PDF file path")
+    .option("--start-at <n>", "Starting page number value")
+    .option("--position <pos>", "Label position on each page")
+    .option("--font-size <n>", "Font size for header/footer and page labels")
+    .option("--format <text>", "Page label format, e.g. {page} / {total}")
+    .option("--header <text>", "Optional header text")
+    .option("--footer <text>", "Optional footer text")
+    .action(async (inputPath: string, options) => {
+      if (!options.output) {
+        throw new Error("--output is required");
+      }
+      const validPositions = [
+        "bottom-center",
+        "bottom-left",
+        "bottom-right",
+        "top-center",
+        "top-left",
+        "top-right",
+      ] as const;
+      const position = options.position ?? "bottom-center";
+      if (!validPositions.includes(position)) {
+        throw new Error(
+          `--position must be one of: ${validPositions.join(", ")}`,
+        );
+      }
+      const result = await addPageNumbers({
+        inputPath: resolve(inputPath),
+        outputPath: resolve(options.output),
+        startAt: options["startAt"] ? parseInt(options["startAt"], 10) : 1,
+        position,
+        fontSize: options["fontSize"] ? parseFloat(options["fontSize"]) : 10,
+        format: options.format,
+        header: options.header,
+        footer: options.footer,
+      });
+      const relOutput = result.outputPath;
+      console.log(
+        `Added page numbers to ${result.pageCount} page(s), saved to ${relOutput}`,
+      );
+    });
 
-  if (!inputPath || !values.output) {
-    console.error(
-      "Usage: tsx scripts/add-page-numbers.ts <input> --output <path> [--start-at <n>] [--position <pos>] [--font-size <n>] [--format '<text>'] [--header <text>] [--footer <text>]",
-    );
-    process.exit(1);
-  }
-
-  const validPositions = [
-    "bottom-center",
-    "bottom-left",
-    "bottom-right",
-    "top-center",
-    "top-left",
-    "top-right",
-  ];
-  const position = values.position ?? "bottom-center";
-
-  if (!validPositions.includes(position)) {
-    console.error(`--position must be one of: ${validPositions.join(", ")}`);
-    process.exit(1);
-  }
-
-  const result = await addPageNumbers({
-    inputPath: resolve(inputPath),
-    outputPath: resolve(values.output),
-    startAt: values["start-at"] ? parseInt(values["start-at"], 10) : 1,
-    position: position as Parameters<typeof addPageNumbers>[0]["position"],
-    fontSize: values["font-size"] ? parseFloat(values["font-size"]) : 10,
-    format: values.format,
-    header: values.header,
-    footer: values.footer,
-  });
-
-  const relOutput = result.outputPath;
-  console.log(
-    `Added page numbers to ${result.pageCount} page(s), saved to ${relOutput}`,
-  );
+  cli.help();
+  await cli.parse();
 }

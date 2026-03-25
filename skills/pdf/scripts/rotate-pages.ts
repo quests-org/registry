@@ -1,8 +1,8 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
 import { PDF } from "@libpdf/core";
+import { cac } from "cac";
 
 export async function rotatePages({
   inputPath,
@@ -50,43 +50,38 @@ export async function rotatePages({
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { values, positionals } = parseArgs({
-    allowPositionals: true,
-    options: {
-      output: { type: "string" },
-      rotation: { type: "string", default: "90" },
-      pages: { type: "string" },
-    },
-  });
+  const cli = cac("rotate-pages");
 
-  const [inputPath] = positionals;
+  cli
+    .command("<inputPath>")
+    .option("--output <path>", "Output PDF file path")
+    .option("--rotation <value>", "Rotation angle: 90, 180, or 270", {
+      default: "90",
+    })
+    .option("--pages <value>", "Comma-separated 1-based page numbers")
+    .action(async (inputPath: string, options) => {
+      if (!options.output) {
+        throw new Error("--output is required");
+      }
+      const rotation = parseInt(options.rotation, 10);
+      if (rotation !== 90 && rotation !== 180 && rotation !== 270) {
+        throw new Error("--rotation must be 90, 180, or 270");
+      }
+      const pages = options.pages
+        ? options.pages.split(",").map((p: string) => parseInt(p.trim(), 10))
+        : undefined;
+      const result = await rotatePages({
+        inputPath: resolve(inputPath),
+        outputPath: resolve(options.output),
+        rotation,
+        pages,
+      });
+      const relOutput = result.outputPath;
+      console.log(
+        `Rotated ${result.rotatedCount} page(s) by ${rotation}°, saved to ${relOutput}`,
+      );
+    });
 
-  if (!inputPath || !values.output) {
-    console.error(
-      "Usage: tsx scripts/rotate-pages.ts <input> --output <path> [--rotation <90|180|270>] [--pages <1,2,3>]",
-    );
-    process.exit(1);
-  }
-
-  const rotation = parseInt(values.rotation ?? "90", 10);
-  if (rotation !== 90 && rotation !== 180 && rotation !== 270) {
-    console.error("--rotation must be 90, 180, or 270");
-    process.exit(1);
-  }
-
-  const pages = values.pages
-    ? values.pages.split(",").map((p) => parseInt(p.trim(), 10))
-    : undefined;
-
-  const result = await rotatePages({
-    inputPath: resolve(inputPath),
-    outputPath: resolve(values.output),
-    rotation,
-    pages,
-  });
-
-  const relOutput = result.outputPath;
-  console.log(
-    `Rotated ${result.rotatedCount} page(s) by ${rotation}°, saved to ${relOutput}`,
-  );
+  cli.help();
+  await cli.parse();
 }

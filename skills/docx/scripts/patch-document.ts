@@ -1,7 +1,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
+import { cac } from "cac";
 import { PatchType, TextRun, patchDocument } from "docx";
 
 export async function patchDocxDocument({
@@ -37,27 +37,25 @@ export async function patchDocxDocument({
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { values, positionals } = parseArgs({
-    allowPositionals: true,
-    options: {
-      output: { type: "string" },
-      "patches-file": { type: "string" },
-    },
-  });
+  const cli = cac("patch-document");
+  cli.option("--output <path>", "Output DOCX file path");
+  cli.option("--patches-file <path>", "JSON file of patch key/value pairs");
+  cli.help();
+  const parsed = cli.parse();
+  const { options } = parsed;
+  const [filePath] = parsed.args;
 
-  const [filePath] = positionals;
-
-  if (!filePath || !values.output || !values["patches-file"]) {
+  if (!filePath || !options.output || !options["patchesFile"]) {
     console.error(
       "Usage: tsx scripts/patch-document.ts <input> --output <path> --patches-file <json>",
     );
     process.exit(1);
   }
 
-  const patchesJson = await readFile(resolve(values["patches-file"]), "utf-8");
+  const patchesJson = await readFile(resolve(options["patchesFile"]), "utf-8");
   const patches = JSON.parse(patchesJson) as Record<string, string>;
 
-  const outputPath = resolve(values.output);
+  const outputPath = resolve(options.output);
   const result = await patchDocxDocument({
     inputPath: resolve(filePath),
     outputPath,

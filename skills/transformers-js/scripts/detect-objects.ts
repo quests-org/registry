@@ -1,7 +1,7 @@
 import { mkdir } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
+import { cac } from "cac";
 import sharp from "sharp";
 import { pipeline, validateImagePath } from "./lib/pipeline.ts";
 
@@ -100,61 +100,58 @@ export async function detectAndAnnotate({
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { values, positionals } = parseArgs({
-    allowPositionals: true,
-    options: {
-      output: { type: "string" },
-      model: { type: "string" },
-      threshold: { type: "string" },
-      json: { type: "boolean" },
-    },
-  });
+  const cli = cac("detect-objects");
+  cli
+    .command("<image>")
+    .option("--output <path>", "Output annotated image path")
+    .option("--model <id>", "Model ID")
+    .option("--threshold <0-1>", "Detection threshold")
+    .option("--json", "Print JSON output")
+    .action(async (filePath: string, options) => {
+      const inputPath = resolve(filePath);
+      const threshold = options.threshold
+        ? parseFloat(options.threshold)
+        : DEFAULT_THRESHOLD;
+      const model = options.model ?? DEFAULT_MODEL;
 
-  const [filePath] = positionals;
-  if (!filePath) {
-    console.error(
-      "Usage: tsx scripts/detect-objects.ts <image> [--output <path>] [--model <id>] [--threshold <0-1>] [--json]",
-    );
-    process.exit(1);
-  }
-
-  const inputPath = resolve(filePath);
-  const threshold = values.threshold
-    ? parseFloat(values.threshold)
-    : DEFAULT_THRESHOLD;
-  const model = values.model ?? DEFAULT_MODEL;
-
-  if (values.output) {
-    const result = await detectAndAnnotate({
-      inputPath,
-      outputPath: resolve(values.output),
-      model,
-      threshold,
+      if (options.output) {
+        const result = await detectAndAnnotate({
+          inputPath,
+          outputPath: resolve(options.output),
+          model,
+          threshold,
+        });
+        const relOutput = result.outputPath;
+        console.log(
+          `Detected ${result.detections.length} objects → ${relOutput} (${result.width}x${result.height})`,
+        );
+        if (options.json) {
+          console.log(JSON.stringify(result.detections, null, 2));
+        } else {
+          for (const d of result.detections) {
+            console.log(
+              `  ${d.label} (${(d.score * 100).toFixed(0)}%) [${d.box.xmin},${d.box.ymin} → ${d.box.xmax},${d.box.ymax}]`,
+            );
+          }
+        }
+      } else {
+        const { detections } = await detectObjects({
+          inputPath,
+          model,
+          threshold,
+        });
+        console.log(`Detected ${detections.length} objects:`);
+        if (options.json) {
+          console.log(JSON.stringify(detections, null, 2));
+        } else {
+          for (const d of detections) {
+            console.log(
+              `  ${d.label} (${(d.score * 100).toFixed(0)}%) [${d.box.xmin},${d.box.ymin} → ${d.box.xmax},${d.box.ymax}]`,
+            );
+          }
+        }
+      }
     });
-    const relOutput = result.outputPath;
-    console.log(
-      `Detected ${result.detections.length} objects → ${relOutput} (${result.width}x${result.height})`,
-    );
-    if (values.json) {
-      console.log(JSON.stringify(result.detections, null, 2));
-    } else {
-      for (const d of result.detections) {
-        console.log(
-          `  ${d.label} (${(d.score * 100).toFixed(0)}%) [${d.box.xmin},${d.box.ymin} → ${d.box.xmax},${d.box.ymax}]`,
-        );
-      }
-    }
-  } else {
-    const { detections } = await detectObjects({ inputPath, model, threshold });
-    console.log(`Detected ${detections.length} objects:`);
-    if (values.json) {
-      console.log(JSON.stringify(detections, null, 2));
-    } else {
-      for (const d of detections) {
-        console.log(
-          `  ${d.label} (${(d.score * 100).toFixed(0)}%) [${d.box.xmin},${d.box.ymin} → ${d.box.xmax},${d.box.ymax}]`,
-        );
-      }
-    }
-  }
+  cli.help();
+  cli.parse();
 }

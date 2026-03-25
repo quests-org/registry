@@ -2,7 +2,7 @@ import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
+import { cac } from "cac";
 import { getFFmpegPath } from "./lib/ffmpeg.ts";
 
 interface StreamInfo {
@@ -97,14 +97,12 @@ export function probe({ inputPath }: { inputPath: string }): ProbeResult {
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { values, positionals } = parseArgs({
-    allowPositionals: true,
-    options: {
-      json: { type: "boolean" },
-    },
-  });
-
-  const [filePath] = positionals;
+  const cli = cac("probe");
+  cli.option("--json", "Print probe result as JSON");
+  cli.help();
+  const parsed = cli.parse();
+  const { options } = parsed;
+  const [filePath] = parsed.args;
   if (!filePath) {
     console.error("Usage: tsx scripts/probe.ts <file> [--json]");
     process.exit(1);
@@ -114,7 +112,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const result = probe({ inputPath });
   const relInput = filePath;
 
-  if (values.json) {
+  if (options.json) {
     console.log(JSON.stringify(result, null, 2));
   } else {
     console.log(`${relInput}:`);

@@ -10,6 +10,9 @@ importers:
 
   .:
     dependencies:
+      cac:
+        specifier: ^6.7.14
+        version: 6.7.14
       docx:
         specifier: ^9.6.1
         version: 9.6.1
@@ -41,6 +44,10 @@ packages:
 
   bluebird@3.4.7:
     resolution: {integrity: sha512-iD3898SR7sWVRHbiQv+sHUtHnMvC1o3nW5rAcqnq3uOn07DSAppZYUkIGslDz6gXC7HfunPe7YVBgoEJASPcHA==}
+
+  cac@6.7.14:
+    resolution: {integrity: sha512-b6Ilus+c3RrdDk+JhLKUAQfzzgLEPy6wcXqS7f/xe1EETvsDP6GORG7SFuOs6cID5YkqchW/LXZbX5bc8j7ZcQ==}
+    engines: {node: '>=8'}
 
   core-util-is@1.0.3:
     resolution: {integrity: sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ==}
@@ -163,6 +170,8 @@ snapshots:
   base64-js@1.5.1: {}
 
   bluebird@3.4.7: {}
+
+  cac@6.7.14: {}
 
   core-util-is@1.0.3: {}
 

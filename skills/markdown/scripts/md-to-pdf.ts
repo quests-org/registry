@@ -1,8 +1,8 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { basename, extname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
 import { markdownToPdf } from "@mdpdf/mdpdf";
+import { cac } from "cac";
 
 export async function convertMdToPdf({
   inputPath,
@@ -23,26 +23,20 @@ export async function convertMdToPdf({
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { positionals, values } = parseArgs({
-    allowPositionals: true,
-    options: {
-      output: { type: "string" },
-    },
-  });
+  const cli = cac("md-to-pdf");
+  cli
+    .command("<filePath>")
+    .option("--output <path>", "Output PDF file path")
+    .action(async (filePath: string, options) => {
+      const inputPath = resolve(filePath);
+      const result = await convertMdToPdf({
+        inputPath,
+        outputPath: options.output ? resolve(options.output) : undefined,
+      });
 
-  const [filePath] = positionals;
-
-  if (!filePath) {
-    console.error("Usage: tsx scripts/md-to-pdf.ts <path> [--output <path>]");
-    process.exit(1);
-  }
-
-  const inputPath = resolve(filePath);
-  const result = await convertMdToPdf({
-    inputPath,
-    outputPath: values.output ? resolve(values.output) : undefined,
-  });
-
-  const relOutput = result.outputPath;
-  console.log(`Converted ${basename(inputPath)} → ${relOutput}`);
+      const relOutput = result.outputPath;
+      console.log(`Converted ${basename(inputPath)} → ${relOutput}`);
+    });
+  cli.help();
+  cli.parse();
 }

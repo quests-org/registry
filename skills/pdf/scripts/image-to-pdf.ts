@@ -1,8 +1,8 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { extname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
 import { PDF } from "@libpdf/core";
+import { cac } from "cac";
 
 export async function imageToPdf({
   imagePaths,
@@ -55,34 +55,33 @@ export async function imageToPdf({
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { values, positionals } = parseArgs({
-    allowPositionals: true,
-    options: {
-      output: { type: "string" },
-      size: { type: "string" },
-    },
-  });
+  const cli = cac("image-to-pdf");
 
-  if (positionals.length === 0 || !values.output) {
-    console.error(
-      "Usage: tsx scripts/image-to-pdf.ts <image1> [image2 ...] --output <path> [--size letter|a4|legal]",
-    );
-    process.exit(1);
-  }
+  cli
+    .command("<imagePaths...>")
+    .option("--output <path>", "Output PDF file path")
+    .option("--size <size>", "Page size: letter, a4, or legal", {
+      default: "letter",
+    })
+    .action(async (imagePaths: string[], options) => {
+      if (!options.output) {
+        throw new Error("--output is required");
+      }
+      const validSizes = ["letter", "a4", "legal"] as const;
+      if (!validSizes.includes(options.size)) {
+        throw new Error(`--size must be one of: ${validSizes.join(", ")}`);
+      }
+      const result = await imageToPdf({
+        imagePaths: imagePaths.map((p) => resolve(p)),
+        outputPath: resolve(options.output),
+        size: options.size,
+      });
+      const relOutput = result.outputPath;
+      console.log(
+        `Created PDF with ${result.pageCount} page(s) at ${relOutput}`,
+      );
+    });
 
-  const size = (values.size ?? "letter") as "letter" | "a4" | "legal";
-  const validSizes = ["letter", "a4", "legal"];
-  if (!validSizes.includes(size)) {
-    console.error(`--size must be one of: ${validSizes.join(", ")}`);
-    process.exit(1);
-  }
-
-  const result = await imageToPdf({
-    imagePaths: positionals.map((p) => resolve(p)),
-    outputPath: resolve(values.output),
-    size,
-  });
-
-  const relOutput = result.outputPath;
-  console.log(`Created PDF with ${result.pageCount} page(s) at ${relOutput}`);
+  cli.help();
+  await cli.parse();
 }

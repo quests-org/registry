@@ -1,7 +1,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { parse, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
+import { cac } from "cac";
 import sharp from "sharp";
 import type { FitEnum } from "sharp";
 
@@ -67,65 +67,58 @@ export async function resizeImage({
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { values, positionals } = parseArgs({
-    allowPositionals: true,
-    options: {
-      background: { type: "string" },
-      fit: { type: "string" },
-      height: { type: "string" },
-      kernel: { type: "string" },
-      "no-enlarge": { type: "boolean" },
-      output: { type: "string" },
-      position: { type: "string" },
-      width: { type: "string" },
-    },
-  });
+  const cli = cac("resize");
+  cli
+    .command("<filePath>")
+    .option("--width <px>", "Target width in pixels")
+    .option("--height <px>", "Target height in pixels")
+    .option("--fit <mode>", "Resize fit mode")
+    .option("--output <path>", "Output image path")
+    .option("--background <color>", "Background color for contain fit")
+    .option("--kernel <kernel>", "Resize kernel")
+    .option("--no-enlarge", "Prevent upscaling smaller inputs")
+    .option("--position <position>", "Gravity/crop position")
+    .action(async (filePath: string, options) => {
+      const inputPath = resolve(filePath);
+      const width = options.width ? Number(options.width) : undefined;
+      const height = options.height ? Number(options.height) : undefined;
 
-  const [filePath] = positionals;
+      if (!width && !height) {
+        const metadata = await sharp(inputPath).metadata();
+        console.log(JSON.stringify(metadata, null, 2));
+        process.exit(0);
+      }
 
-  if (!filePath) {
-    console.error(
-      "Usage: tsx scripts/resize.ts <path> [--width <px>] [--height <px>] [--fit <mode>] [--output <path>]",
-    );
-    process.exit(1);
-  }
+      const fit = (options.fit ?? "cover") as string;
+      if (!VALID_FITS.has(fit as Fit)) {
+        console.error(
+          `Invalid fit mode "${fit}". Valid: ${[...VALID_FITS].join(", ")}`,
+        );
+        process.exit(1);
+      }
 
-  const inputPath = resolve(filePath);
-  const width = values.width ? Number(values.width) : undefined;
-  const height = values.height ? Number(values.height) : undefined;
+      const parsed = parse(inputPath);
+      const outputPath = options.output
+        ? resolve(options.output)
+        : resolve(parsed.dir, `${parsed.name}-resized${parsed.ext}`);
 
-  if (!width && !height) {
-    const metadata = await sharp(inputPath).metadata();
-    console.log(JSON.stringify(metadata, null, 2));
-    process.exit(0);
-  }
-
-  const fit = (values.fit ?? "cover") as string;
-  if (!VALID_FITS.has(fit as Fit)) {
-    console.error(
-      `Invalid fit mode "${fit}". Valid: ${[...VALID_FITS].join(", ")}`,
-    );
-    process.exit(1);
-  }
-
-  const parsed = parse(inputPath);
-  const outputPath = values.output
-    ? resolve(values.output)
-    : resolve(parsed.dir, `${parsed.name}-resized${parsed.ext}`);
-
-  const result = await resizeImage({
-    background: values.background,
-    fit: fit as Fit,
-    height,
-    inputPath,
-    kernel: values.kernel as "lanczos3" | undefined,
-    outputPath,
-    position: values.position,
-    width,
-    withoutEnlargement: values["no-enlarge"],
-  });
-  const displayOutput = values.output ?? `${parsed.name}-resized${parsed.ext}`;
-  console.log(
-    `Resized → ${displayOutput} (${result.width}×${result.height}, ${result.fit}, ${result.bytes} bytes)`,
-  );
+      const result = await resizeImage({
+        background: options.background,
+        fit: fit as Fit,
+        height,
+        inputPath,
+        kernel: options.kernel as "lanczos3" | undefined,
+        outputPath,
+        position: options.position,
+        width,
+        withoutEnlargement: options.noEnlarge,
+      });
+      const displayOutput =
+        options.output ?? `${parsed.name}-resized${parsed.ext}`;
+      console.log(
+        `Resized → ${displayOutput} (${result.width}×${result.height}, ${result.fit}, ${result.bytes} bytes)`,
+      );
+    });
+  cli.help();
+  cli.parse();
 }

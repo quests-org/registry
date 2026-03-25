@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
+    "cac": "^6.7.14",
     "docx": "^9.6.1",
     "mammoth": "^1.9.0"
   },

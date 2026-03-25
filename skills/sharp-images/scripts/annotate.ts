@@ -1,7 +1,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { parse, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
+import { cac } from "cac";
 import sharp from "sharp";
 
 interface Annotation {
@@ -110,64 +110,61 @@ export async function annotateImage({
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { values, positionals } = parseArgs({
-    allowPositionals: true,
-    options: {
-      "font-size": { type: "string" },
-      json: { type: "string" },
-      "json-file": { type: "string" },
-      output: { type: "string" },
-      "stroke-width": { type: "string" },
-    },
-  });
+  const cli = cac("annotate");
+  cli
+    .command("<filePath>")
+    .option("--json <inlineJson>", "Inline JSON annotations array")
+    .option("--json-file <path>", "Path to annotations JSON file")
+    .option("--stroke-width <px>", "Annotation stroke width in pixels")
+    .option("--font-size <px>", "Annotation label font size in pixels")
+    .option("--output <path>", "Output image path")
+    .action(async (filePath: string, options) => {
+      if (!options.json && !options.jsonFile) {
+        console.error(
+          "Usage: tsx scripts/annotate.ts <image> --json <inline-json> [--json-file <path>] [--stroke-width <px>] [--font-size <px>] [--output <path>]",
+        );
+        console.error(
+          '\nInline JSON: --json \'[{ "left": 10, "top": 10, "width": 100, "height": 50, "label": "Cat", "color": "#FF0000" }]\'',
+        );
+        console.error("File:        --json-file annotations.json");
+        process.exit(1);
+      }
 
-  const [filePath] = positionals;
+      const inputPath = resolve(filePath);
+      const parsed = parse(inputPath);
+      const outputPath = options.output
+        ? resolve(options.output)
+        : resolve(parsed.dir, `${parsed.name}-annotated${parsed.ext}`);
+      let annotations: Annotation[];
 
-  if (!filePath || (!values.json && !values["json-file"])) {
-    console.error(
-      "Usage: tsx scripts/annotate.ts <image> --json <inline-json> [--json-file <path>] [--stroke-width <px>] [--font-size <px>] [--output <path>]",
-    );
-    console.error(
-      '\nInline JSON: --json \'[{ "left": 10, "top": 10, "width": 100, "height": 50, "label": "Cat", "color": "#FF0000" }]\'',
-    );
-    console.error("File:        --json-file annotations.json");
-    process.exit(1);
-  }
+      try {
+        const raw = options.jsonFile
+          ? await readFile(resolve(options.jsonFile), "utf-8")
+          : options.json;
+        if (raw === undefined) {
+          throw new Error("Missing annotations JSON");
+        }
+        annotations = JSON.parse(raw);
+      } catch {
+        console.error("Failed to parse annotations JSON");
+        process.exit(1);
+      }
 
-  const inputPath = resolve(filePath);
-  const parsed = parse(inputPath);
-  const outputPath = values.output
-    ? resolve(values.output)
-    : resolve(parsed.dir, `${parsed.name}-annotated${parsed.ext}`);
-
-  let annotations: Annotation[];
-
-  try {
-    const raw = values["json-file"]
-      ? await readFile(resolve(values["json-file"]), "utf-8")
-      : values.json;
-    if (raw === undefined) {
-      throw new Error("Missing annotations JSON");
-    }
-    annotations = JSON.parse(raw);
-  } catch {
-    console.error("Failed to parse annotations JSON");
-    process.exit(1);
-  }
-
-  const result = await annotateImage({
-    annotations,
-    fontSize: values["font-size"] ? Number(values["font-size"]) : undefined,
-    inputPath,
-    outputPath,
-    strokeWidth: values["stroke-width"]
-      ? Number(values["stroke-width"])
-      : undefined,
-  });
-
-  const displayOutput =
-    values.output ?? `${parsed.name}-annotated${parsed.ext}`;
-  console.log(
-    `Annotated → ${displayOutput} (${result.width}×${result.height}, ${result.annotationCount} annotations, ${result.bytes} bytes)`,
-  );
+      const result = await annotateImage({
+        annotations,
+        fontSize: options.fontSize ? Number(options.fontSize) : undefined,
+        inputPath,
+        outputPath,
+        strokeWidth: options.strokeWidth
+          ? Number(options.strokeWidth)
+          : undefined,
+      });
+      const displayOutput =
+        options.output ?? `${parsed.name}-annotated${parsed.ext}`;
+      console.log(
+        `Annotated → ${displayOutput} (${result.width}×${result.height}, ${result.annotationCount} annotations, ${result.bytes} bytes)`,
+      );
+    });
+  cli.help();
+  cli.parse();
 }

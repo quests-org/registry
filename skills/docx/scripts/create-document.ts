@@ -1,7 +1,7 @@
 import { writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
+import { cac } from "cac";
 import {
   Document,
   HeadingLevel,
@@ -114,15 +114,15 @@ export async function createDocument({
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { values } = parseArgs({
-    options: {
-      output: { type: "string" },
-      sections: { type: "string" },
-      title: { type: "string" },
-    },
-  });
+  const cli = cac("create-document");
+  cli.option("--output <path>", "Output DOCX file path");
+  cli.option("--sections <json>", "Sections JSON input");
+  cli.option("--title <title>", "Single heading title shortcut");
+  cli.help();
+  const parsed = cli.parse();
+  const { options } = parsed;
 
-  if (!values.output) {
+  if (!options.output) {
     console.error(
       "Usage: tsx scripts/create-document.ts --output <path> --sections <json>\n       tsx scripts/create-document.ts --output <path> --title <title>",
     );
@@ -131,12 +131,12 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 
   let sections: SectionInput[];
 
-  if (values.sections) {
-    sections = JSON.parse(values.sections) as SectionInput[];
-  } else if (values.title) {
+  if (options.sections) {
+    sections = JSON.parse(options.sections) as SectionInput[];
+  } else if (options.title) {
     sections = [
       {
-        children: [{ type: "heading", level: 1, text: values.title }],
+        children: [{ type: "heading", level: 1, text: options.title }],
       },
     ];
   } else {
@@ -144,7 +144,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     process.exit(1);
   }
 
-  const outputPath = resolve(values.output);
+  const outputPath = resolve(options.output);
   const result = await createDocument({ outputPath, sections });
   const relOutput = result.outputPath;
   console.log(`Created ${relOutput}`);

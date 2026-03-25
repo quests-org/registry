@@ -16,6 +16,9 @@ importers:
       '@napi-rs/canvas':
         specifier: ^0.1.96
         version: 0.1.96
+      cac:
+        specifier: ^6.7.14
+        version: 6.7.14
       sharp:
         specifier: ^0.34.5
         version: 0.34.5
@@ -277,6 +280,10 @@ packages:
     resolution: {integrity: sha512-U1Z/ob71V/bXfVABvNr/Kumf5VyeQRBEm6Txb0PQ6S7V5GpBM3w4Cbqz/xPDicR5tN0uvDifng8C+5qECeGwyQ==}
     engines: {node: '>=6.0.0'}
 
+  cac@6.7.14:
+    resolution: {integrity: sha512-b6Ilus+c3RrdDk+JhLKUAQfzzgLEPy6wcXqS7f/xe1EETvsDP6GORG7SFuOs6cID5YkqchW/LXZbX5bc8j7ZcQ==}
+    engines: {node: '>=8'}
+
   detect-libc@2.1.2:
     resolution: {integrity: sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ==}
     engines: {node: '>=8'}
@@ -501,6 +508,8 @@ snapshots:
       tslib: 2.8.1
 
   bytestreamjs@2.0.1: {}
+
+  cac@6.7.14: {}
 
   detect-libc@2.1.2: {}
 

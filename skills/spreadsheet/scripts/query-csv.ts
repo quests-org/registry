@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
+import { cac } from "cac";
 
 import Papa from "papaparse";
 
@@ -65,18 +65,16 @@ export async function queryCsv({
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { values, positionals } = parseArgs({
-    allowPositionals: true,
-    options: {
-      column: { type: "string" },
-      columns: { type: "string" },
-      limit: { type: "string" },
-      sort: { type: "string" },
-      value: { type: "string" },
-    },
-  });
-
-  const [filePath] = positionals;
+  const cli = cac("query-csv");
+  cli.option("--column <name>", "Column name to filter on");
+  cli.option("--columns <a,b,c>", "Comma-separated columns to project");
+  cli.option("--limit <n>", "Maximum number of rows to return");
+  cli.option("--sort <col>", "Column to sort by");
+  cli.option("--value <val>", "Filter value for --column");
+  cli.help();
+  const parsed = cli.parse();
+  const { options } = parsed;
+  const [filePath] = parsed.args;
 
   if (!filePath) {
     console.error(
@@ -86,18 +84,18 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   }
 
   const inputPath = resolve(filePath);
-  const limitNum = values.limit ? parseInt(values.limit, 10) : undefined;
-  const columnsList = values.columns
-    ? values.columns.split(",").map((c) => c.trim())
+  const limitNum = options.limit ? parseInt(options.limit, 10) : undefined;
+  const columnsList = options.columns
+    ? options.columns.split(",").map((c: string) => c.trim())
     : undefined;
 
   const rows = await queryCsv({
     inputPath,
-    column: values.column,
+    column: options.column,
     columns: columnsList,
     limit: limitNum,
-    sort: values.sort,
-    value: values.value,
+    sort: options.sort,
+    value: options.value,
   });
 
   console.log(JSON.stringify(rows, null, 2));

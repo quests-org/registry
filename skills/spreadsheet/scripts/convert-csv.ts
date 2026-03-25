@@ -1,7 +1,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { extname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
+import { cac } from "cac";
 import * as XLSX from "xlsx";
 
 export async function convertCsv({
@@ -52,17 +52,15 @@ export async function convertCsv({
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { values, positionals } = parseArgs({
-    allowPositionals: true,
-    options: {
-      output: { type: "string" },
-      sheet: { type: "string" },
-    },
-  });
+  const cli = cac("convert-csv");
+  cli.option("--output <path>", "Output file path");
+  cli.option("--sheet <name>", "Sheet name for spreadsheet conversion");
+  cli.help();
+  const parsed = cli.parse();
+  const { options } = parsed;
+  const [inputFile] = parsed.args;
 
-  const [inputFile] = positionals;
-
-  if (!inputFile || !values.output) {
+  if (!inputFile || !options.output) {
     console.error(
       "Usage: tsx scripts/convert-csv.ts <input> --output <path> [--sheet <name>]",
     );
@@ -71,8 +69,8 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 
   const result = await convertCsv({
     inputPath: resolve(inputFile),
-    outputPath: resolve(values.output),
-    sheetName: values.sheet,
+    outputPath: resolve(options.output),
+    sheetName: options.sheet,
   });
 
   console.log(

@@ -1,7 +1,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { parse, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
+import { cac } from "cac";
 import sharp from "sharp";
 
 export async function adjustImage({
@@ -108,60 +108,53 @@ export async function adjustImage({
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { values, positionals } = parseArgs({
-    allowPositionals: true,
-    options: {
-      blur: { type: "string" },
-      brightness: { type: "string" },
-      gamma: { type: "string" },
-      grayscale: { type: "boolean" },
-      hue: { type: "string" },
-      lightness: { type: "string" },
-      median: { type: "string" },
-      negate: { type: "boolean" },
-      normalize: { type: "boolean" },
-      output: { type: "string" },
-      saturation: { type: "string" },
-      sharpen: { type: "string" },
-      threshold: { type: "string" },
-      tint: { type: "string" },
-    },
-  });
+  const cli = cac("adjust");
+  cli
+    .command("<filePath>")
+    .option("--brightness <n>", "Brightness multiplier")
+    .option("--saturation <n>", "Saturation multiplier")
+    .option("--hue <deg>", "Hue rotation in degrees")
+    .option("--sharpen <sigma>", "Sharpen sigma value")
+    .option("--blur <sigma>", "Blur sigma value")
+    .option("--gamma <n>", "Gamma correction value")
+    .option("--grayscale", "Convert output to grayscale")
+    .option("--negate", "Invert image colors")
+    .option("--normalize", "Normalize contrast")
+    .option("--tint <color>", "Apply tint color")
+    .option("--threshold <0-255>", "Threshold value")
+    .option("--median <size>", "Median filter window size")
+    .option("--lightness <n>", "Lightness multiplier")
+    .option("--output <path>", "Output image path")
+    .action(async (filePath: string, options) => {
+      const inputPath = resolve(filePath);
+      const parsed = parse(inputPath);
+      const outputPath = options.output
+        ? resolve(options.output)
+        : resolve(parsed.dir, `${parsed.name}-adjusted${parsed.ext}`);
 
-  const [filePath] = positionals;
-
-  if (!filePath) {
-    console.error(
-      "Usage: tsx scripts/adjust.ts <path> [--brightness <n>] [--saturation <n>] [--hue <deg>] [--sharpen <sigma>] [--blur <sigma>] [--gamma <n>] [--grayscale] [--negate] [--normalize] [--tint <color>] [--threshold <0-255>] [--median <size>] [--output <path>]",
-    );
-    process.exit(1);
-  }
-
-  const inputPath = resolve(filePath);
-  const parsed = parse(inputPath);
-  const outputPath = values.output
-    ? resolve(values.output)
-    : resolve(parsed.dir, `${parsed.name}-adjusted${parsed.ext}`);
-
-  const result = await adjustImage({
-    blur: values.blur ? Number(values.blur) : undefined,
-    brightness: values.brightness ? Number(values.brightness) : undefined,
-    gamma: values.gamma ? Number(values.gamma) : undefined,
-    grayscale: values.grayscale,
-    hue: values.hue ? Number(values.hue) : undefined,
-    inputPath,
-    lightness: values.lightness ? Number(values.lightness) : undefined,
-    median: values.median ? Number(values.median) : undefined,
-    negate: values.negate,
-    normalize: values.normalize,
-    outputPath,
-    saturation: values.saturation ? Number(values.saturation) : undefined,
-    sharpen: values.sharpen ? Number(values.sharpen) : undefined,
-    threshold: values.threshold ? Number(values.threshold) : undefined,
-    tint: values.tint,
-  });
-  const displayOutput = values.output ?? `${parsed.name}-adjusted${parsed.ext}`;
-  console.log(
-    `Adjusted → ${displayOutput} (${result.width}×${result.height}, ${result.bytes} bytes)`,
-  );
+      const result = await adjustImage({
+        blur: options.blur ? Number(options.blur) : undefined,
+        brightness: options.brightness ? Number(options.brightness) : undefined,
+        gamma: options.gamma ? Number(options.gamma) : undefined,
+        grayscale: options.grayscale,
+        hue: options.hue ? Number(options.hue) : undefined,
+        inputPath,
+        lightness: options.lightness ? Number(options.lightness) : undefined,
+        median: options.median ? Number(options.median) : undefined,
+        negate: options.negate,
+        normalize: options.normalize,
+        outputPath,
+        saturation: options.saturation ? Number(options.saturation) : undefined,
+        sharpen: options.sharpen ? Number(options.sharpen) : undefined,
+        threshold: options.threshold ? Number(options.threshold) : undefined,
+        tint: options.tint,
+      });
+      const displayOutput =
+        options.output ?? `${parsed.name}-adjusted${parsed.ext}`;
+      console.log(
+        `Adjusted → ${displayOutput} (${result.width}×${result.height}, ${result.bytes} bytes)`,
+      );
+    });
+  cli.help();
+  cli.parse();
 }

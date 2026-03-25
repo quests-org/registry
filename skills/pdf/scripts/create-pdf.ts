@@ -1,8 +1,8 @@
 import { writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
 import { PDF, rgb } from "@libpdf/core";
+import { cac } from "cac";
 
 export async function createPdf({
   content,
@@ -43,25 +43,25 @@ export async function createPdf({
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { values, positionals } = parseArgs({
-    allowPositionals: true,
-    options: {
-      output: { type: "string" },
-    },
-  });
+  const cli = cac("create-pdf");
 
-  const [content] = positionals;
+  cli
+    .command("[content]")
+    .option("--output <path>", "Output PDF file path")
+    .action(async (content: string | undefined, options) => {
+      if (!options.output) {
+        throw new Error("--output is required");
+      }
+      const result = await createPdf({
+        content: content ?? "",
+        outputPath: resolve(options.output),
+      });
+      const relOutput = result.outputPath;
+      console.log(
+        `Created PDF with ${result.pageCount} page(s) at ${relOutput}`,
+      );
+    });
 
-  if (!values.output) {
-    console.error("Usage: tsx scripts/create-pdf.ts <content> --output <path>");
-    process.exit(1);
-  }
-
-  const result = await createPdf({
-    content: content ?? "",
-    outputPath: resolve(values.output),
-  });
-
-  const relOutput = result.outputPath;
-  console.log(`Created PDF with ${result.pageCount} page(s) at ${relOutput}`);
+  cli.help();
+  await cli.parse();
 }

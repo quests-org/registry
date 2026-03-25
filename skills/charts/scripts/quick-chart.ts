@@ -1,6 +1,6 @@
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
+import { cac } from "cac";
 
 import type { ChartConfiguration } from "chart.js";
 
@@ -60,26 +60,26 @@ export async function createQuickChart({
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { values } = parseArgs({
-    options: {
-      data: { type: "string" },
-      height: { type: "string" },
-      labels: { type: "string" },
-      output: { type: "string" },
-      title: { type: "string" },
-      type: { type: "string" },
-      width: { type: "string" },
-    },
-  });
+  const cli = cac("quick-chart");
+  cli.option("--type <name>", "Chart type");
+  cli.option("--labels <a,b,c>", "Comma-separated label list");
+  cli.option("--data <1,2,3>", "Comma-separated numeric values");
+  cli.option("--title <text>", "Optional chart title");
+  cli.option("--output <path>", "Output chart file path");
+  cli.option("--width <px>", "Chart width in pixels");
+  cli.option("--height <px>", "Chart height in pixels");
+  cli.help();
+  const parsed = cli.parse();
+  const { options } = parsed;
 
-  if (!values.type || !values.labels || !values.data) {
+  if (!options.type || !options.labels || !options.data) {
     console.error(
       "Usage: tsx scripts/quick-chart.ts --type <bar|line|pie|doughnut|radar> --labels <a,b,c> --data <1,2,3> [--title <text>] [--output <path>] [--width <px>] [--height <px>]",
     );
     process.exit(1);
   }
 
-  const type = values.type as QuickChartType;
+  const type = options.type as QuickChartType;
   if (!VALID_TYPES.has(type)) {
     console.error(
       `Invalid chart type "${type}". Valid types: ${[...VALID_TYPES].join(", ")}`,
@@ -87,18 +87,18 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     process.exit(1);
   }
 
-  const labels = values.labels.split(",").map((s) => s.trim());
-  const data = values.data.split(",").map((s) => Number(s.trim()));
-  const width = values.width ? Number(values.width) : 800;
-  const height = values.height ? Number(values.height) : 600;
-  const outputPath = values.output ?? "chart.png";
+  const labels = options.labels.split(",").map((s: string) => s.trim());
+  const data = options.data.split(",").map((s: string) => Number(s.trim()));
+  const width = options.width ? Number(options.width) : 800;
+  const height = options.height ? Number(options.height) : 600;
+  const outputPath = options.output ?? "chart.png";
 
   const result = await createQuickChart({
     data,
     height,
     labels,
     outputPath,
-    title: values.title,
+    title: options.title,
     type,
     width,
   });
