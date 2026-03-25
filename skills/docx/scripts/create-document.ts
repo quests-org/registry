@@ -1,3 +1,7 @@
+/**
+ * Create a Word document from a structured sections and blocks JSON input
+ * @note Sections contain a `children` array of block objects. Block types: `heading` (level 1–6), `paragraph`, `table` (rows as string arrays). Headings and paragraphs support optional `bold` and `italic` fields.
+ */
 import { writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -115,37 +119,21 @@ export async function createDocument({
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("create-document");
+  cli.usage("--output <path> --sections <json>");
   cli.option("--output <path>", "Output DOCX file path");
   cli.option("--sections <json>", "Sections JSON input");
-  cli.option("--title <title>", "Single heading title shortcut");
   cli.help();
   const parsed = cli.parse();
   const { options } = parsed;
+  if (options.help) process.exit(0);
 
-  if (!options.output) {
-    console.error(
-      "Usage: tsx scripts/create-document.ts --output <path> --sections <json>\n       tsx scripts/create-document.ts --output <path> --title <title>",
-    );
+  if (!options.output || !options.sections) {
+    cli.outputHelp();
     process.exit(1);
   }
 
-  let sections: SectionInput[];
-
-  if (options.sections) {
-    sections = JSON.parse(options.sections) as SectionInput[];
-  } else if (options.title) {
-    sections = [
-      {
-        children: [{ type: "heading", level: 1, text: options.title }],
-      },
-    ];
-  } else {
-    console.error("Provide either --sections <json> or --title <title>");
-    process.exit(1);
-  }
-
+  const sections = JSON.parse(options.sections) as SectionInput[];
   const outputPath = resolve(options.output);
   const result = await createDocument({ outputPath, sections });
-  const relOutput = result.outputPath;
-  console.log(`Created ${relOutput}`);
+  console.log(`Created ${result.outputPath}`);
 }

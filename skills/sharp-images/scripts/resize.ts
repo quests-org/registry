@@ -1,3 +1,7 @@
+/**
+ * Resize an image to specified dimensions with configurable fit mode
+ * @note If neither --width nor --height is provided, the script prints image metadata instead of resizing.
+ */
 import { readFile, writeFile } from "node:fs/promises";
 import { parse, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -68,57 +72,59 @@ export async function resizeImage({
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("resize");
-  cli
-    .command("<filePath>")
-    .option("--width <px>", "Target width in pixels")
-    .option("--height <px>", "Target height in pixels")
-    .option("--fit <mode>", "Resize fit mode")
-    .option("--output <path>", "Output image path")
-    .option("--background <color>", "Background color for contain fit")
-    .option("--kernel <kernel>", "Resize kernel")
-    .option("--no-enlarge", "Prevent upscaling smaller inputs")
-    .option("--position <position>", "Gravity/crop position")
-    .action(async (filePath: string, options) => {
-      const inputPath = resolve(filePath);
-      const width = options.width ? Number(options.width) : undefined;
-      const height = options.height ? Number(options.height) : undefined;
-
-      if (!width && !height) {
-        const metadata = await sharp(inputPath).metadata();
-        console.log(JSON.stringify(metadata, null, 2));
-        process.exit(0);
-      }
-
-      const fit = (options.fit ?? "cover") as string;
-      if (!VALID_FITS.has(fit as Fit)) {
-        console.error(
-          `Invalid fit mode "${fit}". Valid: ${[...VALID_FITS].join(", ")}`,
-        );
-        process.exit(1);
-      }
-
-      const parsed = parse(inputPath);
-      const outputPath = options.output
-        ? resolve(options.output)
-        : resolve(parsed.dir, `${parsed.name}-resized${parsed.ext}`);
-
-      const result = await resizeImage({
-        background: options.background,
-        fit: fit as Fit,
-        height,
-        inputPath,
-        kernel: options.kernel as "lanczos3" | undefined,
-        outputPath,
-        position: options.position,
-        width,
-        withoutEnlargement: options.noEnlarge,
-      });
-      const displayOutput =
-        options.output ?? `${parsed.name}-resized${parsed.ext}`;
-      console.log(
-        `Resized → ${displayOutput} (${result.width}×${result.height}, ${result.fit}, ${result.bytes} bytes)`,
-      );
-    });
+  cli.usage("photo.jpg --width 800 --height 600 --output resized.jpg");
+  cli.option("--width <px>", "Target width in pixels");
+  cli.option("--height <px>", "Target height in pixels");
+  cli.option("--fit <mode>", "Resize fit mode", { default: "cover" });
+  cli.option("--output <path>", "Output image path");
+  cli.option("--background <color>", "Background color for contain fit");
+  cli.option("--kernel <kernel>", "Resize kernel");
+  cli.option("--no-enlarge", "Prevent upscaling smaller inputs");
+  cli.option("--position <position>", "Gravity/crop position");
   cli.help();
-  cli.parse();
+  const { args, options } = cli.parse();
+  if (options.help) process.exit(0);
+
+  if (!args[0]) {
+    cli.outputHelp();
+    process.exit(1);
+  }
+
+  const inputPath = resolve(args[0]);
+  const width = options.width ? Number(options.width) : undefined;
+  const height = options.height ? Number(options.height) : undefined;
+
+  if (!width && !height) {
+    const metadata = await sharp(inputPath).metadata();
+    console.log(JSON.stringify(metadata, null, 2));
+    process.exit(0);
+  }
+
+  const fit = options.fit as string;
+  if (!VALID_FITS.has(fit as Fit)) {
+    throw new Error(
+      `Invalid fit mode "${fit}". Valid: ${[...VALID_FITS].join(", ")}`,
+    );
+  }
+
+  const parsed = parse(inputPath);
+  const outputPath = options.output
+    ? resolve(options.output)
+    : resolve(parsed.dir, `${parsed.name}-resized${parsed.ext}`);
+
+  const result = await resizeImage({
+    background: options.background,
+    fit: fit as Fit,
+    height,
+    inputPath,
+    kernel: options.kernel as "lanczos3" | undefined,
+    outputPath,
+    position: options.position,
+    width,
+    withoutEnlargement: options.noEnlarge,
+  });
+  const displayOutput = options.output ?? `${parsed.name}-resized${parsed.ext}`;
+  console.log(
+    `Resized → ${displayOutput} (${result.width}×${result.height}, ${result.fit}, ${result.bytes} bytes)`,
+  );
 }

@@ -1,3 +1,6 @@
+/**
+ * Extract all text content from a Word document
+ */
 import { writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -11,16 +14,16 @@ export async function extractDocxText({ inputPath }: { inputPath: string }) {
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("extract-text");
+  cli.usage("<path> [--output <path>]");
   cli.option("--output <path>", "Write extracted text to a file");
   cli.help();
   const parsed = cli.parse();
   const { options } = parsed;
+  if (options.help) process.exit(0);
   const [filePath] = parsed.args;
 
   if (!filePath) {
-    console.error(
-      "Usage: tsx scripts/extract-text.ts <path> [--output <path>]",
-    );
+    cli.outputHelp();
     process.exit(1);
   }
 

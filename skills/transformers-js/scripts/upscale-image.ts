@@ -1,3 +1,7 @@
+/**
+ * Upscale an image 2x using super-resolution
+ */
+
 import { mkdir } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -32,25 +36,29 @@ export async function upscaleImage({
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("upscale-image");
-  cli
-    .command("<image>")
-    .option("--output <path>", "Output upscaled image path")
-    .option("--model <id>", "Model ID")
-    .action(async (filePath: string, options) => {
-      const inputPath = resolve(filePath);
-      const outputPath = resolve(
-        options.output ?? filePath.replace(/(\.[^.]+)$/, "-upscaled$1"),
-      );
-
-      const result = await upscaleImage({
-        inputPath,
-        outputPath,
-        model: options.model ?? DEFAULT_MODEL,
-      });
-
-      const relOutput = result.outputPath;
-      console.log(`Upscaled → ${relOutput} (${result.width}x${result.height})`);
-    });
+  cli.usage("photo.jpg --output photo-upscaled.jpg");
+  cli.option("--output <path>", "Output upscaled image path");
+  cli.option("--model <id>", "Model ID", { default: DEFAULT_MODEL });
   cli.help();
-  cli.parse();
+  const { args, options } = cli.parse();
+  if (options.help) process.exit(0);
+
+  if (!args[0]) {
+    cli.outputHelp();
+    process.exit(1);
+  }
+
+  const inputPath = resolve(args[0]);
+  const outputPath = resolve(
+    options.output ?? args[0].replace(/(\.[^.]+)$/, "-upscaled$1"),
+  );
+
+  const result = await upscaleImage({
+    inputPath,
+    outputPath,
+    model: options.model,
+  });
+  console.log(
+    `Upscaled → ${result.outputPath} (${result.width}x${result.height})`,
+  );
 }

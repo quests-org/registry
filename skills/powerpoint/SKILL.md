@@ -11,28 +11,40 @@ Use the scripts in `scripts/` to create and read PowerPoint presentations.
 
 Each script can also be used programmatically via its exported function.
 
-### `create-presentation.ts` Create a new PowerPoint presentation
+### `create-presentation.ts` Create a PowerPoint presentation from a slides JSON array
 
-Export: `createPresentation({ slides, outputPath })`
+Exports:
 
-```bash
-tsx scripts/create-presentation.ts --output <path> [--slides <json>]
+- `createPresentation({ slides, outputPath, }: { slides: SlideInput[]; outputPath: string; }): Promise<{ slideCount: number; outputPath: string; }>`
+
+```text
+create-presentation
+
+Usage:
+  $ create-presentation --output <path> [--slides <json>]
+
+Options:
+  --output <path>  Output PPTX file path
+  --slides <json>  Slides JSON array
+  -h, --help       Display this message
 ```
 
-| Argument          | Required | Default | Description                                                                             |
-| ----------------- | -------- | ------- | --------------------------------------------------------------------------------------- |
-| `--output <path>` | Yes      |         | Output .pptx file path                                                                  |
-| `--slides <json>` | No       | `[]`    | JSON array of slides: `[{"title":"…","body":"…"}]` or `[{"title":"…","bullets":["…"]}]` |
+> [!NOTE]
+> Each slide object requires a `title` and either a `body` string or a `bullets` string array, e.g. `[{"title":"Intro","body":"Hello"},{"title":"Points","bullets":["One","Two"]}]`.
 
-### `extract-text.ts` Extract text from a PowerPoint file
+### `extract-text.ts` Extract all text content from a PowerPoint file
 
-Export: `extractPptxText({ inputPath })`
+Exports:
 
-```bash
-tsx scripts/extract-text.ts <path> [--output <path>]
+- `extractPptxText({ inputPath }: { inputPath: string; }): Promise<{ text: string; }>`
+
+```text
+extract-text
+
+Usage:
+  $ extract-text <path> [--output <path>]
+
+Options:
+  --output <path>  Write extracted text to a file
+  -h, --help       Display this message
 ```
-
-| Argument          | Required | Default | Description                    |
-| ----------------- | -------- | ------- | ------------------------------ |
-| `<path>`          | Yes      |         | Input .pptx file               |
-| `--output <path>` | No       |         | Write extracted text to a file |

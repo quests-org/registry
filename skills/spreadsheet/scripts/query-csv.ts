@@ -1,3 +1,6 @@
+/**
+ * Filter, sort, and project rows from a CSV file
+ */
 import fs from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -66,6 +69,9 @@ export async function queryCsv({
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("query-csv");
+  cli.usage(
+    "<path> [--column <name>] [--value <val>] [--columns <a,b,c>] [--sort <col>] [--limit <n>]",
+  );
   cli.option("--column <name>", "Column name to filter on");
   cli.option("--columns <a,b,c>", "Comma-separated columns to project");
   cli.option("--limit <n>", "Maximum number of rows to return");
@@ -74,12 +80,11 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   cli.help();
   const parsed = cli.parse();
   const { options } = parsed;
+  if (options.help) process.exit(0);
   const [filePath] = parsed.args;
 
   if (!filePath) {
-    console.error(
-      "Usage: tsx scripts/query-csv.ts <path> [--column <name>] [--value <val>] [--columns <a,b,c>] [--sort <col>] [--limit <n>]",
-    );
+    cli.outputHelp();
     process.exit(1);
   }
 

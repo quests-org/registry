@@ -1,3 +1,7 @@
+/**
+ * Draw labeled bounding box annotations on an image
+ * @note One of --json (inline JSON array) or --json-file (path to JSON file) is required. Each annotation object: `{ left, top, width, height, label?, color? }`. Colors cycle automatically when omitted.
+ */
 import { readFile, writeFile } from "node:fs/promises";
 import { parse, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -111,60 +115,53 @@ export async function annotateImage({
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("annotate");
-  cli
-    .command("<filePath>")
-    .option("--json <inlineJson>", "Inline JSON annotations array")
-    .option("--json-file <path>", "Path to annotations JSON file")
-    .option("--stroke-width <px>", "Annotation stroke width in pixels")
-    .option("--font-size <px>", "Annotation label font size in pixels")
-    .option("--output <path>", "Output image path")
-    .action(async (filePath: string, options) => {
-      if (!options.json && !options.jsonFile) {
-        console.error(
-          "Usage: tsx scripts/annotate.ts <image> --json <inline-json> [--json-file <path>] [--stroke-width <px>] [--font-size <px>] [--output <path>]",
-        );
-        console.error(
-          '\nInline JSON: --json \'[{ "left": 10, "top": 10, "width": 100, "height": 50, "label": "Cat", "color": "#FF0000" }]\'',
-        );
-        console.error("File:        --json-file annotations.json");
-        process.exit(1);
-      }
-
-      const inputPath = resolve(filePath);
-      const parsed = parse(inputPath);
-      const outputPath = options.output
-        ? resolve(options.output)
-        : resolve(parsed.dir, `${parsed.name}-annotated${parsed.ext}`);
-      let annotations: Annotation[];
-
-      try {
-        const raw = options.jsonFile
-          ? await readFile(resolve(options.jsonFile), "utf-8")
-          : options.json;
-        if (raw === undefined) {
-          throw new Error("Missing annotations JSON");
-        }
-        annotations = JSON.parse(raw);
-      } catch {
-        console.error("Failed to parse annotations JSON");
-        process.exit(1);
-      }
-
-      const result = await annotateImage({
-        annotations,
-        fontSize: options.fontSize ? Number(options.fontSize) : undefined,
-        inputPath,
-        outputPath,
-        strokeWidth: options.strokeWidth
-          ? Number(options.strokeWidth)
-          : undefined,
-      });
-      const displayOutput =
-        options.output ?? `${parsed.name}-annotated${parsed.ext}`;
-      console.log(
-        `Annotated → ${displayOutput} (${result.width}×${result.height}, ${result.annotationCount} annotations, ${result.bytes} bytes)`,
-      );
-    });
+  cli.usage(
+    'photo.jpg --json \'[{"left":10,"top":10,"width":100,"height":50,"label":"Cat"}]\' --output annotated.jpg',
+  );
+  cli.option("--json <inlineJson>", "Inline JSON annotations array");
+  cli.option("--json-file <path>", "Path to annotations JSON file");
+  cli.option("--stroke-width <px>", "Annotation stroke width in pixels");
+  cli.option("--font-size <px>", "Annotation label font size in pixels");
+  cli.option("--output <path>", "Output image path");
   cli.help();
-  cli.parse();
+  const { args, options } = cli.parse();
+  if (options.help) process.exit(0);
+
+  if (!args[0] || (!options.json && !options.jsonFile)) {
+    cli.outputHelp();
+    process.exit(1);
+  }
+
+  const inputPath = resolve(args[0]);
+  const parsed = parse(inputPath);
+  const outputPath = options.output
+    ? resolve(options.output)
+    : resolve(parsed.dir, `${parsed.name}-annotated${parsed.ext}`);
+  let annotations: Annotation[];
+
+  try {
+    const raw = options.jsonFile
+      ? await readFile(resolve(options.jsonFile), "utf-8")
+      : options.json;
+    if (raw === undefined) {
+      throw new Error("Missing annotations JSON");
+    }
+    annotations = JSON.parse(raw);
+  } catch {
+    console.error("Failed to parse annotations JSON");
+    process.exit(1);
+  }
+
+  const result = await annotateImage({
+    annotations,
+    fontSize: options.fontSize ? Number(options.fontSize) : undefined,
+    inputPath,
+    outputPath,
+    strokeWidth: options.strokeWidth ? Number(options.strokeWidth) : undefined,
+  });
+  const displayOutput =
+    options.output ?? `${parsed.name}-annotated${parsed.ext}`;
+  console.log(
+    `Annotated → ${displayOutput} (${result.width}×${result.height}, ${result.annotationCount} annotations, ${result.bytes} bytes)`,
+  );
 }

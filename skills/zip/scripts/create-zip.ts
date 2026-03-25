@@ -1,3 +1,6 @@
+/**
+ * Create a ZIP archive from files or directories
+ */
 import { lstatSync } from "node:fs";
 import { basename, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -35,16 +38,16 @@ export function createZip({
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("create-zip");
+  cli.usage("--output <path> <input...>");
   cli.option("--output <path>", "Output ZIP file path");
   cli.help();
   const parsed = cli.parse();
   const { options } = parsed;
+  if (options.help) process.exit(0);
   const positionals = parsed.args;
 
   if (!options.output || positionals.length === 0) {
-    console.error(
-      "Usage: tsx scripts/create-zip.ts --output <path> <input...>",
-    );
+    cli.outputHelp();
     process.exit(1);
   }
 

@@ -1,3 +1,7 @@
+/**
+ * Convert a Markdown file to PDF
+ */
+
 import { readFile, writeFile } from "node:fs/promises";
 import { basename, extname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -24,19 +28,21 @@ export async function convertMdToPdf({
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("md-to-pdf");
-  cli
-    .command("<filePath>")
-    .option("--output <path>", "Output PDF file path")
-    .action(async (filePath: string, options) => {
-      const inputPath = resolve(filePath);
-      const result = await convertMdToPdf({
-        inputPath,
-        outputPath: options.output ? resolve(options.output) : undefined,
-      });
-
-      const relOutput = result.outputPath;
-      console.log(`Converted ${basename(inputPath)} → ${relOutput}`);
-    });
+  cli.usage("document.md --output document.pdf");
+  cli.option("--output <path>", "Output PDF file path");
   cli.help();
-  cli.parse();
+  const { args, options } = cli.parse();
+  if (options.help) process.exit(0);
+
+  if (!args[0]) {
+    cli.outputHelp();
+    process.exit(1);
+  }
+
+  const inputPath = resolve(args[0]);
+  const result = await convertMdToPdf({
+    inputPath,
+    outputPath: options.output ? resolve(options.output) : undefined,
+  });
+  console.log(`Converted ${basename(inputPath)} → ${result.outputPath}`);
 }

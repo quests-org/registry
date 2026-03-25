@@ -1,3 +1,7 @@
+/**
+ * Render a chart from a Chart.js JSON config file
+ */
+
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -34,26 +38,32 @@ export async function createChartFromConfig({
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("create-chart");
+  cli.usage(
+    "--config <path> [--output <path>] [--width <px>] [--height <px>] [--format png|pdf]",
+  );
   cli.option("--config <path>", "Chart.js config JSON file path");
-  cli.option("--output <path>", "Output chart file path");
-  cli.option("--width <px>", "Chart width in pixels");
-  cli.option("--height <px>", "Chart height in pixels");
-  cli.option("--format <name>", "Output format: png or pdf");
+  cli.option("--output <path>", "Output chart file path", {
+    default: "chart.png",
+  });
+  cli.option("--width <px>", "Chart width in pixels", { default: 800 });
+  cli.option("--height <px>", "Chart height in pixels", { default: 600 });
+  cli.option("--format <name>", "Output format: png or pdf", {
+    default: "png",
+  });
   cli.help();
   const parsed = cli.parse();
   const { options } = parsed;
+  if (options.help) process.exit(0);
 
   if (!options.config) {
-    console.error(
-      "Usage: tsx scripts/create-chart.ts --config <path> [--output <path>] [--width <px>] [--height <px>] [--format png|pdf]",
-    );
+    cli.outputHelp();
     process.exit(1);
   }
 
-  const format = (options.format ?? "png") as ChartFormat;
-  const width = options.width ? Number(options.width) : 800;
-  const height = options.height ? Number(options.height) : 600;
-  const outputPath = options.output ?? "chart.png";
+  const format = options.format as ChartFormat;
+  const width = Number(options.width);
+  const height = Number(options.height);
+  const outputPath = options.output;
 
   const result = await createChartFromConfig({
     configPath: resolve(options.config),

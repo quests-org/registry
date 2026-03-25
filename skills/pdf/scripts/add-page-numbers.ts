@@ -1,3 +1,6 @@
+/**
+ * Add page numbers (and optional header/footer text) to a PDF
+ */
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -97,50 +100,50 @@ export async function addPageNumbers({
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("add-page-numbers");
-
-  cli
-    .command("<inputPath>")
-    .option("--output <path>", "Output PDF file path")
-    .option("--start-at <n>", "Starting page number value")
-    .option("--position <pos>", "Label position on each page")
-    .option("--font-size <n>", "Font size for header/footer and page labels")
-    .option("--format <text>", "Page label format, e.g. {page} / {total}")
-    .option("--header <text>", "Optional header text")
-    .option("--footer <text>", "Optional footer text")
-    .action(async (inputPath: string, options) => {
-      if (!options.output) {
-        throw new Error("--output is required");
-      }
-      const validPositions = [
-        "bottom-center",
-        "bottom-left",
-        "bottom-right",
-        "top-center",
-        "top-left",
-        "top-right",
-      ] as const;
-      const position = options.position ?? "bottom-center";
-      if (!validPositions.includes(position)) {
-        throw new Error(
-          `--position must be one of: ${validPositions.join(", ")}`,
-        );
-      }
-      const result = await addPageNumbers({
-        inputPath: resolve(inputPath),
-        outputPath: resolve(options.output),
-        startAt: options["startAt"] ? parseInt(options["startAt"], 10) : 1,
-        position,
-        fontSize: options["fontSize"] ? parseFloat(options["fontSize"]) : 10,
-        format: options.format,
-        header: options.header,
-        footer: options.footer,
-      });
-      const relOutput = result.outputPath;
-      console.log(
-        `Added page numbers to ${result.pageCount} page(s), saved to ${relOutput}`,
-      );
-    });
-
+  cli.usage("input.pdf --output output.pdf");
+  cli.option("--output <path>", "Output PDF file path");
+  cli.option("--start-at <n>", "Starting page number value", { default: 1 });
+  cli.option("--position <pos>", "Label position on each page", {
+    default: "bottom-center",
+  });
+  cli.option("--font-size <n>", "Font size for header/footer and page labels", {
+    default: 10,
+  });
+  cli.option("--format <text>", "Page label format, e.g. {page} / {total}");
+  cli.option("--header <text>", "Optional header text");
+  cli.option("--footer <text>", "Optional footer text");
   cli.help();
-  await cli.parse();
+  const { args, options } = cli.parse();
+  if (options.help) process.exit(0);
+
+  if (!args[0] || !options.output) {
+    cli.outputHelp();
+    process.exit(1);
+  }
+
+  const validPositions = [
+    "bottom-center",
+    "bottom-left",
+    "bottom-right",
+    "top-center",
+    "top-left",
+    "top-right",
+  ] as const;
+  const position = options.position;
+  if (!validPositions.includes(position)) {
+    throw new Error(`--position must be one of: ${validPositions.join(", ")}`);
+  }
+  const result = await addPageNumbers({
+    inputPath: resolve(args[0]),
+    outputPath: resolve(options.output),
+    startAt: parseInt(options["startAt"], 10),
+    position,
+    fontSize: parseFloat(options["fontSize"]),
+    format: options.format,
+    header: options.header,
+    footer: options.footer,
+  });
+  console.log(
+    `Added page numbers to ${result.pageCount} page(s), saved to ${result.outputPath}`,
+  );
 }

@@ -11,214 +11,304 @@ Use the scripts in `scripts/` to work with PDF files.
 
 Each script can also be used programmatically via its exported function.
 
-### `extract-text.ts` Extract all text from a PDF
+### `add-page-numbers.ts` Add page numbers (and optional header/footer text) to a PDF
 
-Export: `extractPdfText({ inputPath, mergePages? })`
+Exports:
 
-Use when you need the full text content of a PDF, e.g. to summarize, search, or process its content.
+- `addPageNumbers({ inputPath, outputPath, startAt, position, fontSize, format, header, footer, }: { inputPath: string; outputPath: string; startAt?: number; position?: "bottom-center" | "bottom-left" | "bottom-right" | "top-center" | "top-left" | "top-right"; fontSize?: number; format?: string; header?: string; footer?: string; }): Promise<{ pageCount: number; outputPath: string; }>`
 
-```bash
-tsx scripts/extract-text.ts <path> [--output <path>] [--no-merge]
+```text
+add-page-numbers
+
+Usage:
+  $ add-page-numbers input.pdf --output output.pdf
+
+Options:
+  --output <path>   Output PDF file path
+  --start-at <n>    Starting page number value (default: 1)
+  --position <pos>  Label position on each page (default: bottom-center)
+  --font-size <n>   Font size for header/footer and page labels (default: 10)
+  --format <text>   Page label format, e.g. {page} / {total}
+  --header <text>   Optional header text
+  --footer <text>   Optional footer text
+  -h, --help        Display this message
 ```
 
-- Merges all pages into a single string by default
-- `--no-merge` returns text per page, separated by `---`
-- `--output` writes to a file instead of stdout
+### `create-pdf.ts` Create a simple text-based PDF document
 
-### `extract-links.ts` Extract all URLs from a PDF
+Exports:
 
-Export: `extractPdfLinks({ inputPath })`
+- `createPdf({ content, outputPath, }: { content: string; outputPath: string; }): Promise<{ pageCount: number; outputPath: string; }>`
 
-Use when you need to find hyperlinks embedded in a PDF.
+```text
+create-pdf
 
-```bash
-tsx scripts/extract-links.ts <path>
+Usage:
+  $ create-pdf --content "Hello world" --output output.pdf
+
+Options:
+  --content <text>  Text content for the PDF
+  --output <path>   Output PDF file path
+  -h, --help        Display this message
 ```
 
-### `get-meta.ts` Get PDF metadata
+### `extract-images.ts` Extract embedded images from a PDF and save them as PNG files
 
-Export: `getPdfMeta({ inputPath, parseDates? })`
+Exports:
 
-Use when you need author, title, creation date, or other document properties.
+- `extractPdfImages({ inputPath, page, }: { inputPath: string; page?: number; }): Promise<ExtractedImageObject[]>`
 
-```bash
-tsx scripts/get-meta.ts <path> [--parse-dates]
+```text
+extract-images
+
+Usage:
+  $ extract-images document.pdf --output ./images
+
+Options:
+  --page <number>  Only extract images from this page
+  --output <dir>   Output directory for extracted images
+  -h, --help       Display this message
 ```
 
-- `--parse-dates` parses date strings into structured date objects
+### `extract-links.ts` Extract all hyperlinks from a PDF
 
-### `extract-images.ts` Extract images from a PDF
+Exports:
 
-Export: `extractPdfImages({ inputPath, page? })`
+- `extractPdfLinks({ inputPath }: { inputPath: string; }): Promise<{ totalPages: number; links: string[]; }>`
 
-Use when you need to save embedded images from a PDF. Extracts all pages by default.
+```text
+extract-links
 
-```bash
-tsx scripts/extract-images.ts <path> [--page <number>] [--output <dir>]
+Usage:
+  $ extract-links <filePath>
+
+Options:
+  -h, --help  Display this message
 ```
 
-- `--page` page number to extract from (default: all pages)
-- `--output` directory to save images (default: `<pdf-name>-images/`)
-- Saves each image as a PNG file named `image-1.png`, `image-2.png`, etc.
+### `extract-text.ts` Extract all text content from a PDF
 
-### `render-pages.ts` Render PDF pages as images
+Exports:
 
-Export: `renderPdfPages({ inputPath, page?, scale? })`
+- `extractPdfText({ inputPath, mergePages, }: { inputPath: string; mergePages?: boolean; }): Promise<{ totalPages: number; text: string; } | { totalPages: number; text: string[]; }>`
 
-Use when you need a visual representation of PDF pages as PNG files.
+```text
+extract-text
 
-```bash
-tsx scripts/render-pages.ts <path> [--page <number>] [--scale <number>] [--output <dir>]
+Usage:
+  $ extract-text document.pdf
+
+Options:
+  --output <path>  Write extracted text to a file
+  --no-merge       Return text as separate per-page blocks (default: true)
+  -h, --help       Display this message
 ```
 
-- `--page` page number to render (default: all pages)
-- `--scale` render scale factor (default: `1.0`; use `2` for higher resolution)
-- `--output` directory to save images (default: `<pdf-name>-pages/`)
-- Saves each page as a PNG file named `page-1.png`, `page-2.png`, etc.; padding width matches total page count (e.g. `page-001.png` for a 100-page PDF)
+> [!NOTE]
+> By default all pages are merged into a single string. Pass --no-merge to get text per page as separate blocks.
 
-## Creating and Modifying PDFs
+### `fill-form.ts` Fill PDF form fields by name and optionally flatten the form
 
-### `insert-image.ts` Insert an image into an existing PDF
+Exports:
 
-Export: `insertImage({ inputPath, outputPath, imagePath, x, y, page?, width?, height?, opacity? })`
+- `fillForm({ inputPath, outputPath, fields, flatten, }: { inputPath: string; outputPath: string; fields: Record<string, string | boolean>; flatten?: boolean; }): Promise<{ filled: string[]; skipped: string[]; outputPath: string; warnings: string[]; }>`
 
-Use when you need to overlay an image onto a specific page of an existing PDF at given coordinates.
+```text
+fill-form
 
-```bash
-tsx scripts/insert-image.ts <input> --image <path> --x <n> --y <n> --output <path> [--page <n>] [--width <n>] [--height <n>] [--opacity <0-1>]
+Usage:
+  $ fill-form form.pdf --field name=John --output filled.pdf
+
+Options:
+  --fields-file <json>  JSON file containing field values
+  --field <key=value>   Single field assignment (repeatable)
+  --flatten             Flatten filled fields into static PDF content
+  --list                List available form fields
+  --output <path>       Output PDF file path
+  -h, --help            Display this message
 ```
 
-- `--image` path to the image file to insert (JPEG or PNG)
-- `--x` / `--y` position in PDF points from the bottom-left of the page (required)
-- `--page` 1-indexed page number to insert on (default: `1`)
-- `--width` / `--height` target dimensions in points; if only one is given, aspect ratio is preserved
-- `--opacity` image opacity, 0-1 (default: `1`)
+> [!NOTE]
+> Use --list to discover available field names before filling
+> Field names are matched with trimmed whitespace, so trailing spaces in PDF field names are handled automatically. Use `true`/`false` strings for checkbox fields.
+> Use --flatten to bake filled values into the page so the form is no longer editable.
 
-### `image-to-pdf.ts` Convert images to a PDF
+### `get-meta.ts` Read metadata and document info from a PDF
 
-Export: `imageToPdf({ imagePaths, outputPath, size? })`
+Exports:
 
-Use when you need to convert one or more images (JPEG or PNG) into a PDF.
+- `getPdfMeta({ inputPath, parseDates, }: { inputPath: string; parseDates?: boolean; }): Promise<{ info: Record<string, any>; metadata: Metadata; }>`
 
-```bash
-tsx scripts/image-to-pdf.ts <image1> [image2 ...] --output <path> [--size letter|a4|legal]
+```text
+get-meta
+
+Usage:
+  $ get-meta document.pdf
+
+Options:
+  --parse-dates  Parse PDF date fields into date-like values
+  -h, --help     Display this message
 ```
 
-- Accepts one or more JPEG or PNG image paths; each becomes one page
-- `--size` page size: `letter` (default), `a4`, or `legal`
-- Images are centered and scaled to fit the page while preserving aspect ratio
+### `image-to-pdf.ts` Convert one or more images into a PDF document, one image per page
 
-### `create-pdf.ts` Create a new PDF from scratch
+Exports:
 
-Export: `createPdf({ content, outputPath })`
+- `imageToPdf({ imagePaths, outputPath, size, }: { imagePaths: string[]; outputPath: string; size?: "letter" | "a4" | "legal"; }): Promise<{ pageCount: number; outputPath: string; }>`
 
-Use when you need to generate a new PDF from text content.
+```text
+image-to-pdf
 
-```bash
-tsx scripts/create-pdf.ts <content> --output <path>
+Usage:
+  $ image-to-pdf photo1.jpg photo2.jpg --output output.pdf
+
+Options:
+  --output <path>  Output PDF file path
+  --size <size>    Page size: letter, a4, or legal (default: letter)
+  -h, --help       Display this message
 ```
 
-- `--output` path to write the output PDF (required)
-- Multi-line content is supported; new pages are added automatically when content overflows
+### `insert-image.ts` Insert an image onto a PDF page at specified coordinates
 
-### `watermark-pdf.ts` Add a diagonal watermark to every page
+Exports:
 
-Export: `watermarkPdf({ inputPath, outputPath, text, opacity?, fontSize? })`
+- `insertImage({ inputPath, outputPath, imagePath, page, x, y, width, height, opacity, }: { inputPath: string; outputPath: string; imagePath: string; page?: number; x: number; y: number; width?: number; height?: number; opacity?: number; }): Promise<{ pageCount: number; outputPath: string; }>`
 
-Use when you need to add large diagonal text across every page of a document.
+```text
+insert-image
 
-```bash
-tsx scripts/watermark-pdf.ts <input> --text <text> --output <path> [--opacity <0-1>] [--font-size <n>]
+Usage:
+  $ insert-image document.pdf --image logo.png --x 50 --y 50 --output output.pdf
+
+Options:
+  --image <path>   Path to image file to insert
+  --x <n>          X position in PDF points
+  --y <n>          Y position in PDF points
+  --output <path>  Output PDF file path
+  --page <n>       1-based page number to edit
+  --width <n>      Draw width in PDF points
+  --height <n>     Draw height in PDF points
+  --opacity <n>    Image opacity between 0 and 1
+  -h, --help       Display this message
 ```
 
-- `--text` watermark label (required)
-- `--opacity` transparency, 0–1 (default: `0.3`)
-- `--font-size` size of the watermark text in points (default: `60`)
+### `merge-pdfs.ts` Merge multiple PDF files into a single document
 
-### `merge-pdfs.ts` Merge multiple PDFs into one
+Exports:
 
-Export: `mergePdfs({ inputPaths, outputPath })`
+- `mergePdfs({ inputPaths, outputPath, }: { inputPaths: string[]; outputPath: string; }): Promise<{ pageCount: number; outputPath: string; }>`
 
-Use when you need to combine several PDF files into a single document.
+```text
+merge-pdfs
 
-```bash
-tsx scripts/merge-pdfs.ts <input1> <input2> [...inputs] --output <path>
+Usage:
+  $ merge-pdfs a.pdf b.pdf c.pdf --output merged.pdf
+
+Options:
+  --output <path>  Output merged PDF file path
+  -h, --help       Display this message
 ```
 
-- Accepts two or more input PDF paths
-- `--output` path to write the merged PDF (required)
-- Pages are appended in the order the inputs are provided
+### `render-pages.ts` Render PDF pages as PNG images
 
-### `split-pdf.ts` Extract pages from a PDF
+Exports:
 
-Export: `splitPdf({ inputPath, outputPath, pages })`
+- `renderPdfPages({ inputPath, page, scale, }: { inputPath: string; page?: number; scale?: number; }): Promise<{ numPages: number; results: { page: number; buffer: ArrayBuffer; }[]; }>`
 
-Use when you need a single page or a range of pages from a larger document.
+```text
+render-pages
 
-```bash
-tsx scripts/split-pdf.ts <input> --output <path> [--page <n>] [--start <n> --end <n>]
+Usage:
+  $ render-pages document.pdf --output ./pages
+
+Options:
+  --page <number>   Render only this page number
+  --scale <number>  Render scale multiplier
+  --output <dir>    Output directory for rendered PNG pages
+  -h, --help        Display this message
 ```
 
-- `--page` extract a single page by number (1-indexed)
-- `--start` / `--end` extract a range of pages (inclusive, 1-indexed)
-- `--output` path to write the output PDF (default: `<name>-split.pdf`)
+> [!NOTE]
+> Output files are named `page-1.png`, `page-2.png`, etc. For PDFs with 10+ pages the number is zero-padded to match the total page count width (e.g. `page-001.png` for a 100-page PDF). Use --scale 2 for higher resolution output.
 
-### `fill-form.ts` Fill fields in a PDF form
+### `rotate-pages.ts` Rotate pages in a PDF by 90, 180, or 270 degrees
 
-Export: `fillForm({ inputPath, outputPath, fields, flatten? })`
+Exports:
 
-Use when you need to populate a fillable PDF form.
+- `rotatePages({ inputPath, outputPath, rotation, pages, }: { inputPath: string; outputPath: string; rotation: 90 | 180 | 270; pages?: number[]; }): Promise<{ rotatedCount: number; pageCount: number; outputPath: string; }>`
 
-```bash
-tsx scripts/fill-form.ts <input> --output <path> --fields-file <json> [--flatten] [--list]
+```text
+rotate-pages
+
+Usage:
+  $ rotate-pages document.pdf --output rotated.pdf --rotation 90
+
+Options:
+  --output <path>     Output PDF file path
+  --rotation <value>  Rotation angle: 90, 180, or 270 (default: 90)
+  --pages <value>     Comma-separated 1-based page numbers
+  -h, --help          Display this message
 ```
 
-- `--fields-file` path to a JSON file containing a `{ "FieldName": "value" }` object; use `true`/`false` for checkboxes
-- `--field` alternative: a `key=value` pair to set inline; repeat for each field (only suitable for a small number of simple field names)
-- `--flatten` bake the filled values into the page so the form is no longer editable
-- `--list` print all field names and types in the PDF without modifying it
-- Field names are matched with trimmed whitespace, so trailing spaces in PDF field names are handled automatically
+### `set-meta.ts` Set metadata fields (title, author, subject, keywords) on a PDF
 
-### `rotate-pages.ts` Rotate pages in a PDF
+Exports:
 
-Export: `rotatePages({ inputPath, outputPath, rotation, pages? })`
+- `setMeta({ inputPath, outputPath, title, author, subject, keywords, producer, creator, }: { inputPath: string; outputPath: string; title?: string; author?: string; subject?: string; keywords?: string[]; producer?: string; creator?: string; }): Promise<{ outputPath: string; }>`
 
-Use when you need to rotate pages in a PDF.
+```text
+set-meta
 
-```bash
-tsx scripts/rotate-pages.ts <input> --output <path> [--rotation <90|180|270>] [--pages <1,2,3>]
+Usage:
+  $ set-meta document.pdf --title "My Doc" --output output.pdf
+
+Options:
+  --output <path>     Output PDF file path
+  --title <value>     Document title
+  --author <value>    Document author
+  --subject <value>   Document subject
+  --keywords <value>  Comma-separated document keywords
+  --producer <value>  PDF producer metadata value
+  --creator <value>   PDF creator metadata value
+  -h, --help          Display this message
 ```
 
-- `--rotation` degrees to rotate clockwise (default: `90`)
-- `--pages` comma-separated list of page numbers to rotate (default: all pages)
+### `split-pdf.ts` Extract a single page or page range from a PDF into a new file
 
-### `add-page-numbers.ts` Add page numbers and/or header/footer text to every page
+Exports:
 
-Export: `addPageNumbers({ inputPath, outputPath, startAt?, position?, fontSize?, format?, header?, footer? })`
+- `splitPdf({ inputPath, outputPath, pages, }: { inputPath: string; outputPath: string; pages: number | { start: number; end: number; }; }): Promise<{ pageCount: number; outputPath: string; }>`
 
-Use when you need to add page numbers, a header, or a footer to every page.
+```text
+split-pdf
 
-```bash
-tsx scripts/add-page-numbers.ts <input> --output <path> [--start-at <n>] [--position <pos>] [--font-size <n>] [--format '<text>'] [--header <text>] [--footer <text>]
+Usage:
+  $ split-pdf document.pdf --page 3 --output page3.pdf
+
+Options:
+  --output <path>  Output PDF file path
+  --page <n>       Single 1-based page number to extract
+  --start <n>      Start page (inclusive) for range extraction
+  --end <n>        End page (inclusive) for range extraction
+  -h, --help       Display this message
 ```
 
-- `--start-at` first page number (default: `1`)
-- `--position` where to place page numbers: `bottom-center` (default), `bottom-left`, `bottom-right`, `top-center`, `top-left`, `top-right`
-- `--font-size` font size in points (default: `10`)
-- `--format` label template using `{page}` and `{total}` (default: `{page} / {total}`)
-- `--header` centered text drawn at the top of every page
-- `--footer` centered text drawn at the bottom of every page
+### `watermark-pdf.ts` Stamp diagonal watermark text on every page of a PDF
 
-### `set-meta.ts` Set PDF metadata
+Exports:
 
-Export: `setMeta({ inputPath, outputPath, title?, author?, subject?, keywords?, producer?, creator? })`
+- `watermarkPdf({ inputPath, outputPath, text, opacity, fontSize, }: { inputPath: string; outputPath: string; text: string; opacity?: number; fontSize?: number; }): Promise<{ pageCount: number; outputPath: string; }>`
 
-Use when you need to update the title, author, subject, keywords, producer, or creator fields of a PDF.
+```text
+watermark-pdf
 
-```bash
-tsx scripts/set-meta.ts <input> --output <path> [--title <t>] [--author <a>] [--subject <s>] [--keywords <k1,k2>] [--producer <p>] [--creator <c>]
+Usage:
+  $ watermark-pdf document.pdf --text "DRAFT" --output watermarked.pdf
+
+Options:
+  --text <text>    Watermark text
+  --output <path>  Output PDF file path
+  --opacity <n>    Watermark opacity between 0 and 1
+  --font-size <n>  Watermark font size in points
+  -h, --help       Display this message
 ```
-
-- Any combination of metadata fields can be set; unspecified fields are left unchanged
-- `--keywords` accepts a comma-separated list
-- Modification date is automatically updated

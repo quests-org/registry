@@ -1,3 +1,8 @@
+/**
+ * Classify or categorize text using sentiment analysis or zero-shot labels
+ * @note Without --labels runs sentiment analysis (POSITIVE/NEGATIVE). With --labels runs zero-shot classification — use to triage, tag, or route text (e.g. --labels "urgent,routine,spam")
+ */
+
 import { pathToFileURL } from "node:url";
 import { cac } from "cac";
 import { pipeline } from "./lib/pipeline.ts";
@@ -62,48 +67,53 @@ export async function classifyTextZeroShot({
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("classify-text");
-  cli
-    .command("<text...>")
-    .option("--labels <a,b,c>", "Comma-separated zero-shot labels")
-    .option("--model <id>", "Model ID")
-    .option("--multi-label", "Enable multi-label zero-shot mode")
-    .option("--top-k <n>", "Number of top labels to return")
-    .option("--json", "Print JSON output")
-    .action(async (textParts: string[], options) => {
-      const text = textParts.join(" ");
-      if (options.labels) {
-        const labels = options.labels.split(",").map((l: string) => l.trim());
-        const { results } = await classifyTextZeroShot({
-          text,
-          labels,
-          model: options.model ?? DEFAULT_ZS_MODEL,
-          multiLabel: options.multiLabel ?? false,
-        });
-        if (options.json) {
-          console.log(JSON.stringify(results, null, 2));
-        } else {
-          console.log("Zero-shot classification:");
-          for (const r of results) {
-            console.log(`  ${r.label}: ${(r.score * 100).toFixed(1)}%`);
-          }
-        }
-      } else {
-        const topK = options.topK ? parseInt(options.topK) : 5;
-        const { results } = await classifyText({
-          text,
-          model: options.model ?? DEFAULT_MODEL,
-          topK,
-        });
-        if (options.json) {
-          console.log(JSON.stringify(results, null, 2));
-        } else {
-          console.log("Classification:");
-          for (const r of results) {
-            console.log(`  ${r.label}: ${(r.score * 100).toFixed(1)}%`);
-          }
-        }
-      }
-    });
+  cli.usage('--text "This movie was great"');
+  cli.option("--text <text>", "Text to classify");
+  cli.option("--labels <a,b,c>", "Comma-separated zero-shot labels");
+  cli.option("--model <id>", "Model ID");
+  cli.option("--multi-label", "Enable multi-label zero-shot mode");
+  cli.option("--top-k <n>", "Number of top labels to return", { default: 5 });
+  cli.option("--json", "Print JSON output");
   cli.help();
-  cli.parse();
+  const { options } = cli.parse();
+  if (options.help) process.exit(0);
+
+  if (!options.text) {
+    cli.outputHelp();
+    process.exit(1);
+  }
+
+  const text = options.text;
+  if (options.labels) {
+    const labels = options.labels.split(",").map((l: string) => l.trim());
+    const { results } = await classifyTextZeroShot({
+      text,
+      labels,
+      model: options.model ?? DEFAULT_ZS_MODEL,
+      multiLabel: options.multiLabel ?? false,
+    });
+    if (options.json) {
+      console.log(JSON.stringify(results, null, 2));
+    } else {
+      console.log("Zero-shot classification:");
+      for (const r of results) {
+        console.log(`  ${r.label}: ${(r.score * 100).toFixed(1)}%`);
+      }
+    }
+  } else {
+    const topK = parseInt(options.topK);
+    const { results } = await classifyText({
+      text,
+      model: options.model ?? DEFAULT_MODEL,
+      topK,
+    });
+    if (options.json) {
+      console.log(JSON.stringify(results, null, 2));
+    } else {
+      console.log("Classification:");
+      for (const r of results) {
+        console.log(`  ${r.label}: ${(r.score * 100).toFixed(1)}%`);
+      }
+    }
+  }
 }

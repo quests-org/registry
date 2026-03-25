@@ -1,3 +1,7 @@
+/**
+ * Convert an HTML file or string to Markdown
+ */
+
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -60,63 +64,54 @@ export function convertHtmlString({
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("html-to-md");
+  cli.usage("--html-file page.html --output page.md");
+  cli.option("--html-file <path>", "Input HTML file path");
+  cli.option("--html <htmlString>", "Inline HTML string input");
+  cli.option("--output <path>", "Output Markdown file path");
+  cli.option("--gfm", "Enable GitHub-Flavored Markdown", { default: true });
+  cli.option("--heading-style <style>", "Heading style: atx or setext", {
+    default: "atx",
+  });
+  cli.option(
+    "--code-block-style <style>",
+    "Code block style: fenced or indented",
+    { default: "fenced" },
+  );
+  cli.help();
+  const { options } = cli.parse();
+  if (options.help) process.exit(0);
 
-  cli
-    .command("[htmlFile]")
-    .option("--html-file <path>", "Input HTML file path")
-    .option("--html <htmlString>", "Inline HTML string input")
-    .option("--output <path>", "Output Markdown file path")
-    .option("--gfm", "Enable GitHub-Flavored Markdown", { default: true })
-    .option("--heading-style <style>", "Heading style: atx or setext")
-    .option(
-      "--code-block-style <style>",
-      "Code block style: fenced or indented",
-    )
-    .action(async (legacyFilePath: string | undefined, options) => {
-      const htmlFile = options.htmlFile ?? legacyFilePath;
+  if (!options.htmlFile && !options.html) {
+    cli.outputHelp();
+    process.exit(1);
+  }
 
-      if (!htmlFile && !options.html) {
-        console.error(
-          "Usage: tsx scripts/html-to-md.ts --html-file <path> [--output <path>] [--gfm] [--no-gfm] [--heading-style <style>] [--code-block-style <style>]",
-        );
-        console.error(
-          "       tsx scripts/html-to-md.ts --html <html-string> [--gfm] [--no-gfm] [--heading-style <style>] [--code-block-style <style>]",
-        );
-        process.exit(1);
-      }
+  const headingStyle = options.headingStyle as HeadingStyle;
+  const codeBlockStyle = options.codeBlockStyle as CodeBlockStyle;
 
-      const headingStyle = (options.headingStyle ?? "atx") as HeadingStyle;
-      const codeBlockStyle = (options.codeBlockStyle ??
-        "fenced") as CodeBlockStyle;
-
-      if (options.html) {
-        const markdown = convertHtmlString({
-          codeBlockStyle,
-          gfm: options.gfm,
-          headingStyle,
-          html: options.html,
-        });
-        process.stdout.write(markdown);
-        return;
-      }
-
-      const inputPath = resolve(htmlFile);
-      const outputPath = options.output ? resolve(options.output) : undefined;
-      const result = await convertHtmlFile({
-        codeBlockStyle,
-        gfm: options.gfm,
-        headingStyle,
-        inputPath,
-        outputPath,
-      });
-
-      if (result.outputPath) {
-        console.log(`Converted → ${result.outputPath}`);
-      } else {
-        process.stdout.write(result.markdown);
-      }
+  if (options.html) {
+    const markdown = convertHtmlString({
+      codeBlockStyle,
+      gfm: options.gfm,
+      headingStyle,
+      html: options.html,
+    });
+    process.stdout.write(markdown);
+  } else {
+    const inputPath = resolve(options.htmlFile);
+    const outputPath = options.output ? resolve(options.output) : undefined;
+    const result = await convertHtmlFile({
+      codeBlockStyle,
+      gfm: options.gfm,
+      headingStyle,
+      inputPath,
+      outputPath,
     });
 
-  cli.help();
-  cli.parse();
+    if (result.outputPath) {
+      console.log(`Converted → ${result.outputPath}`);
+    } else {
+      process.stdout.write(result.markdown);
+    }
+  }
 }

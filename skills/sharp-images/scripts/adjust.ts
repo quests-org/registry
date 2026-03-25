@@ -1,3 +1,6 @@
+/**
+ * Adjust image color, brightness, blur, sharpen, and other visual properties
+ */
 import { readFile, writeFile } from "node:fs/promises";
 import { parse, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -109,52 +112,56 @@ export async function adjustImage({
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("adjust");
-  cli
-    .command("<filePath>")
-    .option("--brightness <n>", "Brightness multiplier")
-    .option("--saturation <n>", "Saturation multiplier")
-    .option("--hue <deg>", "Hue rotation in degrees")
-    .option("--sharpen <sigma>", "Sharpen sigma value")
-    .option("--blur <sigma>", "Blur sigma value")
-    .option("--gamma <n>", "Gamma correction value")
-    .option("--grayscale", "Convert output to grayscale")
-    .option("--negate", "Invert image colors")
-    .option("--normalize", "Normalize contrast")
-    .option("--tint <color>", "Apply tint color")
-    .option("--threshold <0-255>", "Threshold value")
-    .option("--median <size>", "Median filter window size")
-    .option("--lightness <n>", "Lightness multiplier")
-    .option("--output <path>", "Output image path")
-    .action(async (filePath: string, options) => {
-      const inputPath = resolve(filePath);
-      const parsed = parse(inputPath);
-      const outputPath = options.output
-        ? resolve(options.output)
-        : resolve(parsed.dir, `${parsed.name}-adjusted${parsed.ext}`);
-
-      const result = await adjustImage({
-        blur: options.blur ? Number(options.blur) : undefined,
-        brightness: options.brightness ? Number(options.brightness) : undefined,
-        gamma: options.gamma ? Number(options.gamma) : undefined,
-        grayscale: options.grayscale,
-        hue: options.hue ? Number(options.hue) : undefined,
-        inputPath,
-        lightness: options.lightness ? Number(options.lightness) : undefined,
-        median: options.median ? Number(options.median) : undefined,
-        negate: options.negate,
-        normalize: options.normalize,
-        outputPath,
-        saturation: options.saturation ? Number(options.saturation) : undefined,
-        sharpen: options.sharpen ? Number(options.sharpen) : undefined,
-        threshold: options.threshold ? Number(options.threshold) : undefined,
-        tint: options.tint,
-      });
-      const displayOutput =
-        options.output ?? `${parsed.name}-adjusted${parsed.ext}`;
-      console.log(
-        `Adjusted → ${displayOutput} (${result.width}×${result.height}, ${result.bytes} bytes)`,
-      );
-    });
+  cli.usage("photo.jpg --brightness 1.2 --output adjusted.jpg");
+  cli.option("--brightness <n>", "Brightness multiplier");
+  cli.option("--saturation <n>", "Saturation multiplier");
+  cli.option("--hue <deg>", "Hue rotation in degrees");
+  cli.option("--sharpen <sigma>", "Sharpen sigma value");
+  cli.option("--blur <sigma>", "Blur sigma value");
+  cli.option("--gamma <n>", "Gamma correction value");
+  cli.option("--grayscale", "Convert output to grayscale");
+  cli.option("--negate", "Invert image colors");
+  cli.option("--normalize", "Normalize contrast");
+  cli.option("--tint <color>", "Apply tint color");
+  cli.option("--threshold <0-255>", "Threshold value");
+  cli.option("--median <size>", "Median filter window size");
+  cli.option("--lightness <n>", "Lightness multiplier");
+  cli.option("--output <path>", "Output image path");
   cli.help();
-  cli.parse();
+  const { args, options } = cli.parse();
+  if (options.help) process.exit(0);
+
+  if (!args[0]) {
+    cli.outputHelp();
+    process.exit(1);
+  }
+
+  const inputPath = resolve(args[0]);
+  const parsed = parse(inputPath);
+  const outputPath = options.output
+    ? resolve(options.output)
+    : resolve(parsed.dir, `${parsed.name}-adjusted${parsed.ext}`);
+
+  const result = await adjustImage({
+    blur: options.blur ? Number(options.blur) : undefined,
+    brightness: options.brightness ? Number(options.brightness) : undefined,
+    gamma: options.gamma ? Number(options.gamma) : undefined,
+    grayscale: options.grayscale,
+    hue: options.hue ? Number(options.hue) : undefined,
+    inputPath,
+    lightness: options.lightness ? Number(options.lightness) : undefined,
+    median: options.median ? Number(options.median) : undefined,
+    negate: options.negate,
+    normalize: options.normalize,
+    outputPath,
+    saturation: options.saturation ? Number(options.saturation) : undefined,
+    sharpen: options.sharpen ? Number(options.sharpen) : undefined,
+    threshold: options.threshold ? Number(options.threshold) : undefined,
+    tint: options.tint,
+  });
+  const displayOutput =
+    options.output ?? `${parsed.name}-adjusted${parsed.ext}`;
+  console.log(
+    `Adjusted → ${displayOutput} (${result.width}×${result.height}, ${result.bytes} bytes)`,
+  );
 }

@@ -1,3 +1,6 @@
+/**
+ * Parse a CSV file into a JSON array of row objects
+ */
 import fs from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -30,18 +33,18 @@ export async function parseCsv({
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("parse-csv");
+  cli.usage("<path> [--output <path>] [--no-header] [--delimiter <char>]");
   cli.option("--output <path>", "Write parsed JSON output to file");
   cli.option("--delimiter <char>", "CSV delimiter character");
   cli.option("--header", "Treat first row as header", { default: true });
   cli.help();
   const parsed = cli.parse();
   const { options } = parsed;
+  if (options.help) process.exit(0);
   const [filePath] = parsed.args;
 
   if (!filePath) {
-    console.error(
-      "Usage: tsx scripts/parse-csv.ts <path> [--output <path>] [--no-header] [--delimiter <char>]",
-    );
+    cli.outputHelp();
     process.exit(1);
   }
 

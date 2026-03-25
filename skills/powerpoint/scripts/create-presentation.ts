@@ -1,3 +1,7 @@
+/**
+ * Create a PowerPoint presentation from a slides JSON array
+ * @note Each slide object requires a `title` and either a `body` string or a `bullets` string array, e.g. `[{"title":"Intro","body":"Hello"},{"title":"Points","bullets":["One","Two"]}]`.
+ */
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { cac } from "cac";
@@ -63,16 +67,16 @@ export async function createPresentation({
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("create-presentation");
+  cli.usage("--output <path> [--slides <json>]");
   cli.option("--output <path>", "Output PPTX file path");
   cli.option("--slides <json>", "Slides JSON array");
   cli.help();
   const parsed = cli.parse();
   const { options } = parsed;
+  if (options.help) process.exit(0);
 
   if (!options.output) {
-    console.error(
-      "Usage: tsx scripts/create-presentation.ts --output <path> [--slides <json>]",
-    );
+    cli.outputHelp();
     process.exit(1);
   }
 

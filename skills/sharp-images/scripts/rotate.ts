@@ -1,3 +1,6 @@
+/**
+ * Rotate or flip an image
+ */
 import { readFile, writeFile } from "node:fs/promises";
 import { parse, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -47,39 +50,40 @@ export async function rotateImage({
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("rotate");
-  cli
-    .command("<filePath>")
-    .option("--angle <degrees>", "Rotation angle in degrees")
-    .option("--background <color>", "Background fill color")
-    .option("--flip", "Flip image vertically")
-    .option("--flop", "Flip image horizontally")
-    .option("--output <path>", "Output image path")
-    .action(async (filePath: string, options) => {
-      if (options.angle === undefined && !options.flip && !options.flop) {
-        console.error("Provide at least one of --angle, --flip, or --flop");
-        process.exit(1);
-      }
-
-      const inputPath = resolve(filePath);
-      const parsed = parse(inputPath);
-      const outputPath = options.output
-        ? resolve(options.output)
-        : resolve(parsed.dir, `${parsed.name}-rotated${parsed.ext}`);
-
-      const result = await rotateImage({
-        angle: options.angle !== undefined ? Number(options.angle) : undefined,
-        background: options.background,
-        flip: options.flip,
-        flop: options.flop,
-        inputPath,
-        outputPath,
-      });
-      const displayOutput =
-        options.output ?? `${parsed.name}-rotated${parsed.ext}`;
-      console.log(
-        `Rotated → ${displayOutput} (${result.width}×${result.height}, ${result.bytes} bytes)`,
-      );
-    });
+  cli.usage("photo.jpg --angle 90 --output rotated.jpg");
+  cli.option("--angle <degrees>", "Rotation angle in degrees");
+  cli.option("--background <color>", "Background fill color");
+  cli.option("--flip", "Flip image vertically");
+  cli.option("--flop", "Flip image horizontally");
+  cli.option("--output <path>", "Output image path");
   cli.help();
-  cli.parse();
+  const { args, options } = cli.parse();
+  if (options.help) process.exit(0);
+
+  if (
+    !args[0] ||
+    (options.angle === undefined && !options.flip && !options.flop)
+  ) {
+    cli.outputHelp();
+    process.exit(1);
+  }
+
+  const inputPath = resolve(args[0]);
+  const parsed = parse(inputPath);
+  const outputPath = options.output
+    ? resolve(options.output)
+    : resolve(parsed.dir, `${parsed.name}-rotated${parsed.ext}`);
+
+  const result = await rotateImage({
+    angle: options.angle !== undefined ? Number(options.angle) : undefined,
+    background: options.background,
+    flip: options.flip,
+    flop: options.flop,
+    inputPath,
+    outputPath,
+  });
+  const displayOutput = options.output ?? `${parsed.name}-rotated${parsed.ext}`;
+  console.log(
+    `Rotated → ${displayOutput} (${result.width}×${result.height}, ${result.bytes} bytes)`,
+  );
 }

@@ -1,3 +1,8 @@
+/**
+ * Classify an image against ImageNet categories or custom zero-shot labels
+ * @note Without --labels uses standard ImageNet (1000 fixed categories). With --labels uses CLIP zero-shot — prefer this when the image may not fit ImageNet classes or when checking for specific concepts
+ */
+
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { cac } from "cac";
@@ -55,48 +60,52 @@ export async function classifyImageZeroShot({
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("classify-image");
-  cli
-    .command("<image>")
-    .option("--labels <a,b,c>", "Comma-separated zero-shot labels")
-    .option("--model <id>", "Model ID")
-    .option("--top-k <n>", "Number of top labels to return")
-    .option("--json", "Print JSON output")
-    .action(async (filePath: string, options) => {
-      const inputPath = resolve(filePath);
-      const relInput = filePath;
-
-      if (options.labels) {
-        const labels = options.labels.split(",").map((l: string) => l.trim());
-        const { results } = await classifyImageZeroShot({
-          inputPath,
-          labels,
-          model: options.model ?? DEFAULT_ZS_MODEL,
-        });
-        console.log(`Zero-shot classification for ${relInput}:`);
-        if (options.json) {
-          console.log(JSON.stringify(results, null, 2));
-        } else {
-          for (const r of results) {
-            console.log(`  ${r.label}: ${(r.score * 100).toFixed(1)}%`);
-          }
-        }
-      } else {
-        const topK = options.topK ? parseInt(options.topK) : 5;
-        const { results } = await classifyImage({
-          inputPath,
-          model: options.model ?? DEFAULT_MODEL,
-          topK,
-        });
-        console.log(`Classification for ${relInput}:`);
-        if (options.json) {
-          console.log(JSON.stringify(results, null, 2));
-        } else {
-          for (const r of results) {
-            console.log(`  ${r.label}: ${(r.score * 100).toFixed(1)}%`);
-          }
-        }
-      }
-    });
+  cli.usage("photo.jpg");
+  cli.option("--labels <a,b,c>", "Comma-separated zero-shot labels");
+  cli.option("--model <id>", "Model ID");
+  cli.option("--top-k <n>", "Number of top labels to return", { default: 5 });
+  cli.option("--json", "Print JSON output");
   cli.help();
-  cli.parse();
+  const { args, options } = cli.parse();
+  if (options.help) process.exit(0);
+
+  if (!args[0]) {
+    cli.outputHelp();
+    process.exit(1);
+  }
+
+  const inputPath = resolve(args[0]);
+  const relInput = args[0];
+
+  if (options.labels) {
+    const labels = options.labels.split(",").map((l: string) => l.trim());
+    const { results } = await classifyImageZeroShot({
+      inputPath,
+      labels,
+      model: options.model ?? DEFAULT_ZS_MODEL,
+    });
+    console.log(`Zero-shot classification for ${relInput}:`);
+    if (options.json) {
+      console.log(JSON.stringify(results, null, 2));
+    } else {
+      for (const r of results) {
+        console.log(`  ${r.label}: ${(r.score * 100).toFixed(1)}%`);
+      }
+    }
+  } else {
+    const topK = parseInt(options.topK);
+    const { results } = await classifyImage({
+      inputPath,
+      model: options.model ?? DEFAULT_MODEL,
+      topK,
+    });
+    console.log(`Classification for ${relInput}:`);
+    if (options.json) {
+      console.log(JSON.stringify(results, null, 2));
+    } else {
+      for (const r of results) {
+        console.log(`  ${r.label}: ${(r.score * 100).toFixed(1)}%`);
+      }
+    }
+  }
 }

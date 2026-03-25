@@ -11,48 +11,7 @@ Convert, probe, and manipulate audio/video files with a statically bundled FFmpe
 
 ## Scripts
 
-### `convert.ts` Convert audio or video files using FFmpeg
-
-Exports:
-
-- `convert({ inputPath, outputPath, sampleRate, channels, codec, bitrate, overwrite, extraArgs, }: { inputPath: string; outputPath: string; sampleRate?: number; channels?: number; codec?: string; bitrate?: string; overwrite?: boolean; extraArgs?: string[]; }): { outputPath: string; }`
-- `toWav({ inputPath, outputPath, sampleRate, channels, }: { inputPath: string; outputPath?: string; sampleRate?: number; channels?: number; }): { outputPath: string; }`
-
-```text
-convert
-
-Usage:
-  $ convert <input> --output <path> [--wav] [--sample-rate <n>] [--channels <n>] [--codec <name>] [--bitrate <rate>]
-
-Options:
-  --output <path>    Output media file path
-  --sample-rate <n>  Audio sample rate in Hz
-  --channels <n>     Audio channel count
-  --codec <name>     Audio codec name
-  --bitrate <rate>   Audio bitrate, e.g. 192k
-  --wav              Convert to WAV with sensible defaults
-  -h, --help         Display this message
-```
-
-> [!NOTE]
-> Use --wav for a quick conversion to 16kHz mono WAV (required format for speech-to-text)
-
-### `probe.ts` Inspect audio/video file format, duration, bitrate, and stream info
-
-Exports:
-
-- `probe({ inputPath }: { inputPath: string; }): ProbeResult`
-
-```text
-probe
-
-Usage:
-  $ probe <file> [--json]
-
-Options:
-  --json      Print probe result as JSON
-  -h, --help  Display this message
-```
+{{GENERATED_SCRIPT_DOCS}}
 
 ## Usage with Other Skills
 

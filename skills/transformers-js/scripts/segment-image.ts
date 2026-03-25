@@ -1,3 +1,8 @@
+/**
+ * Segment an image into labeled regions with colored overlays
+ * @note Default model uses panoptic segmentation (distinct object instances). For scene-level regions (wall, floor, sky) use --model Xenova/segformer-b0-finetuned-ade-512-512
+ */
+
 import { mkdir } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -119,50 +124,53 @@ export async function segmentAndVisualize({
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("segment-image");
-  cli
-    .command("<image>")
-    .option("--output <path>", "Output segmented overlay image path")
-    .option("--model <id>", "Model ID")
-    .option("--json", "Print JSON output")
-    .action(async (filePath: string, options) => {
-      const inputPath = resolve(filePath);
-
-      if (options.output) {
-        const result = await segmentAndVisualize({
-          inputPath,
-          outputPath: resolve(options.output),
-          model: options.model ?? DEFAULT_MODEL,
-        });
-        const relOutput = result.outputPath;
-        console.log(
-          `Segmented ${result.segments.length} regions → ${relOutput} (${result.width}x${result.height})`,
-        );
-        if (options.json) {
-          console.log(JSON.stringify(result.segments, null, 2));
-        } else {
-          for (const s of result.segments) {
-            console.log(
-              `  ${s.label} (${s.pixelCount} px${s.score !== null ? `, ${(s.score * 100).toFixed(0)}%` : ""})`,
-            );
-          }
-        }
-      } else {
-        const { segments } = await segmentImage({
-          inputPath,
-          model: options.model ?? DEFAULT_MODEL,
-        });
-        console.log(`Found ${segments.length} segments:`);
-        if (options.json) {
-          console.log(JSON.stringify(segments, null, 2));
-        } else {
-          for (const s of segments) {
-            console.log(
-              `  ${s.label} (${s.pixelCount} px${s.score !== null ? `, ${(s.score * 100).toFixed(0)}%` : ""})`,
-            );
-          }
-        }
-      }
-    });
+  cli.usage("photo.jpg --output segmented.png");
+  cli.option("--output <path>", "Output segmented overlay image path");
+  cli.option("--model <id>", "Model ID", { default: DEFAULT_MODEL });
+  cli.option("--json", "Print JSON output");
   cli.help();
-  cli.parse();
+  const { args, options } = cli.parse();
+  if (options.help) process.exit(0);
+
+  if (!args[0]) {
+    cli.outputHelp();
+    process.exit(1);
+  }
+
+  const inputPath = resolve(args[0]);
+
+  if (options.output) {
+    const result = await segmentAndVisualize({
+      inputPath,
+      outputPath: resolve(options.output),
+      model: options.model,
+    });
+    console.log(
+      `Segmented ${result.segments.length} regions → ${result.outputPath} (${result.width}x${result.height})`,
+    );
+    if (options.json) {
+      console.log(JSON.stringify(result.segments, null, 2));
+    } else {
+      for (const s of result.segments) {
+        console.log(
+          `  ${s.label} (${s.pixelCount} px${s.score !== null ? `, ${(s.score * 100).toFixed(0)}%` : ""})`,
+        );
+      }
+    }
+  } else {
+    const { segments } = await segmentImage({
+      inputPath,
+      model: options.model,
+    });
+    console.log(`Found ${segments.length} segments:`);
+    if (options.json) {
+      console.log(JSON.stringify(segments, null, 2));
+    } else {
+      for (const s of segments) {
+        console.log(
+          `  ${s.label} (${s.pixelCount} px${s.score !== null ? `, ${(s.score * 100).toFixed(0)}%` : ""})`,
+        );
+      }
+    }
+  }
 }

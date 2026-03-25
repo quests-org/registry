@@ -1,3 +1,6 @@
+/**
+ * Merge multiple PDF files into a single document
+ */
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -23,27 +26,22 @@ export async function mergePdfs({
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("merge-pdfs");
-
-  cli
-    .command("<inputPaths...>")
-    .option("--output <path>", "Output merged PDF file path")
-    .action(async (inputPaths: string[], options) => {
-      if (inputPaths.length < 2) {
-        throw new Error("At least two input PDFs are required");
-      }
-      if (!options.output) {
-        throw new Error("--output is required");
-      }
-      const result = await mergePdfs({
-        inputPaths: inputPaths.map((p) => resolve(p)),
-        outputPath: resolve(options.output),
-      });
-      const relOutput = result.outputPath;
-      console.log(
-        `Merged ${inputPaths.length} PDFs into ${result.pageCount} page(s) at ${relOutput}`,
-      );
-    });
-
+  cli.usage("a.pdf b.pdf c.pdf --output merged.pdf");
+  cli.option("--output <path>", "Output merged PDF file path");
   cli.help();
-  await cli.parse();
+  const { args, options } = cli.parse();
+  if (options.help) process.exit(0);
+
+  if (args.length < 2 || !options.output) {
+    cli.outputHelp();
+    process.exit(1);
+  }
+
+  const result = await mergePdfs({
+    inputPaths: args.map((p: string) => resolve(p)),
+    outputPath: resolve(options.output),
+  });
+  console.log(
+    `Merged ${args.length} PDFs into ${result.pageCount} page(s) at ${result.outputPath}`,
+  );
 }

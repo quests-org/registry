@@ -1,3 +1,7 @@
+/**
+ * Generate a natural-language caption for an image
+ */
+
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { cac } from "cac";
@@ -25,28 +29,31 @@ export async function describeImage({
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("describe-image");
-  cli
-    .command("<image>")
-    .option("--model <id>", "Model ID")
-    .option("--max-tokens <n>", "Maximum generated tokens")
-    .option("--json", "Print JSON output")
-    .action(async (filePath: string, options) => {
-      const inputPath = resolve(filePath);
-      const relInput = filePath;
-      const maxTokens = options.maxTokens ? parseInt(options.maxTokens) : 50;
-
-      const { text } = await describeImage({
-        inputPath,
-        model: options.model ?? DEFAULT_MODEL,
-        maxTokens,
-      });
-
-      if (options.json) {
-        console.log(JSON.stringify({ text }, null, 2));
-      } else {
-        console.log(`Caption for ${relInput}:\n  ${text}`);
-      }
-    });
+  cli.usage("photo.jpg");
+  cli.option("--model <id>", "Model ID", { default: DEFAULT_MODEL });
+  cli.option("--max-tokens <n>", "Maximum generated tokens", { default: 50 });
+  cli.option("--json", "Print JSON output");
   cli.help();
-  cli.parse();
+  const { args, options } = cli.parse();
+  if (options.help) process.exit(0);
+
+  if (!args[0]) {
+    cli.outputHelp();
+    process.exit(1);
+  }
+
+  const inputPath = resolve(args[0]);
+  const maxTokens = parseInt(options.maxTokens);
+
+  const { text } = await describeImage({
+    inputPath,
+    model: options.model,
+    maxTokens,
+  });
+
+  if (options.json) {
+    console.log(JSON.stringify({ text }, null, 2));
+  } else {
+    console.log(`Caption for ${args[0]}:\n  ${text}`);
+  }
 }

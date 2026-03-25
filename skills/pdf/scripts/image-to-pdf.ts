@@ -1,3 +1,6 @@
+/**
+ * Convert one or more images into a PDF document, one image per page
+ */
 import { readFile, writeFile } from "node:fs/promises";
 import { extname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -56,32 +59,30 @@ export async function imageToPdf({
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("image-to-pdf");
-
-  cli
-    .command("<imagePaths...>")
-    .option("--output <path>", "Output PDF file path")
-    .option("--size <size>", "Page size: letter, a4, or legal", {
-      default: "letter",
-    })
-    .action(async (imagePaths: string[], options) => {
-      if (!options.output) {
-        throw new Error("--output is required");
-      }
-      const validSizes = ["letter", "a4", "legal"] as const;
-      if (!validSizes.includes(options.size)) {
-        throw new Error(`--size must be one of: ${validSizes.join(", ")}`);
-      }
-      const result = await imageToPdf({
-        imagePaths: imagePaths.map((p) => resolve(p)),
-        outputPath: resolve(options.output),
-        size: options.size,
-      });
-      const relOutput = result.outputPath;
-      console.log(
-        `Created PDF with ${result.pageCount} page(s) at ${relOutput}`,
-      );
-    });
-
+  cli.usage("photo1.jpg photo2.jpg --output output.pdf");
+  cli.option("--output <path>", "Output PDF file path");
+  cli.option("--size <size>", "Page size: letter, a4, or legal", {
+    default: "letter",
+  });
   cli.help();
-  await cli.parse();
+  const { args, options } = cli.parse();
+  if (options.help) process.exit(0);
+
+  if (args.length === 0 || !options.output) {
+    cli.outputHelp();
+    process.exit(1);
+  }
+
+  const validSizes = ["letter", "a4", "legal"] as const;
+  if (!validSizes.includes(options.size)) {
+    throw new Error(`--size must be one of: ${validSizes.join(", ")}`);
+  }
+  const result = await imageToPdf({
+    imagePaths: args.map((p: string) => resolve(p)),
+    outputPath: resolve(options.output),
+    size: options.size,
+  });
+  console.log(
+    `Created PDF with ${result.pageCount} page(s) at ${result.outputPath}`,
+  );
 }

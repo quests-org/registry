@@ -1,3 +1,6 @@
+/**
+ * Re-encode an image to reduce file size while preserving format
+ */
 import { readFile, stat, writeFile } from "node:fs/promises";
 import { parse, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -55,34 +58,38 @@ export async function optimizeImage({
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("optimize");
-  cli
-    .command("<filePath>")
-    .option("--quality <1-100>", "Encoder quality")
-    .option("--effort <0-10>", "Encoder effort/speed tradeoff")
-    .option("--progressive", "Enable progressive encoding if supported")
-    .option("--lossless", "Enable lossless mode if supported")
-    .option("--output <path>", "Output image path")
-    .action(async (filePath: string, options) => {
-      const inputPath = resolve(filePath);
-      const parsed = parse(inputPath);
-      const outputPath = options.output
-        ? resolve(options.output)
-        : resolve(parsed.dir, `${parsed.name}-optimized${parsed.ext}`);
-
-      const result = await optimizeImage({
-        effort: options.effort ? Number(options.effort) : undefined,
-        inputPath,
-        lossless: options.lossless,
-        outputPath,
-        progressive: options.progressive,
-        quality: options.quality ? Number(options.quality) : undefined,
-      });
-      const displayOutput =
-        options.output ?? `${parsed.name}-optimized${parsed.ext}`;
-      console.log(
-        `Optimized → ${displayOutput} (${result.format}, ${result.width}×${result.height}, ${result.originalBytes} → ${result.bytes} bytes, ${result.savedPercent}% saved)`,
-      );
-    });
+  cli.usage("photo.jpg --quality 80 --output optimized.jpg");
+  cli.option("--quality <1-100>", "Encoder quality");
+  cli.option("--effort <0-10>", "Encoder effort/speed tradeoff");
+  cli.option("--progressive", "Enable progressive encoding if supported");
+  cli.option("--lossless", "Enable lossless mode if supported");
+  cli.option("--output <path>", "Output image path");
   cli.help();
-  cli.parse();
+  const { args, options } = cli.parse();
+  if (options.help) process.exit(0);
+
+  if (!args[0]) {
+    cli.outputHelp();
+    process.exit(1);
+  }
+
+  const inputPath = resolve(args[0]);
+  const parsed = parse(inputPath);
+  const outputPath = options.output
+    ? resolve(options.output)
+    : resolve(parsed.dir, `${parsed.name}-optimized${parsed.ext}`);
+
+  const result = await optimizeImage({
+    effort: options.effort ? Number(options.effort) : undefined,
+    inputPath,
+    lossless: options.lossless,
+    outputPath,
+    progressive: options.progressive,
+    quality: options.quality ? Number(options.quality) : undefined,
+  });
+  const displayOutput =
+    options.output ?? `${parsed.name}-optimized${parsed.ext}`;
+  console.log(
+    `Optimized → ${displayOutput} (${result.format}, ${result.width}×${result.height}, ${result.originalBytes} → ${result.bytes} bytes, ${result.savedPercent}% saved)`,
+  );
 }

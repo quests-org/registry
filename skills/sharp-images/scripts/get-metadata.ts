@@ -1,3 +1,6 @@
+/**
+ * Read format, dimensions, color space, and file size of an image
+ */
 import { stat } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -22,12 +25,17 @@ export async function getImageMetadata({ inputPath }: { inputPath: string }) {
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("get-metadata");
-  cli.command("<filePath>").action(async (filePath: string) => {
-    const inputPath = resolve(filePath);
-    const metadata = await getImageMetadata({ inputPath });
-    console.log(`Metadata for ${filePath}:`);
-    console.log(JSON.stringify(metadata, null, 2));
-  });
+  cli.usage("<filePath>");
   cli.help();
-  cli.parse();
+
+  const { args, options } = cli.parse();
+  if (options.help) process.exit(0);
+
+  const filePath = args[0];
+  if (!filePath) throw new Error("Missing <filePath>");
+
+  const inputPath = resolve(filePath);
+  const metadata = await getImageMetadata({ inputPath });
+  console.log(`Metadata for ${filePath}:`);
+  console.log(JSON.stringify(metadata, null, 2));
 }

@@ -1,3 +1,6 @@
+/**
+ * Set metadata fields (title, author, subject, keywords) on a PDF
+ */
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -43,36 +46,35 @@ export async function setMeta({
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("set-meta");
-
-  cli
-    .command("<inputPath>")
-    .option("--output <path>", "Output PDF file path")
-    .option("--title <value>", "Document title")
-    .option("--author <value>", "Document author")
-    .option("--subject <value>", "Document subject")
-    .option("--keywords <value>", "Comma-separated document keywords")
-    .option("--producer <value>", "PDF producer metadata value")
-    .option("--creator <value>", "PDF creator metadata value")
-    .action(async (inputPath: string, options) => {
-      if (!options.output) {
-        throw new Error("--output is required");
-      }
-      const keywords = options.keywords
-        ? options.keywords.split(",").map((k: string) => k.trim())
-        : undefined;
-      await setMeta({
-        inputPath: resolve(inputPath),
-        outputPath: resolve(options.output),
-        title: options.title,
-        author: options.author,
-        subject: options.subject,
-        keywords,
-        producer: options.producer,
-        creator: options.creator,
-      });
-      console.log(`Metadata updated, saved to ${options.output}`);
-    });
-
+  cli.usage('document.pdf --title "My Doc" --output output.pdf');
+  cli.option("--output <path>", "Output PDF file path");
+  cli.option("--title <value>", "Document title");
+  cli.option("--author <value>", "Document author");
+  cli.option("--subject <value>", "Document subject");
+  cli.option("--keywords <value>", "Comma-separated document keywords");
+  cli.option("--producer <value>", "PDF producer metadata value");
+  cli.option("--creator <value>", "PDF creator metadata value");
   cli.help();
-  await cli.parse();
+  const { args, options } = cli.parse();
+  if (options.help) process.exit(0);
+
+  if (!args[0] || !options.output) {
+    cli.outputHelp();
+    process.exit(1);
+  }
+
+  const keywords = options.keywords
+    ? options.keywords.split(",").map((k: string) => k.trim())
+    : undefined;
+  await setMeta({
+    inputPath: resolve(args[0]),
+    outputPath: resolve(options.output),
+    title: options.title,
+    author: options.author,
+    subject: options.subject,
+    keywords,
+    producer: options.producer,
+    creator: options.creator,
+  });
+  console.log(`Metadata updated, saved to ${options.output}`);
 }

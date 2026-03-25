@@ -1,3 +1,6 @@
+/**
+ * Read rows from an Excel or CSV spreadsheet as JSON
+ */
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -37,17 +40,17 @@ export async function readSpreadsheet({
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("read-spreadsheet");
+  cli.usage("<path> [--sheet <name>] [--output <path>]");
   cli.option("--sheet <name>", "Read only a specific sheet");
   cli.option("--output <path>", "Write JSON output to file");
   cli.help();
   const parsed = cli.parse();
   const { options } = parsed;
+  if (options.help) process.exit(0);
   const [filePath] = parsed.args;
 
   if (!filePath) {
-    console.error(
-      "Usage: tsx scripts/read-spreadsheet.ts <path> [--sheet <name>] [--output <path>]",
-    );
+    cli.outputHelp();
     process.exit(1);
   }
 

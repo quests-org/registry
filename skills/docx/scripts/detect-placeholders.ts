@@ -1,3 +1,6 @@
+/**
+ * List all placeholder token names in a Word document template
+ */
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -12,12 +15,14 @@ export async function detectPlaceholders({ inputPath }: { inputPath: string }) {
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("detect-placeholders");
+  cli.usage("<path>");
   cli.help();
   const parsed = cli.parse();
+  if (parsed.options.help) process.exit(0);
   const [filePath] = parsed.args;
 
   if (!filePath) {
-    console.error("Usage: tsx scripts/detect-placeholders.ts <path>");
+    cli.outputHelp();
     process.exit(1);
   }
 

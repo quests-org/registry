@@ -11,97 +11,77 @@ Use the scripts in `scripts/` to work with Word documents.
 
 Each script can also be used programmatically via its exported function.
 
-### `extract-text.ts` Extract plain text from a .docx file
+### `create-document.ts` Create a Word document from a structured sections and blocks JSON input
 
-Export: `extractDocxText({ inputPath })`
+Exports:
 
-Use when you need the full text content of a Word document, e.g. to summarize, search, or process its content.
+- `createDocument({ outputPath, sections, }: { outputPath: string; sections: SectionInput[]; }): Promise<{ outputPath: string; }>`
 
-```bash
-tsx scripts/extract-text.ts <path> [--output <path>]
+```text
+create-document
+
+Usage:
+  $ create-document --output <path> --sections <json>
+
+Options:
+  --output <path>    Output DOCX file path
+  --sections <json>  Sections JSON input
+  -h, --help         Display this message
 ```
 
-| Argument          | Required | Default | Description                    |
-| ----------------- | -------- | ------- | ------------------------------ |
-| `<path>`          | Yes      |         | Input .docx file               |
-| `--output <path>` | No       | stdout  | Write extracted text to a file |
+> [!NOTE]
+> Sections contain a `children` array of block objects. Block types: `heading` (level 1–6), `paragraph`, `table` (rows as string arrays). Headings and paragraphs support optional `bold` and `italic` fields.
 
-### `create-document.ts` Create a new Word document
+### `detect-placeholders.ts` List all placeholder token names in a Word document template
 
-Export: `createDocument({ outputPath, sections })`
+Exports:
 
-Use when you need to generate a new .docx file with headings, paragraphs, and tables.
+- `detectPlaceholders({ inputPath }: { inputPath: string; }): Promise<{ placeholders: string[]; }>`
 
-```bash
-tsx scripts/create-document.ts --output <path> --sections <json>
-tsx scripts/create-document.ts --output <path> --title <title>
+```text
+detect-placeholders
+
+Usage:
+  $ detect-placeholders <path>
+
+Options:
+  -h, --help  Display this message
 ```
 
-| Argument            | Required | Default | Description                                          |
-| ------------------- | -------- | ------- | ---------------------------------------------------- |
-| `--output <path>`   | Yes      |         | Output .docx file path                               |
-| `--sections <json>` | No       |         | JSON array of sections (see below)                   |
-| `--title <title>`   | No       |         | Shorthand: creates a single section with an H1 title |
+### `extract-text.ts` Extract all text content from a Word document
 
-Each section has a `children` array of blocks:
+Exports:
 
-```json
-[
-  {
-    "children": [
-      { "type": "heading", "level": 1, "text": "Title" },
-      {
-        "type": "paragraph",
-        "text": "Body text",
-        "bold": false,
-        "italic": false
-      },
-      {
-        "type": "table",
-        "rows": [
-          ["Header 1", "Header 2"],
-          ["Cell 1", "Cell 2"]
-        ]
-      }
-    ]
-  }
-]
+- `extractDocxText({ inputPath }: { inputPath: string; }): Promise<{ text: string; messages: (Warning | Error)[]; }>`
+
+```text
+extract-text
+
+Usage:
+  $ extract-text <path> [--output <path>]
+
+Options:
+  --output <path>  Write extracted text to a file
+  -h, --help       Display this message
 ```
 
-Block types: `heading` (level 1-6), `paragraph`, `table` (rows as string arrays). Paragraphs and headings support `bold` and `italic`.
+### `patch-document.ts` Replace placeholder tokens in a Word document template with values
 
-### `patch-document.ts` Replace placeholders in a .docx template
+Exports:
 
-Export: `patchDocxDocument({ inputPath, outputPath, patches })`
+- `patchDocxDocument({ inputPath, outputPath, patches, }: { inputPath: string; outputPath: string; patches: Record<string, string>; }): Promise<{ outputPath: string; }>`
 
-Use when you have a .docx template with `{{placeholder}}` markers and want to fill them with values.
+```text
+patch-document
 
-```bash
-tsx scripts/patch-document.ts <input> --output <path> --patches-file <json>
+Usage:
+  $ patch-document <input> --output <path> --patches-file <json>
+
+Options:
+  --output <path>        Output DOCX file path
+  --patches-file <path>  JSON file of patch key/value pairs
+  -h, --help             Display this message
 ```
 
-| Argument                | Required | Default | Description                                    |
-| ----------------------- | -------- | ------- | ---------------------------------------------- |
-| `<input>`               | Yes      |         | Input .docx template file                      |
-| `--output <path>`       | Yes      |         | Output .docx file path                         |
-| `--patches-file <json>` | Yes      |         | JSON file mapping placeholder names to strings |
-
-The patches JSON file maps placeholder names (without delimiters) to replacement strings:
-
-```json
-{ "name": "John Doe", "date": "2026-03-20", "amount": "$5,000" }
-```
-
-### `detect-placeholders.ts` List placeholders in a .docx template
-
-Export: `detectPlaceholders({ inputPath })`
-
-Use when you need to discover what placeholders a template expects before patching it.
-
-```bash
-tsx scripts/detect-placeholders.ts <path>
-```
-
-| Argument | Required | Description               |
-| -------- | -------- | ------------------------- |
-| `<path>` | Yes      | Input .docx template file |
+> [!NOTE]
+> The patches JSON maps placeholder names without their `{{` `}}` delimiters to replacement strings, e.g. `{ "name": "John", "date": "2026-01-01" }`. Run detect-placeholders first to discover what keys a template expects.

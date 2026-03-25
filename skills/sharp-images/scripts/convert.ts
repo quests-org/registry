@@ -1,3 +1,6 @@
+/**
+ * Convert an image to a different format (jpeg, png, webp, avif, etc.)
+ */
 import { readFile, writeFile } from "node:fs/promises";
 import { parse, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -62,47 +65,43 @@ export async function convertImage({
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("convert");
-  cli
-    .command("<filePath>")
-    .option("--format <fmt>", "Target output image format")
-    .option("--quality <1-100>", "Encoder quality")
-    .option("--output <path>", "Output image path")
-    .action(async (filePath: string, options) => {
-      if (!options.format) {
-        console.error(
-          "Usage: tsx scripts/convert.ts <path> --format <fmt> [--quality <1-100>] [--output <path>]",
-        );
-        process.exit(1);
-      }
-
-      const format = options.format as string;
-      if (!OUTPUT_FORMATS.has(format as OutputFormat)) {
-        console.error(
-          `Invalid format "${format}". Valid: ${[...OUTPUT_FORMATS].join(", ")}`,
-        );
-        process.exit(1);
-      }
-
-      const validFormat = format as OutputFormat;
-      const inputPath = resolve(filePath);
-      const quality = options.quality ? Number(options.quality) : undefined;
-      const parsed = parse(inputPath);
-      const ext = FORMAT_EXTENSIONS[validFormat] ?? `.${validFormat}`;
-      const outputPath = options.output
-        ? resolve(options.output)
-        : resolve(parsed.dir, `${parsed.name}${ext}`);
-
-      const result = await convertImage({
-        format: validFormat,
-        inputPath,
-        outputPath,
-        quality,
-      });
-      const displayOutput = options.output ?? `${parsed.name}${ext}`;
-      console.log(
-        `Converted → ${displayOutput} (${result.format}, ${result.width}×${result.height}, ${result.bytes} bytes)`,
-      );
-    });
+  cli.usage("photo.jpg --format webp --output photo.webp");
+  cli.option("--format <fmt>", "Target output image format");
+  cli.option("--quality <1-100>", "Encoder quality");
+  cli.option("--output <path>", "Output image path");
   cli.help();
-  cli.parse();
+  const { args, options } = cli.parse();
+  if (options.help) process.exit(0);
+
+  if (!args[0] || !options.format) {
+    cli.outputHelp();
+    process.exit(1);
+  }
+
+  const format = options.format as string;
+  if (!OUTPUT_FORMATS.has(format as OutputFormat)) {
+    throw new Error(
+      `Invalid format "${format}". Valid: ${[...OUTPUT_FORMATS].join(", ")}`,
+    );
+  }
+
+  const validFormat = format as OutputFormat;
+  const inputPath = resolve(args[0]);
+  const quality = options.quality ? Number(options.quality) : undefined;
+  const parsed = parse(inputPath);
+  const ext = FORMAT_EXTENSIONS[validFormat] ?? `.${validFormat}`;
+  const outputPath = options.output
+    ? resolve(options.output)
+    : resolve(parsed.dir, `${parsed.name}${ext}`);
+
+  const result = await convertImage({
+    format: validFormat,
+    inputPath,
+    outputPath,
+    quality,
+  });
+  const displayOutput = options.output ?? `${parsed.name}${ext}`;
+  console.log(
+    `Converted → ${displayOutput} (${result.format}, ${result.width}×${result.height}, ${result.bytes} bytes)`,
+  );
 }

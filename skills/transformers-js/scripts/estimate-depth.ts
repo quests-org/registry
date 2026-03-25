@@ -1,3 +1,7 @@
+/**
+ * Generate a depth map image from a photo
+ */
+
 import { mkdir } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -97,29 +101,31 @@ function turboColormap(t: number): [number, number, number] {
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("estimate-depth");
-  cli
-    .command("<image>")
-    .option("--output <path>", "Output depth map image path")
-    .option("--model <id>", "Model ID")
-    .option("--grayscale", "Disable colorized depth rendering")
-    .action(async (filePath: string, options) => {
-      const inputPath = resolve(filePath);
-      const outputPath = resolve(
-        options.output ?? filePath.replace(/\.[^.]+$/, "-depth.png"),
-      );
-
-      const result = await estimateDepth({
-        inputPath,
-        outputPath,
-        model: options.model ?? DEFAULT_MODEL,
-        colorize: !options.grayscale,
-      });
-
-      const relOutput = result.outputPath;
-      console.log(
-        `Depth map → ${relOutput} (${result.width}x${result.height})`,
-      );
-    });
+  cli.usage("photo.jpg --output depth.png");
+  cli.option("--output <path>", "Output depth map image path");
+  cli.option("--model <id>", "Model ID", { default: DEFAULT_MODEL });
+  cli.option("--grayscale", "Disable colorized depth rendering");
   cli.help();
-  cli.parse();
+  const { args, options } = cli.parse();
+  if (options.help) process.exit(0);
+
+  if (!args[0]) {
+    cli.outputHelp();
+    process.exit(1);
+  }
+
+  const inputPath = resolve(args[0]);
+  const outputPath = resolve(
+    options.output ?? args[0].replace(/\.[^.]+$/, "-depth.png"),
+  );
+
+  const result = await estimateDepth({
+    inputPath,
+    outputPath,
+    model: options.model,
+    colorize: !options.grayscale,
+  });
+  console.log(
+    `Depth map → ${result.outputPath} (${result.width}x${result.height})`,
+  );
 }

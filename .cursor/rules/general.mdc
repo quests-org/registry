@@ -14,6 +14,8 @@ This is a **skill and template registry**. It is not an application — it provi
 
 Skills are tested in this repository (each skill has its own `tests/` directory), but keep the consumer context in mind: the agent running the scripts is working inside the workspace project, not inside this registry.
 
+If a skill has a `SKILL.template.md`, then `SKILL.md` is auto-generated from it — edit the template, not `SKILL.md`. Script docs are injected at the `{{GENERATED_SCRIPT_DOCS}}` placeholder via `scripts/generate-skill-md.ts`.
+
 ## Code Style
 
 - NEVER add comments unless asked by the user.

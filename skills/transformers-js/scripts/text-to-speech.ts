@@ -1,3 +1,8 @@
+/**
+ * Generate speech from text as a WAV file
+ * @note Default --steps 5 is fast but low quality — use --steps 20+ for clearer speech, especially before feeding into speech-to-text
+ */
+
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -76,30 +81,40 @@ function encodeWav(samples: Float32Array, sampleRate: number): Buffer {
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("text-to-speech");
-  cli
-    .command("<text...>")
-    .option("--output <path>", "Output WAV path")
-    .option("--model <id>", "Model ID")
-    .option("--voice <F1|M1>", "Voice embedding ID")
-    .option("--speed <n>", "Speech speed multiplier")
-    .option("--steps <n>", "Inference step count")
-    .action(async (textParts: string[], options) => {
-      const text = textParts.join(" ");
-      const outputPath = resolve(options.output ?? "output.wav");
-      const result = await textToSpeech({
-        text,
-        outputPath,
-        model: options.model ?? DEFAULT_MODEL,
-        voice: options.voice ?? DEFAULT_VOICE,
-        speed: options.speed ? parseFloat(options.speed) : 1.0,
-        steps: options.steps ? parseInt(options.steps) : 5,
-      });
-
-      const relOutput = result.outputPath;
-      console.log(
-        `Audio → ${relOutput} (voice: ${result.voice}, speed: ${result.speed}x)`,
-      );
-    });
+  cli.usage('--text "Hello world" --output hello.wav');
+  cli.option("--text <text>", "Text to synthesize");
+  cli.option("--output <path>", "Output WAV path", { default: "output.wav" });
+  cli.option("--model <id>", "Model ID", { default: DEFAULT_MODEL });
+  cli.option("--voice <F1|M1>", "Voice preset (F1 = female, M1 = male)", {
+    default: DEFAULT_VOICE,
+  });
+  cli.option("--speed <n>", "Speech speed multiplier (0.8–1.2 typical)", {
+    default: 1.0,
+  });
+  cli.option(
+    "--steps <n>",
+    "Inference steps — higher = better quality, 1–50 range",
+    { default: 5 },
+  );
   cli.help();
-  cli.parse();
+  const { options } = cli.parse();
+  if (options.help) process.exit(0);
+
+  if (!options.text) {
+    cli.outputHelp();
+    process.exit(1);
+  }
+
+  const outputPath = resolve(options.output);
+  const result = await textToSpeech({
+    text: options.text,
+    outputPath,
+    model: options.model,
+    voice: options.voice,
+    speed: parseFloat(options.speed),
+    steps: parseInt(options.steps),
+  });
+  console.log(
+    `Audio → ${result.outputPath} (voice: ${result.voice}, speed: ${result.speed}x)`,
+  );
 }

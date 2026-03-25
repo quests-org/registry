@@ -1,3 +1,7 @@
+/**
+ * Generate text embeddings and compute semantic similarity
+ */
+
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { cac } from "cac";
@@ -74,99 +78,92 @@ export async function rankBySimilarity({
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("embed-text");
-  cli
-    .command("[text...]")
-    .option("--model <id>", "Model ID")
-    .option("--compare <text>", "Second text for similarity")
-    .option("--candidates <a|b|c>", "Pipe-separated candidate texts")
-    .option("--file <path>", "Text file with one entry per line")
-    .option("--json", "Print JSON output")
-    .action(async (textParts: string[], options) => {
-      const text = textParts.join(" ");
-
-      if (options.candidates) {
-        if (!text) {
-          console.error(
-            "Usage: tsx scripts/embed-text.ts <query> --candidates <a|b|c> [--model <id>] [--json]",
-          );
-          process.exit(1);
-        }
-        const candidates = options.candidates
-          .split("|")
-          .map((c: string) => c.trim());
-        const { ranked } = await rankBySimilarity({
-          query: text,
-          candidates,
-          model: options.model ?? DEFAULT_MODEL,
-        });
-        if (options.json) {
-          console.log(JSON.stringify(ranked, null, 2));
-        } else {
-          console.log(`Ranked by similarity to "${text}":`);
-          for (const r of ranked) {
-            console.log(`  ${(r.score * 100).toFixed(1)}% — ${r.text}`);
-          }
-        }
-      } else if (options.compare) {
-        if (!text) {
-          console.error(
-            "Usage: tsx scripts/embed-text.ts <textA> --compare <textB> [--model <id>] [--json]",
-          );
-          process.exit(1);
-        }
-        const { similarity } = await computeSimilarity({
-          textA: text,
-          textB: options.compare,
-          model: options.model ?? DEFAULT_MODEL,
-        });
-        if (options.json) {
-          console.log(JSON.stringify({ similarity }, null, 2));
-        } else {
-          console.log(`Similarity: ${(similarity * 100).toFixed(1)}%`);
-        }
-      } else if (options.file) {
-        const { readFile } = await import("node:fs/promises");
-        const filePath = resolve(options.file);
-        const relPath = options.file;
-        const content = await readFile(filePath, "utf-8");
-        const lines = content
-          .split("\n")
-          .map((l) => l.trim())
-          .filter(Boolean);
-        const { embeddings, dimensions } = await embedText({
-          texts: lines,
-          model: options.model ?? DEFAULT_MODEL,
-        });
-        if (options.json) {
-          console.log(JSON.stringify({ dimensions, count: embeddings.length }));
-        } else {
-          console.log(
-            `Embedded ${embeddings.length} lines from ${relPath} (${dimensions}d)`,
-          );
-        }
-      } else {
-        if (!text) {
-          console.error(
-            "Usage: tsx scripts/embed-text.ts <text> [--compare <text>] [--candidates <a|b|c>] [--file <path>] [--model <id>] [--json]",
-          );
-          process.exit(1);
-        }
-        const { embeddings, dimensions } = await embedText({
-          texts: [text],
-          model: options.model ?? DEFAULT_MODEL,
-        });
-        if (options.json) {
-          console.log(JSON.stringify({ dimensions, embedding: embeddings[0] }));
-        } else {
-          console.log(
-            `Embedding (${dimensions}d): [${embeddings[0]
-              .slice(0, 5)
-              .map((v) => v.toFixed(4))
-              .join(", ")}, ...]`,
-          );
-        }
-      }
-    });
+  cli.usage('--text "hello world" --compare "hi there"');
+  cli.option("--text <text>", "Text to embed");
+  cli.option("--model <id>", "Model ID", { default: DEFAULT_MODEL });
+  cli.option("--compare <text>", "Second text for similarity");
+  cli.option("--candidates <a|b|c>", "Pipe-separated candidate texts");
+  cli.option("--file <path>", "Text file with one entry per line");
+  cli.option("--json", "Print JSON output");
   cli.help();
-  cli.parse();
+  const { options } = cli.parse();
+  if (options.help) process.exit(0);
+
+  const text = options.text ?? "";
+
+  if (options.candidates) {
+    if (!text) {
+      cli.outputHelp();
+      process.exit(1);
+    }
+    const candidates = options.candidates
+      .split("|")
+      .map((c: string) => c.trim());
+    const { ranked } = await rankBySimilarity({
+      query: text,
+      candidates,
+      model: options.model,
+    });
+    if (options.json) {
+      console.log(JSON.stringify(ranked, null, 2));
+    } else {
+      console.log(`Ranked by similarity to "${text}":`);
+      for (const r of ranked) {
+        console.log(`  ${(r.score * 100).toFixed(1)}% — ${r.text}`);
+      }
+    }
+  } else if (options.compare) {
+    if (!text) {
+      cli.outputHelp();
+      process.exit(1);
+    }
+    const { similarity } = await computeSimilarity({
+      textA: text,
+      textB: options.compare,
+      model: options.model,
+    });
+    if (options.json) {
+      console.log(JSON.stringify({ similarity }, null, 2));
+    } else {
+      console.log(`Similarity: ${(similarity * 100).toFixed(1)}%`);
+    }
+  } else if (options.file) {
+    const { readFile } = await import("node:fs/promises");
+    const filePath = resolve(options.file);
+    const content = await readFile(filePath, "utf-8");
+    const lines = content
+      .split("\n")
+      .map((l) => l.trim())
+      .filter(Boolean);
+    const { embeddings, dimensions } = await embedText({
+      texts: lines,
+      model: options.model,
+    });
+    if (options.json) {
+      console.log(JSON.stringify({ dimensions, count: embeddings.length }));
+    } else {
+      console.log(
+        `Embedded ${embeddings.length} lines from ${options.file} (${dimensions}d)`,
+      );
+    }
+  } else {
+    if (!text) {
+      cli.outputHelp();
+      process.exit(1);
+    }
+    const { embeddings, dimensions } = await embedText({
+      texts: [text],
+      model: options.model,
+    });
+    if (options.json) {
+      console.log(JSON.stringify({ dimensions, embedding: embeddings[0] }));
+    } else {
+      console.log(
+        `Embedding (${dimensions}d): [${embeddings[0]
+          .slice(0, 5)
+          .map((v) => v.toFixed(4))
+          .join(", ")}, ...]`,
+      );
+    }
+  }
 }

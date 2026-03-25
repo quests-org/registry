@@ -3,163 +3,77 @@ name: create-registry-skill
 description: Guide for creating effective Agent Skills. Use when you want to create, write, or author a new skill, or asks about skill structure, best practices, or SKILL.md format.
 ---
 
-# Creating Skills
+# Creating Registry Skills
 
-Skills are markdown files that teach the agent how to perform specific tasks. They live in `skills/` and are loaded automatically when relevant.
+Skills live in `skills/` and are installed into the workspace on demand. Each skill has scripts the agent runs via CLI.
 
-## Before You Begin: Gather Requirements
+## Directory Layout
 
-1. **Purpose and scope**: What specific task or workflow should this skill help with?
-2. **Trigger scenarios**: When should the agent automatically apply this skill?
-3. **Key domain knowledge**: What specialized information does the agent need?
-4. **Output format preferences**: Are there specific templates or formats required?
-5. **Existing patterns**: Are there existing examples or conventions to follow?
+```
+skills/skill-name/
+├── SKILL.template.md     # Source of truth — contains {{GENERATED_SCRIPT_DOCS}}
+├── SKILL.md              # Generated — never edit directly
+├── package.json
+├── pnpm-lock.yaml
+└── scripts/
+    └── my-script.ts
+```
 
-If you have previous conversation context, infer the skill from what was discussed.
+**`SKILL.md` is generated** from `SKILL.template.md` by running:
+
+```bash
+tsx scripts/generate-skill-md.ts --skill skill-name
+```
+
+The generator replaces `{{GENERATED_SCRIPT_DOCS}}` with documentation extracted from each script's JSDoc and CAC `--help` output. Always edit `SKILL.template.md`, never `SKILL.md`.
 
 ---
 
-## Skill File Structure
+## SKILL.template.md
 
-### Directory Layout
-
-```
-skills/skill-name/ in the repository root
-├── SKILL.md              # Required - main instructions
-├── package.json          # Required if scripts use npm packages
-├── pnpm-lock.yaml        # Required if package.json exists
-├── references/           # Optional - documentation
-│   └── REFERENCE.md      # Detailed technical reference
-├── scripts/              # Optional - utility TypeScript scripts
-│   ├── my-script.ts
-│   └── lib/
-│       └── helper.ts
-└── assets/               # Optional - templates, resources
-```
-
-Dependencies are bundled via `package.json` + `pnpm-lock.yaml`. The skill loader runs `pnpm install` automatically when the skill is loaded — **never** include installation instructions (like `pnpm add`) in the SKILL.md.
-
-### SKILL.md Structure
+Keep it minimal — script docs are injected automatically:
 
 ```markdown
 ---
 name: your-skill-name
-description: Brief description of what this skill does and when to use it
+description: "..."
 ---
 
 # Your Skill Name
 
-## Instructions
+Brief one-liner about what this skill does.
 
-Clear, step-by-step guidance for the agent.
+## Scripts
+
+Each script can also be used programmatically via its exported function.
+
+{{GENERATED_SCRIPT_DOCS}}
 ```
-
-### Required Metadata Fields
-
-| Field         | Requirements                                         | Purpose                                    |
-| ------------- | ---------------------------------------------------- | ------------------------------------------ |
-| `name`        | Max 64 chars, lowercase letters/numbers/hyphens only | Unique identifier for the skill            |
-| `description` | Max 1024 chars, non-empty                            | Helps agent decide when to apply the skill |
 
 ---
 
 ## Writing Effective Descriptions
 
-The description carries the entire burden of triggering — the agent only sees `name` + `description` when deciding whether to load a skill. Max 1024 characters.
+The description is the only thing the agent sees when deciding whether to load the skill. Max 1024 characters.
 
-### Principles
-
-1. **Focus on user intent, not implementation.** Describe what the user is trying to achieve. "Use when the user wants to remove a background from an image" beats "Runs the RMBG-1.4 model via ONNX Runtime."
-
-2. **Use imperative phrasing.** Frame as an instruction: "Use when..." / "Activate when..." rather than "This skill does..."
-
-3. **Be pushy about when to activate.** Explicitly list trigger scenarios, including cases where the user doesn't name the domain directly: "even if they don't mention 'spreadsheet' or 'CSV'."
-
-4. **Lead with the most ambiguous capabilities.** If another skill shares keywords (e.g. two skills both work with images), put the distinguishing capabilities first so the agent reads them before pattern-matching on shared terms.
-
-5. **Disambiguate from similar skills.** When skills overlap in domain, add explicit negative signals: "Not for X (use other-skill)." Put these at the start — negative signals buried at the end of a long description are weak.
-
-6. **Keep it concise.** A few sentences is right. Long keyword lists dilute signal. Prefer intent-based phrases over exhaustive feature lists.
-
-### Before vs After
-
-```yaml
-# Before — implementation-focused, no trigger guidance
-description: Process CSV files.
-
-# After — intent-focused, pushy, includes non-obvious triggers
-description: Analyze CSV and tabular data files — compute summary statistics, add derived columns, generate charts, and clean messy data. Use when the user has a CSV, TSV, or Excel file and wants to explore, transform, or visualize the data, even if they don't explicitly mention "CSV" or "analysis."
-```
+- **Focus on user intent**: "Use when the user wants to remove a background" beats "Runs RMBG-1.4 via ONNX."
+- **Use imperative phrasing**: "Use when..." / "Activate when..."
+- **List trigger scenarios** including cases where the user doesn't name the domain directly.
+- **Disambiguate from similar skills** with negative signals if needed.
 
 ---
 
-## Core Authoring Principles
+## Script Structure
 
-### 1. Concise is Key
-
-The context window is shared with conversation history, other skills, and requests. Every token competes for space.
-
-**Default assumption**: The agent is already very smart. Only add context it doesn't already have.
-
-Challenge each piece of information:
-
-- "Does the agent really need this explanation?"
-- "Can I assume the agent knows this?"
-- "Does this paragraph justify its token cost?"
-
-### 2. Keep SKILL.md Under 500 Lines
-
-Use progressive disclosure for detailed content.
-
-### 3. Progressive Disclosure
-
-Put essential information in SKILL.md; detailed reference material in separate files that the agent reads only when needed.
-
-```markdown
-## Additional resources
-
-- For complete API details, see [references/REFERENCE.md](references/REFERENCE.md)
-```
-
-**Keep references one level deep**: link directly from SKILL.md to reference files.
-
-### 4. Set Appropriate Degrees of Freedom
-
-| Freedom Level                     | When to Use                                  | Example                |
-| --------------------------------- | -------------------------------------------- | ---------------------- |
-| **High** (text instructions)      | Multiple valid approaches, context-dependent | Code review guidelines |
-| **Medium** (pseudocode/templates) | Preferred pattern with acceptable variation  | Report generation      |
-| **Low** (specific scripts)        | Fragile operations, consistency critical     | File conversions       |
-
----
-
-## Utility Scripts
-
-Skills can include TypeScript scripts in a `scripts/` directory. CLI-style scripts that take arguments are preferred:
-
-- Can be run directly by the agent, without the need to modify the code
-- Versatile, can be used many times without modification
-- Can be tested
-
-### Running Scripts
-
-The runtime environment is always Node.js 22+, so all modern Node.js APIs are available.
-
-`tsx` is the best way to execute scripts. When explaining how to use a script, use the following format:
-
-```bash
-tsx skills/skill-name/scripts/my-script.ts ./file.txt
-```
-
-### Script Structure
-
-Scripts should export their core logic as a named async function **and** include a CLI entrypoint guarded by an `import.meta.url` check. This lets the agent run the script from the terminal or import the function programmatically.
+Scripts use **CAC** for CLI parsing and export a named async function for programmatic use.
 
 ```typescript
-import { writeFile } from "node:fs/promises";
-import { relative, resolve } from "node:path";
+/**
+ * Brief description of what this script does
+ * @note Optional note shown as a callout in the generated docs
+ */
+import { cac } from "cac";
 import { pathToFileURL } from "node:url";
-import { parseArgs } from "node:util";
 
 export async function doSomething({
   inputPath,
@@ -168,216 +82,68 @@ export async function doSomething({
   inputPath: string;
   outputPath: string;
 }) {
-  // ... implementation ...
+  // ...
   return { outputPath };
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const { values, positionals } = parseArgs({
-    allowPositionals: true,
-    options: {
-      output: { type: "string" },
-    },
-  });
+  const cli = cac("my-script");
+  cli.usage("<inputPath>");
+  cli.option("--output <path>", "Output file path");
+  cli.help();
+  const { args, options } = cli.parse();
+  if (options.help) process.exit(0);
 
-  const [filePath] = positionals;
+  if (!args[0]) {
+    cli.outputHelp();
+    process.exit(1);
+  }
+
   const result = await doSomething({
-    inputPath: resolve(filePath),
-    outputPath: resolve(values.output ?? "output.txt"),
+    inputPath: resolve(args[0]),
+    outputPath: resolve(options.output ?? "output.txt"),
   });
 
-  const relOutput = relative(process.cwd(), result.outputPath) || ".";
-  console.log(`Saved to ${relOutput}`);
+  console.log(`Saved to ${relative(process.cwd(), result.outputPath) || "."}`);
 }
 ```
 
-### Output Paths
+### What gets auto-generated
 
-Scripts run from the project root. Always log paths **relative to `process.cwd()`** so the agent can use them directly — never log absolute paths.
+The generator extracts:
 
-Use `relative()` from `node:path` to convert resolved paths back to relative ones for console output:
+1. **Heading + description** — from the file-level JSDoc comment
+2. **Exports** — TypeScript function signatures via the type checker
+3. **CLI help** — from running the script with `--help` via CAC
+4. **Notes** — from `@note` tags in the file-level JSDoc
+
+So the only things you need to write manually in `SKILL.template.md` are the frontmatter and any context that isn't captured by scripts.
+
+### Output paths
+
+Always log paths **relative to `process.cwd()`**:
 
 ```typescript
 import { relative, resolve } from "node:path";
-
-const outputPath = resolve(values.output);
-await writeFile(outputPath, data);
-
-const relOutput = relative(process.cwd(), outputPath) || ".";
+const relOutput = relative(process.cwd(), resolve(outputPath)) || ".";
 console.log(`Saved to ${relOutput}`);
-```
-
-For scripts that generate an output directory (e.g. rendering pages), log the **full relative path** to each file — not just the filename:
-
-```typescript
-const relDir = relative(process.cwd(), outputDir) || ".";
-console.log(`Saved ${relDir}/page-01.png`);
-```
-
-### Documenting Scripts
-
-In the SKILL.md, document each script's CLI usage **and** its exported function. Add an `Export:` line with the function name and parameter signature right after the script heading so the agent knows both options:
-
-````markdown
-### `my-script.ts` Does something useful
-
-Export: `doSomething({ inputPath, outputPath })`
-
-```bash
-tsx skills/skill-name/scripts/my-script.ts ./input.txt --output ./output.md
-```
-````
-
-Make clear whether the agent should **execute** the script (most common) or **read** it as reference.
-
----
-
-## Common Patterns
-
-### Template Pattern
-
-Provide output format templates:
-
-```markdown
-## Report structure
-
-Use this template:
-
-\`\`\`markdown
-
-# [Analysis Title]
-
-## Executive summary
-
-[One-paragraph overview]
-
-## Key findings
-
-- Finding 1
-- Finding 2
-  \`\`\`
-```
-
----
-
-## Skill Creation Workflow
-
-### Phase 1: Discovery
-
-Gather information about:
-
-1. The skill's purpose and primary use case
-2. Trigger scenarios
-3. Any specific requirements or constraints
-4. Existing examples or patterns to follow
-
-### Phase 2: Design
-
-1. Draft the skill name (lowercase, hyphens, max 64 chars)
-2. Write a specific, third-person description
-3. Outline the main sections needed
-4. Identify if TypeScript utility scripts are needed
-
-### Phase 3: Implementation
-
-1. Create the directory at `skills/skill-name/` in the repository root
-2. Write the SKILL.md file with frontmatter
-3. Create any supporting reference files
-4. Create any TypeScript utility scripts in `scripts/`
-
-### Phase 4: Verification
-
-1. Verify the SKILL.md is under 500 lines
-2. Check that the description is specific and includes trigger terms
-3. Ensure consistent terminology throughout
-4. Verify all file references are one level deep
-5. Confirm scripts use `tsx` and are referenced with full `skills/...` paths
-
----
-
-## Complete Example
-
-**Directory structure:**
-
-```
-skills/image-resize/ in the repository root
-├── SKILL.md
-├── package.json
-├── pnpm-lock.yaml
-└── scripts/
-    └── resize.ts
-```
-
-**SKILL.md:**
-
-````markdown
----
-name: image-resize
-description: "Resize images to target dimensions or generate thumbnails. Use when the user wants to scale, shrink, enlarge, or change the size of an image."
----
-
-# image-resize
-
-Resize images using the `sharp` library.
-
-## Quick Start
-
-```bash
-tsx skills/image-resize/scripts/resize.ts ./photo.jpg
-tsx skills/image-resize/scripts/resize.ts ./photo.jpg --width 800
-```
-
-## CLI Options
-
-| Argument          | Required | Default | Description       |
-| ----------------- | -------- | ------- | ----------------- |
-| `<path>`          | Yes      |         | Input image       |
-| `--width <px>`    | No       |         | Target width      |
-| `--height <px>`   | No       |         | Target height     |
-| `--output <path>` | No       | auto    | Output image path |
-
-## Output
-
-Prints the relative output path on success:
-
-```
-Resized photo.jpg → photo-resized.jpg (800x600)
-```
-
 ```
 
 ---
 
 ## Summary Checklist
 
-Before finalizing a skill, verify:
-
 ### Core Quality
 
-- [ ] Description focuses on user intent, not implementation
-- [ ] Description leads with the most ambiguous/distinguishing capabilities
-- [ ] Description includes explicit trigger scenarios ("Use when...", "Activate when...")
-- [ ] Description disambiguates from similar skills with negative signals if needed
-- [ ] Description is under 1024 characters
-- [ ] SKILL.md body is under 500 lines
-- [ ] Consistent terminology throughout
+- [ ] Description focuses on user intent, includes trigger scenarios, is under 1024 chars
+- [ ] `SKILL.template.md` contains `{{GENERATED_SCRIPT_DOCS}}`
+- [ ] `SKILL.md` is generated — run `tsx scripts/generate-skill-md.ts --skill skill-name`
 
-### Structure
+### Scripts
 
-- [ ] Skill is located at `skills/skill-name/` in the repository root
-- [ ] File references are one level deep
-- [ ] Progressive disclosure used appropriately
-- [ ] No time-sensitive information
-
-### If Including Scripts
-
-- [ ] Scripts are TypeScript (`.ts`) files
-- [ ] Scripts export a named async function and guard CLI with `import.meta.url`
-- [ ] Each script's `Export:` line is documented in SKILL.md
-- [ ] Scripts are run with `tsx`, never `node` or `python`
-- [ ] Script paths use `skills/skill-name/scripts/...`
-- [ ] Dependencies are in `package.json` + `pnpm-lock.yaml` (no install instructions in SKILL.md)
-- [ ] Scripts log paths relative to `process.cwd()`, never absolute
-- [ ] Error handling is explicit and helpful
-```
-````
+- [ ] File-level JSDoc describes what the script does (becomes the heading description)
+- [ ] Use `@note` tags for important caveats (rendered as callouts)
+- [ ] Use **CAC** for CLI parsing, not `parseArgs`
+- [ ] Export a named async function; guard CLI with `import.meta.url`
+- [ ] Log output paths relative to `process.cwd()`
+- [ ] Dependencies in `package.json` + `pnpm-lock.yaml`

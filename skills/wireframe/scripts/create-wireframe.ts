@@ -1,3 +1,8 @@
+/**
+ * Generate an HTML wireframe page with Tailwind CSS styling
+ * @note Pass --body with your full HTML content to generate the wireframe in one command with no read-then-edit round trip. Always run from the project root — do not cd into the skill directory.
+ */
+
 import { mkdir, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { dirname, resolve } from "node:path";
@@ -36,6 +41,7 @@ export async function createWireframe({
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("create-wireframe");
+  cli.usage('--output wireframe.html --body "<div>Hello</div>"');
   cli.option("--output <path>", "Output HTML file path");
   cli.option("--body <html>", "Inline HTML body content");
   cli.option("--theme <name>", "Theme name");

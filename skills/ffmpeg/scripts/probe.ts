@@ -1,3 +1,6 @@
+/**
+ * Inspect audio/video file format, duration, bitrate, and stream info
+ */
 import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
@@ -98,13 +101,15 @@ export function probe({ inputPath }: { inputPath: string }): ProbeResult {
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("probe");
+  cli.usage("<file> [--json]");
   cli.option("--json", "Print probe result as JSON");
   cli.help();
   const parsed = cli.parse();
   const { options } = parsed;
+  if (options.help) process.exit(0);
   const [filePath] = parsed.args;
   if (!filePath) {
-    console.error("Usage: tsx scripts/probe.ts <file> [--json]");
+    cli.outputHelp();
     process.exit(1);
   }
 

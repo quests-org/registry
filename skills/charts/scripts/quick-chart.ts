@@ -1,3 +1,7 @@
+/**
+ * Create a simple chart from inline labels and data values
+ */
+
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { cac } from "cac";
@@ -61,21 +65,25 @@ export async function createQuickChart({
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("quick-chart");
+  cli.usage(
+    "--type <bar|line|pie|doughnut|radar> --labels <a,b,c> --data <1,2,3> [--title <text>] [--output <path>] [--width <px>] [--height <px>]",
+  );
   cli.option("--type <name>", "Chart type");
   cli.option("--labels <a,b,c>", "Comma-separated label list");
   cli.option("--data <1,2,3>", "Comma-separated numeric values");
   cli.option("--title <text>", "Optional chart title");
-  cli.option("--output <path>", "Output chart file path");
-  cli.option("--width <px>", "Chart width in pixels");
-  cli.option("--height <px>", "Chart height in pixels");
+  cli.option("--output <path>", "Output chart file path", {
+    default: "chart.png",
+  });
+  cli.option("--width <px>", "Chart width in pixels", { default: 800 });
+  cli.option("--height <px>", "Chart height in pixels", { default: 600 });
   cli.help();
   const parsed = cli.parse();
   const { options } = parsed;
+  if (options.help) process.exit(0);
 
   if (!options.type || !options.labels || !options.data) {
-    console.error(
-      "Usage: tsx scripts/quick-chart.ts --type <bar|line|pie|doughnut|radar> --labels <a,b,c> --data <1,2,3> [--title <text>] [--output <path>] [--width <px>] [--height <px>]",
-    );
+    cli.outputHelp();
     process.exit(1);
   }
 
@@ -89,9 +97,9 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 
   const labels = options.labels.split(",").map((s: string) => s.trim());
   const data = options.data.split(",").map((s: string) => Number(s.trim()));
-  const width = options.width ? Number(options.width) : 800;
-  const height = options.height ? Number(options.height) : 600;
-  const outputPath = options.output ?? "chart.png";
+  const width = Number(options.width);
+  const height = Number(options.height);
+  const outputPath = options.output;
 
   const result = await createQuickChart({
     data,

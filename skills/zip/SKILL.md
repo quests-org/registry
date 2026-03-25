@@ -9,40 +9,55 @@ Create, extract, and inspect zip archives using `adm-zip`.
 
 ## Scripts
 
-### `create-zip.ts` Create a zip archive from files and directories
+### `create-zip.ts` Create a ZIP archive from files or directories
 
-Export: `createZip({ outputPath, inputPaths })`
+Exports:
 
-```bash
-tsx scripts/create-zip.ts --output <path> <input...>
+- `createZip({ outputPath, inputPaths, }: { outputPath: string; inputPaths: readonly string[]; }): { outputPath: string; entryCount: number; }`
+
+```text
+create-zip
+
+Usage:
+  $ create-zip --output <path> <input...>
+
+Options:
+  --output <path>  Output ZIP file path
+  -h, --help       Display this message
 ```
 
-| Argument          | Required | Description                             |
-| ----------------- | -------- | --------------------------------------- |
-| `--output <path>` | Yes      | Output zip file path                    |
-| `<input...>`      | Yes      | One or more files or directories to add |
+### `extract-zip.ts` Extract all files from a ZIP archive
 
-### `extract-zip.ts` Extract a zip archive to a directory
+Exports:
 
-Export: `extractZip({ inputPath, outputDir })`
+- `extractZip({ inputPath, outputDir, }: { inputPath: string; outputDir?: string; }): { outputDir: string; files: string[]; }`
 
-```bash
-tsx scripts/extract-zip.ts <zipfile> [--output <dir>]
+```text
+extract-zip
+
+Usage:
+  $ extract-zip <zipfile> [--output <dir>]
+
+Options:
+  --output <dir>  Output directory for extracted files
+  -h, --help      Display this message
 ```
 
-| Argument         | Required | Default                     | Description          |
-| ---------------- | -------- | --------------------------- | -------------------- |
-| `<zipfile>`      | Yes      |                             | Path to the zip file |
-| `--output <dir>` | No       | Zip filename without `.zip` | Output directory     |
+> [!NOTE]
+> If --output is not specified, files are extracted into a directory named after the zip file (without the .zip extension) in the same location as the archive.
 
-### `list-zip.ts` List contents of a zip file
+### `list-zip.ts` List entries in a ZIP archive with sizes
 
-Export: `listZip({ inputPath })`
+Exports:
 
-```bash
-tsx scripts/list-zip.ts <zipfile>
+- `listZip({ inputPath }: { inputPath: string; }): ZipEntryInfo[]`
+
+```text
+list-zip
+
+Usage:
+  $ list-zip <zipfile>
+
+Options:
+  -h, --help  Display this message
 ```
-
-| Argument    | Required | Description          |
-| ----------- | -------- | -------------------- |
-| `<zipfile>` | Yes      | Path to the zip file |

@@ -1,3 +1,6 @@
+/**
+ * List entries in a ZIP archive with sizes
+ */
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { cac } from "cac";
@@ -24,12 +27,14 @@ export function listZip({ inputPath }: { inputPath: string }): ZipEntryInfo[] {
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("list-zip");
+  cli.usage("<zipfile>");
   cli.help();
   const parsed = cli.parse();
+  if (parsed.options.help) process.exit(0);
   const [zipFile] = parsed.args;
 
   if (!zipFile) {
-    console.error("Usage: tsx scripts/list-zip.ts <zipfile>");
+    cli.outputHelp();
     process.exit(1);
   }
 

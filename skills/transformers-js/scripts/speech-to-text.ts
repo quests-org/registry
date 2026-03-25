@@ -1,3 +1,8 @@
+/**
+ * Transcribe audio to text using Whisper
+ * @note Only accepts .wav files — convert first with ffmpeg: ffmpeg -i input.mp3 -ar 16000 -ac 1 output.wav. Do NOT pass --language with the default .en model — only use it with multilingual models like onnx-community/whisper-tiny (without .en)
+ */
+
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -120,37 +125,43 @@ function resample(
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("speech-to-text");
-  cli
-    .command("<audio>")
-    .option("--model <id>", "Model ID")
-    .option("--language <code>", "Language code hint")
-    .option("--timestamps", "Include timestamp chunks")
-    .option("--json", "Print JSON output")
-    .action(async (filePath: string, options) => {
-      const inputPath = resolve(filePath);
-      const relInput = filePath;
-
-      const result = await speechToText({
-        inputPath,
-        model: options.model ?? DEFAULT_MODEL,
-        language: options.language,
-        timestamps: options.timestamps ?? false,
-      });
-
-      if (options.json) {
-        console.log(JSON.stringify(result, null, 2));
-      } else {
-        console.log(`Transcription for ${relInput}:\n  ${result.text}`);
-        if (result.chunks.length > 0) {
-          for (const chunk of result.chunks) {
-            const ts = chunk.timestamp ?? [];
-            console.log(
-              `  [${ts[0]?.toFixed(1) ?? "?"}s - ${ts[1]?.toFixed(1) ?? "?"}s] ${chunk.text}`,
-            );
-          }
-        }
-      }
-    });
+  cli.usage("audio.wav");
+  cli.option("--model <id>", "Model ID", { default: DEFAULT_MODEL });
+  cli.option(
+    "--language <code>",
+    "Language code for multilingual models only (e.g. en, fr) — do not use with .en models",
+  );
+  cli.option("--timestamps", "Include timestamp chunks");
+  cli.option("--json", "Print JSON output");
   cli.help();
-  cli.parse();
+  const { args, options } = cli.parse();
+  if (options.help) process.exit(0);
+
+  if (!args[0]) {
+    cli.outputHelp();
+    process.exit(1);
+  }
+
+  const inputPath = resolve(args[0]);
+
+  const result = await speechToText({
+    inputPath,
+    model: options.model,
+    language: options.language,
+    timestamps: options.timestamps,
+  });
+
+  if (options.json) {
+    console.log(JSON.stringify(result, null, 2));
+  } else {
+    console.log(`Transcription for ${args[0]}:\n  ${result.text}`);
+    if (result.chunks.length > 0) {
+      for (const chunk of result.chunks) {
+        const ts = chunk.timestamp ?? [];
+        console.log(
+          `  [${ts[0]?.toFixed(1) ?? "?"}s - ${ts[1]?.toFixed(1) ?? "?"}s] ${chunk.text}`,
+        );
+      }
+    }
+  }
 }

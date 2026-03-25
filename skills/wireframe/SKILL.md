@@ -7,22 +7,27 @@ description: "Generate HTML wireframes and prototypes with Tailwind CSS. Use whe
 
 Generate a self-contained HTML wireframe powered by the `@tailwindcss/browser` playground — Tailwind v4 compiles client-side with no build step required.
 
-## Usage
+## Scripts
 
-```bash
-tsx scripts/create-wireframe.ts --output <path> [--theme <css>] [--body <html>]
+### `create-wireframe.ts` Generate an HTML wireframe page with Tailwind CSS styling
+
+Exports:
+
+- `createWireframe({ body, outputPath, theme, }: { body?: string; outputPath: string; theme?: string; }): Promise<{ outputPath: string; }>`
+
+```text
+create-wireframe
+
+Usage:
+  $ create-wireframe --output wireframe.html --body "<div>Hello</div>"
+
+Options:
+  --output <path>  Output HTML file path
+  --body <html>    Inline HTML body content
+  --theme <name>   Theme name
+  -h, --help       Display this message
+--output <path> is required
 ```
 
-| Argument          | Required | Description                         |
-| ----------------- | -------- | ----------------------------------- |
-| `--output <path>` | Yes      | Output HTML file path               |
-| `--theme <css>`   | No       | CSS injected into `@theme {}` block |
-| `--body <html>`   | No       | HTML string to use as `<body>`      |
-
-**One-shot workflow:** Pass your HTML body directly via `--body` to generate the final wireframe in a single command with no read-then-edit round trip. Always run from the **project root** — do not `cd` into the skill directory.
-
-```bash
-tsx scripts/create-wireframe.ts --output output/page.html --body "<div class='p-4'>Hello</div>"
-```
-
-You do not need to read the generated file before editing — the full template structure is shown above. When you know the content upfront, use `--body` to skip the edit step.
+> [!NOTE]
+> Pass --body with your full HTML content to generate the wireframe in one command with no read-then-edit round trip. Always run from the project root — do not cd into the skill directory.

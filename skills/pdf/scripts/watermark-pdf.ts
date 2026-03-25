@@ -1,3 +1,6 @@
+/**
+ * Stamp diagonal watermark text on every page of a PDF
+ */
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -43,30 +46,28 @@ export async function watermarkPdf({
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("watermark-pdf");
-
-  cli
-    .command("<inputPath>")
-    .option("--text <text>", "Watermark text")
-    .option("--output <path>", "Output PDF file path")
-    .option("--opacity <n>", "Watermark opacity between 0 and 1")
-    .option("--font-size <n>", "Watermark font size in points")
-    .action(async (inputPath: string, options) => {
-      if (!options.output || !options.text) {
-        throw new Error("--text and --output are required");
-      }
-      const result = await watermarkPdf({
-        inputPath: resolve(inputPath),
-        outputPath: resolve(options.output),
-        text: options.text,
-        opacity: options.opacity ? parseFloat(options.opacity) : undefined,
-        fontSize: options.fontSize ? parseFloat(options.fontSize) : undefined,
-      });
-      const relOutput = result.outputPath;
-      console.log(
-        `Watermarked ${result.pageCount} page(s) with "${options.text}", saved to ${relOutput}`,
-      );
-    });
-
+  cli.usage('document.pdf --text "DRAFT" --output watermarked.pdf');
+  cli.option("--text <text>", "Watermark text");
+  cli.option("--output <path>", "Output PDF file path");
+  cli.option("--opacity <n>", "Watermark opacity between 0 and 1");
+  cli.option("--font-size <n>", "Watermark font size in points");
   cli.help();
-  await cli.parse();
+  const { args, options } = cli.parse();
+  if (options.help) process.exit(0);
+
+  if (!args[0] || !options.output || !options.text) {
+    cli.outputHelp();
+    process.exit(1);
+  }
+
+  const result = await watermarkPdf({
+    inputPath: resolve(args[0]),
+    outputPath: resolve(options.output),
+    text: options.text,
+    opacity: options.opacity ? parseFloat(options.opacity) : undefined,
+    fontSize: options.fontSize ? parseFloat(options.fontSize) : undefined,
+  });
+  console.log(
+    `Watermarked ${result.pageCount} page(s) with "${options.text}", saved to ${result.outputPath}`,
+  );
 }

@@ -1,3 +1,6 @@
+/**
+ * Create a simple text-based PDF document
+ */
 import { writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -44,24 +47,23 @@ export async function createPdf({
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("create-pdf");
-
-  cli
-    .command("[content]")
-    .option("--output <path>", "Output PDF file path")
-    .action(async (content: string | undefined, options) => {
-      if (!options.output) {
-        throw new Error("--output is required");
-      }
-      const result = await createPdf({
-        content: content ?? "",
-        outputPath: resolve(options.output),
-      });
-      const relOutput = result.outputPath;
-      console.log(
-        `Created PDF with ${result.pageCount} page(s) at ${relOutput}`,
-      );
-    });
-
+  cli.usage('--content "Hello world" --output output.pdf');
+  cli.option("--content <text>", "Text content for the PDF");
+  cli.option("--output <path>", "Output PDF file path");
   cli.help();
-  await cli.parse();
+  const { options } = cli.parse();
+  if (options.help) process.exit(0);
+
+  if (!options.content || !options.output) {
+    cli.outputHelp();
+    process.exit(1);
+  }
+
+  const result = await createPdf({
+    content: options.content,
+    outputPath: resolve(options.output),
+  });
+  console.log(
+    `Created PDF with ${result.pageCount} page(s) at ${result.outputPath}`,
+  );
 }

@@ -1,7 +1,8 @@
 #!/usr/bin/env tsx
 
 import { existsSync, readFileSync, readdirSync } from "fs";
-import { join } from "path";
+import { spawnSync } from "node:child_process";
+import { basename, join } from "path";
 import { estimateTokenCount } from "tokenx";
 
 const SKILLS_DIR = join(process.cwd(), "skills");
@@ -183,6 +184,66 @@ function validateNoAbsoluteSkillPaths(
   return errors;
 }
 
+const CLI_USAGE_RE = /cli\.usage\s*\(/;
+const CAC_RE = /\bcac\s*\(/;
+
+function validateScriptCliUsage(skillPath: string): string[] {
+  const scriptsDir = join(skillPath, "scripts");
+  if (!existsSync(scriptsDir)) return [];
+
+  const errors: string[] = [];
+  const files = readdirSync(scriptsDir, { withFileTypes: true })
+    .filter((f) => f.isFile() && f.name.endsWith(".ts"))
+    .map((f) => join(scriptsDir, f.name));
+
+  for (const filePath of files) {
+    const source = readFileSync(filePath, "utf-8");
+    if (CAC_RE.test(source) && !CLI_USAGE_RE.test(source)) {
+      const relative = filePath.slice(skillPath.length + 1);
+      errors.push(`${relative}: missing cli.usage(...) call`);
+    }
+  }
+
+  return errors;
+}
+
+function validateGeneratedSkillMd(skillPath: string): string[] {
+  const templatePath = join(skillPath, "SKILL.template.md");
+  const skillName = basename(skillPath);
+
+  if (!existsSync(templatePath) || !skillName) {
+    return [];
+  }
+
+  const result = spawnSync(
+    "pnpm",
+    [
+      "exec",
+      "jiti",
+      "scripts/generate-skill-md.ts",
+      "--check",
+      "--skill",
+      skillName,
+    ],
+    {
+      cwd: process.cwd(),
+      encoding: "utf-8",
+    },
+  );
+
+  if (result.status === 0) {
+    return [];
+  }
+
+  const errorOutput = [result.stdout.trim(), result.stderr.trim()]
+    .filter(Boolean)
+    .join("\n");
+
+  return [
+    `Generated SKILL.md check failed${errorOutput ? `: ${errorOutput}` : ""}`,
+  ];
+}
+
 function validateSkill(folderName: string): string[] {
   const errors: string[] = [];
   const skillPath = join(SKILLS_DIR, folderName);
@@ -265,6 +326,8 @@ function validateSkill(folderName: string): string[] {
   errors.push(...validatePackageJson(folderName, skillPath));
   errors.push(...validateTsconfig(skillPath));
   errors.push(...validateNoAbsoluteSkillPaths(folderName, skillPath));
+  errors.push(...validateScriptCliUsage(skillPath));
+  errors.push(...validateGeneratedSkillMd(skillPath));
 
   return errors;
 }

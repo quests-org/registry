@@ -1,3 +1,6 @@
+/**
+ * Read metadata and document info from a PDF
+ */
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -19,21 +22,23 @@ export async function getPdfMeta({
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("get-meta");
-
-  cli
-    .command("<filePath>")
-    .option("--parse-dates", "Parse PDF date fields into date-like values")
-    .action(async (filePath: string, options) => {
-      const { info, metadata } = await getPdfMeta({
-        inputPath: resolve(filePath),
-        parseDates: options.parseDates,
-      });
-      console.log("Info:");
-      console.log(JSON.stringify(info, null, 2));
-      console.log("\nMetadata:");
-      console.log(JSON.stringify(metadata, null, 2));
-    });
-
+  cli.usage("document.pdf");
+  cli.option("--parse-dates", "Parse PDF date fields into date-like values");
   cli.help();
-  await cli.parse();
+  const { args, options } = cli.parse();
+  if (options.help) process.exit(0);
+
+  if (!args[0]) {
+    cli.outputHelp();
+    process.exit(1);
+  }
+
+  const { info, metadata } = await getPdfMeta({
+    inputPath: resolve(args[0]),
+    parseDates: options.parseDates,
+  });
+  console.log("Info:");
+  console.log(JSON.stringify(info, null, 2));
+  console.log("\nMetadata:");
+  console.log(JSON.stringify(metadata, null, 2));
 }

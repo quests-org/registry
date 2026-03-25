@@ -1,3 +1,6 @@
+/**
+ * Create an Excel spreadsheet from a JSON array of row objects
+ */
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -28,6 +31,9 @@ export async function createSpreadsheet({
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("create-spreadsheet");
+  cli.usage(
+    "--output <path> [--sheet <name>] [--data <json>] [--data-file <path>]",
+  );
   cli.option("--output <path>", "Output spreadsheet path");
   cli.option("--sheet <name>", "Sheet name");
   cli.option("--data <json>", "Inline JSON array data");
@@ -35,11 +41,10 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   cli.help();
   const parsed = cli.parse();
   const { options } = parsed;
+  if (options.help) process.exit(0);
 
   if (!options.output) {
-    console.error(
-      "Usage: tsx scripts/create-spreadsheet.ts --output <path> [--sheet <name>] [--data <json>] [--data-file <path>]",
-    );
+    cli.outputHelp();
     process.exit(1);
   }
 

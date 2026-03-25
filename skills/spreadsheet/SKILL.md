@@ -11,93 +11,117 @@ Use the scripts in `scripts/` to work with spreadsheet and tabular data files.
 
 Each script can also be used programmatically via its exported function.
 
-### `read-spreadsheet.ts` Read an Excel or CSV file
+### `convert-csv.ts` Convert between CSV and Excel (XLSX/XLS) formats
 
-Export: `readSpreadsheet({ inputPath })`
+Exports:
 
-Use when you need to extract data from a spreadsheet file as JSON.
+- `convertCsv({ inputPath, outputPath, sheetName, }: { inputPath: string; outputPath: string; sheetName?: string; }): Promise<{ inputPath: string; outputPath: string; direction: "csv-to-xlsx"; } | { inputPath: string; outputPath: string; direction: "xlsx-to-csv"; }>`
 
-```bash
-tsx scripts/read-spreadsheet.ts <path> [--sheet <name>] [--output <path>]
+```text
+convert-csv
+
+Usage:
+  $ convert-csv <input> --output <path> [--sheet <name>]
+
+Options:
+  --output <path>  Output file path
+  --sheet <name>   Sheet name for spreadsheet conversion
+  -h, --help       Display this message
 ```
 
-- Reads `.xlsx`, `.xls`, and `.csv` files
-- Returns all sheets by default; use `--sheet` to select a specific sheet
-- Each sheet's data is returned as an array of objects keyed by header row
-- `--output` writes JSON to a file instead of stdout
+### `create-spreadsheet.ts` Create an Excel spreadsheet from a JSON array of row objects
 
-### `create-spreadsheet.ts` Create a new .xlsx file from JSON data
+Exports:
 
-Export: `createSpreadsheet({ data, outputPath, sheetName? })`
+- `createSpreadsheet({ data, outputPath, sheetName, }: { data: Record<string, unknown>[]; outputPath: string; sheetName?: string; }): Promise<{ outputPath: string; sheetName: string; rowCount: number; }>`
 
-Use when you need to generate a spreadsheet from structured data.
+```text
+create-spreadsheet
 
-```bash
-tsx scripts/create-spreadsheet.ts --output <path> [--sheet <name>] [--data <json>] [--data-file <path>]
+Usage:
+  $ create-spreadsheet --output <path> [--sheet <name>] [--data <json>] [--data-file <path>]
+
+Options:
+  --output <path>     Output spreadsheet path
+  --sheet <name>      Sheet name
+  --data <json>       Inline JSON array data
+  --data-file <path>  Path to JSON array data file
+  -h, --help          Display this message
 ```
 
-- `--data` inline JSON string (array of objects)
-- `--data-file` path to a JSON file containing an array of objects
-- `--sheet` sheet name (default: `Sheet1`)
-- `--output` path to write the `.xlsx` file (required)
+### `generate-csv.ts` Generate CSV text from a JSON array of row objects
 
-### `convert-csv.ts` Convert between CSV and XLSX formats
+Exports:
 
-Export: `convertCsv({ inputPath, outputPath, sheetName? })`
+- `generateCsv({ data, header, delimiter, }: { data: Record<string, unknown>[]; header?: boolean; delimiter?: string; }): string`
 
-Use when you need to convert a CSV file to XLSX or an XLSX file to CSV.
+```text
+generate-csv
 
-```bash
-tsx scripts/convert-csv.ts <input> --output <path> [--sheet <name>]
+Usage:
+  $ generate-csv <json-path> [--output <path>] [--delimiter <char>] [--no-header]
+
+Options:
+  --output <path>     Write CSV output to file
+  --delimiter <char>  CSV delimiter character (default: ,)
+  --header            Include header row (default: true)
+  -h, --help          Display this message
 ```
 
-- Infers conversion direction from file extensions
-- CSV to XLSX: wraps CSV data in a workbook with optional sheet name
-- XLSX to CSV: exports the first sheet (or named `--sheet`) as CSV
+### `parse-csv.ts` Parse a CSV file into a JSON array of row objects
 
-### `parse-csv.ts` Parse a CSV file into JSON
+Exports:
 
-Export: `parseCsv({ inputPath, header?, delimiter? })`
+- `parseCsv({ inputPath, header, delimiter, }: { inputPath: string; header?: boolean; delimiter?: string; }): Promise<{ data: Record<string, string>[] | string[][]; meta: Papa.ParseMeta; errors: Papa.ParseError[]; }>`
 
-```bash
-tsx scripts/parse-csv.ts <path> [--output <path>] [--no-header] [--delimiter <char>]
+```text
+parse-csv
+
+Usage:
+  $ parse-csv <path> [--output <path>] [--no-header] [--delimiter <char>]
+
+Options:
+  --output <path>     Write parsed JSON output to file
+  --delimiter <char>  CSV delimiter character
+  --header            Treat first row as header (default: true)
+  -h, --help          Display this message
 ```
 
-| Argument          | Required | Default     | Description                       |
-| ----------------- | -------- | ----------- | --------------------------------- |
-| `<path>`          | Yes      |             | Input CSV file                    |
-| `--output <path>` | No       | stdout      | Write JSON output to file         |
-| `--no-header`     | No       | `false`     | Do not treat first row as headers |
-| `--delimiter <c>` | No       | auto-detect | Delimiter character               |
+### `query-csv.ts` Filter, sort, and project rows from a CSV file
 
-### `generate-csv.ts` Generate a CSV file from JSON
+Exports:
 
-Export: `generateCsv({ data, header?, delimiter? })`
+- `queryCsv({ inputPath, column, value, columns, sort, limit, }: { inputPath: string; column?: string; value?: string; columns?: string[]; sort?: string; limit?: number; }): Promise<Record<string, string>[]>`
 
-```bash
-tsx scripts/generate-csv.ts <json-path> [--output <path>] [--delimiter <char>] [--no-header]
+```text
+query-csv
+
+Usage:
+  $ query-csv <path> [--column <name>] [--value <val>] [--columns <a,b,c>] [--sort <col>] [--limit <n>]
+
+Options:
+  --column <name>    Column name to filter on
+  --columns <a,b,c>  Comma-separated columns to project
+  --limit <n>        Maximum number of rows to return
+  --sort <col>       Column to sort by
+  --value <val>      Filter value for --column
+  -h, --help         Display this message
 ```
 
-| Argument          | Required | Default | Description                        |
-| ----------------- | -------- | ------- | ---------------------------------- |
-| `<json-path>`     | Yes      |         | Input JSON file (array of objects) |
-| `--output <path>` | No       | stdout  | Write CSV output to file           |
-| `--delimiter <c>` | No       | `,`     | Delimiter character                |
-| `--no-header`     | No       | `false` | Omit the header row                |
+### `read-spreadsheet.ts` Read rows from an Excel or CSV spreadsheet as JSON
 
-### `query-csv.ts` Query and filter a CSV file
+Exports:
 
-Export: `queryCsv({ inputPath, column?, value?, columns?, sort?, limit? })`
+- `readSpreadsheet({ inputPath, sheetName, }: { inputPath: string; sheetName?: string; }): Promise<{ sheetNames: string[]; sheets: SheetData[]; }>`
 
-```bash
-tsx scripts/query-csv.ts <path> [--column <name>] [--value <val>] [--columns <a,b,c>] [--sort <col>] [--limit <n>]
+```text
+read-spreadsheet
+
+Usage:
+  $ read-spreadsheet <path> [--sheet <name>] [--output <path>]
+
+Options:
+  --sheet <name>   Read only a specific sheet
+  --output <path>  Write JSON output to file
+  -h, --help       Display this message
 ```
-
-| Argument           | Required | Default | Description                               |
-| ------------------ | -------- | ------- | ----------------------------------------- |
-| `<path>`           | Yes      |         | Input CSV file                            |
-| `--column <name>`  | No       |         | Column to filter on (requires --value)    |
-| `--value <val>`    | No       |         | Value to match in the filter column       |
-| `--columns <list>` | No       | all     | Comma-separated list of columns to output |
-| `--sort <col>`     | No       |         | Column to sort by (ascending)             |
-| `--limit <n>`      | No       | all     | Maximum number of rows to output          |

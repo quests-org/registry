@@ -1,3 +1,7 @@
+/**
+ * Convert audio or video files using FFmpeg
+ * @note Use --wav for a quick conversion to 16kHz mono WAV (required format for speech-to-text)
+ */
 import { existsSync } from "node:fs";
 import { basename, extname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -68,6 +72,9 @@ export function toWav({
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("convert");
+  cli.usage(
+    "<input> --output <path> [--wav] [--sample-rate <n>] [--channels <n>] [--codec <name>] [--bitrate <rate>]",
+  );
   cli.option("--output <path>", "Output media file path");
   cli.option("--sample-rate <n>", "Audio sample rate in Hz");
   cli.option("--channels <n>", "Audio channel count");
@@ -77,11 +84,10 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   cli.help();
   const parsed = cli.parse();
   const { options } = parsed;
+  if (options.help) process.exit(0);
   const [filePath] = parsed.args;
   if (!filePath) {
-    console.error(
-      "Usage: tsx scripts/convert.ts <input> --output <path> [--wav] [--sample-rate <n>] [--channels <n>] [--codec <name>] [--bitrate <rate>]",
-    );
+    cli.outputHelp();
     process.exit(1);
   }
 

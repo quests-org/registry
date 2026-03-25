@@ -9,39 +9,49 @@ Create chart images server-side using Chart.js via `chartjs-node-canvas`. Suppor
 
 ## Scripts
 
-### `create-chart.ts` Create a chart from a JSON config file
+### `create-chart.ts` Render a chart from a Chart.js JSON config file
 
-Export: `createChartFromConfig({ configPath, outputPath?, width?, height?, format? })`
+Exports:
 
-```bash
-tsx scripts/create-chart.ts --config <path> [--output <path>] [--width <px>] [--height <px>] [--format png|pdf]
+- `createChartFromConfig({ configPath, outputPath, width, height, format, }: { configPath: string; outputPath?: string; width?: number; height?: number; format?: ChartFormat; }): Promise<{ bytes: number; outputPath: string; }>`
+
+```text
+create-chart
+
+Usage:
+  $ create-chart --config <path> [--output <path>] [--width <px>] [--height <px>] [--format png|pdf]
+
+Options:
+  --config <path>  Chart.js config JSON file path
+  --output <path>  Output chart file path (default: chart.png)
+  --width <px>     Chart width in pixels (default: 800)
+  --height <px>    Chart height in pixels (default: 600)
+  --format <name>  Output format: png or pdf (default: png)
+  -h, --help       Display this message
 ```
 
-| Argument          | Required | Default     | Description                            |
-| ----------------- | -------- | ----------- | -------------------------------------- |
-| `--config <path>` | Yes      |             | Path to JSON file with Chart.js config |
-| `--output <path>` | No       | `chart.png` | Output image path                      |
-| `--width <px>`    | No       | `800`       | Chart width in pixels                  |
-| `--height <px>`   | No       | `600`       | Chart height in pixels                 |
-| `--format <fmt>`  | No       | `png`       | Output format: `png` or `pdf`          |
+### `quick-chart.ts` Create a simple chart from inline labels and data values
 
-### `quick-chart.ts` Create common charts with simple CLI args
+Exports:
 
-Export: `createQuickChart({ type, labels, data, title?, outputPath?, width?, height? })`
+- `createQuickChart({ type, labels, data, title, outputPath, width, height, }: { type: QuickChartType; labels: string[]; data: number[]; title?: string; outputPath?: string; width?: number; height?: number; }): Promise<{ bytes: number; outputPath: string; }>`
 
-```bash
-tsx scripts/quick-chart.ts --type <type> --labels <a,b,c> --data <1,2,3> [--title <text>] [--output <path>] [--width <px>] [--height <px>]
+```text
+quick-chart
+
+Usage:
+  $ quick-chart --type <bar|line|pie|doughnut|radar> --labels <a,b,c> --data <1,2,3> [--title <text>] [--output <path>] [--width <px>] [--height <px>]
+
+Options:
+  --type <name>     Chart type
+  --labels <a,b,c>  Comma-separated label list
+  --data <1,2,3>    Comma-separated numeric values
+  --title <text>    Optional chart title
+  --output <path>   Output chart file path (default: chart.png)
+  --width <px>      Chart width in pixels (default: 800)
+  --height <px>     Chart height in pixels (default: 600)
+  -h, --help        Display this message
 ```
-
-| Argument          | Required | Default     | Description                                           |
-| ----------------- | -------- | ----------- | ----------------------------------------------------- |
-| `--type <type>`   | Yes      |             | Chart type: `bar`, `line`, `pie`, `doughnut`, `radar` |
-| `--labels <list>` | Yes      |             | Comma-separated labels                                |
-| `--data <list>`   | Yes      |             | Comma-separated numbers                               |
-| `--title <text>`  | No       |             | Chart title                                           |
-| `--output <path>` | No       | `chart.png` | Output image path                                     |
-| `--width <px>`    | No       | `800`       | Chart width in pixels                                 |
-| `--height <px>`   | No       | `600`       | Chart height in pixels                                |
 
 ## Example Chart.js Config JSON
 

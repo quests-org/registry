@@ -1,3 +1,6 @@
+/**
+ * Convert between CSV and Excel (XLSX/XLS) formats
+ */
 import { readFile, writeFile } from "node:fs/promises";
 import { extname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -53,17 +56,17 @@ export async function convertCsv({
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const cli = cac("convert-csv");
+  cli.usage("<input> --output <path> [--sheet <name>]");
   cli.option("--output <path>", "Output file path");
   cli.option("--sheet <name>", "Sheet name for spreadsheet conversion");
   cli.help();
   const parsed = cli.parse();
   const { options } = parsed;
+  if (options.help) process.exit(0);
   const [inputFile] = parsed.args;
 
   if (!inputFile || !options.output) {
-    console.error(
-      "Usage: tsx scripts/convert-csv.ts <input> --output <path> [--sheet <name>]",
-    );
+    cli.outputHelp();
     process.exit(1);
   }
 
