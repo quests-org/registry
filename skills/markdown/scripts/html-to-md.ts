@@ -39,6 +39,25 @@ export async function convertHtmlFile({
   return { markdown };
 }
 
+export function convertHtmlString({
+  html,
+  gfm = true,
+  headingStyle = "atx",
+  codeBlockStyle = "fenced",
+}: {
+  codeBlockStyle?: CodeBlockStyle;
+  gfm?: boolean;
+  headingStyle?: HeadingStyle;
+  html: string;
+}) {
+  return convertHtml({
+    codeBlockStyle,
+    gfm,
+    headingStyle,
+    html,
+  });
+}
+
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const { positionals, values } = parseArgs({
     allowPositionals: true,
@@ -46,37 +65,53 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
       "code-block-style": { type: "string" },
       gfm: { default: true, type: "boolean" },
       "heading-style": { type: "string" },
+      html: { type: "string" },
+      "html-file": { type: "string" },
       output: { type: "string" },
     },
   });
 
-  const [filePath] = positionals;
+  const [legacyFilePath] = positionals;
+  const htmlFile = values["html-file"] ?? legacyFilePath;
 
-  if (!filePath) {
+  if (!htmlFile && !values.html) {
     console.error(
-      "Usage: tsx scripts/html-to-md.ts <path> [--output <path>] [--gfm] [--no-gfm] [--heading-style <style>] [--code-block-style <style>]",
+      "Usage: tsx scripts/html-to-md.ts --html-file <path> [--output <path>] [--gfm] [--no-gfm] [--heading-style <style>] [--code-block-style <style>]",
+    );
+    console.error(
+      "       tsx scripts/html-to-md.ts --html <html-string> [--gfm] [--no-gfm] [--heading-style <style>] [--code-block-style <style>]",
     );
     process.exit(1);
   }
 
-  const inputPath = resolve(filePath);
-  const outputPath = values.output ? resolve(values.output) : undefined;
   const headingStyle = (values["heading-style"] ?? "atx") as HeadingStyle;
   const codeBlockStyle = (values["code-block-style"] ??
     "fenced") as CodeBlockStyle;
 
-  const result = await convertHtmlFile({
-    codeBlockStyle,
-    gfm: values.gfm,
-    headingStyle,
-    inputPath,
-    outputPath,
-  });
-
-  if (result.outputPath) {
-    const relOutput = result.outputPath;
-    console.log(`Converted → ${relOutput}`);
+  if (values.html) {
+    const markdown = convertHtmlString({
+      codeBlockStyle,
+      gfm: values.gfm,
+      headingStyle,
+      html: values.html,
+    });
+    process.stdout.write(markdown);
   } else {
-    process.stdout.write(result.markdown);
+    const inputPath = resolve(htmlFile as string);
+    const outputPath = values.output ? resolve(values.output) : undefined;
+
+    const result = await convertHtmlFile({
+      codeBlockStyle,
+      gfm: values.gfm,
+      headingStyle,
+      inputPath,
+      outputPath,
+    });
+
+    if (result.outputPath) {
+      console.log(`Converted → ${result.outputPath}`);
+    } else {
+      process.stdout.write(result.markdown);
+    }
   }
 }

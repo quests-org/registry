@@ -2,8 +2,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { convertHtmlFile } from "../scripts/html-to-md.ts";
-import { convertHtmlString } from "../scripts/html-string-to-md.ts";
+import { convertHtmlFile, convertHtmlString } from "../scripts/html-to-md.ts";
 import { convertMdToPdf } from "../scripts/md-to-pdf.ts";
 
 describe("convertHtmlString", () => {

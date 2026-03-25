@@ -22,33 +22,20 @@ tsx scripts/md-to-pdf.ts <path> [--output <path>]
 | `<path>`          | Yes      |                           | Input Markdown file  |
 | `--output <path>` | No       | same name with `.pdf` ext | Output PDF file path |
 
-### `html-to-md.ts` Convert an HTML file to Markdown
+### `html-to-md.ts` Convert HTML to Markdown
 
-Export: `convertHtmlFile({ inputPath, outputPath?, gfm?, headingStyle?, codeBlockStyle? })`
-
-```bash
-tsx scripts/html-to-md.ts <path> [--output <path>] [--gfm] [--no-gfm] [--heading-style <style>] [--code-block-style <style>]
-```
-
-| Argument                     | Required | Default  | Description                              |
-| ---------------------------- | -------- | -------- | ---------------------------------------- |
-| `<path>`                     | Yes      |          | Input HTML file                          |
-| `--output <path>`            | No       | stdout   | Output Markdown file path                |
-| `--gfm` / `--no-gfm`         | No       | `true`   | Enable GitHub-Flavored Markdown          |
-| `--heading-style <style>`    | No       | `atx`    | Heading style: `atx` or `setext`         |
-| `--code-block-style <style>` | No       | `fenced` | Code block style: `fenced` or `indented` |
-
-### `html-string-to-md.ts` Convert an HTML string to Markdown
-
-Export: `convertHtmlString({ html, gfm?, headingStyle?, codeBlockStyle? })`
+Exports: `convertHtmlFile({ inputPath, outputPath?, gfm?, headingStyle?, codeBlockStyle? })`, `convertHtmlString({ html, gfm?, headingStyle?, codeBlockStyle? })`
 
 ```bash
-tsx scripts/html-string-to-md.ts <html-string> [--gfm] [--no-gfm] [--heading-style <style>] [--code-block-style <style>]
+tsx scripts/html-to-md.ts --html-file <path> [--output <path>] [--gfm] [--no-gfm] [--heading-style <style>] [--code-block-style <style>]
+tsx scripts/html-to-md.ts --html <html-string> [--gfm] [--no-gfm] [--heading-style <style>] [--code-block-style <style>]
 ```
 
-| Argument                     | Required | Default  | Description                              |
-| ---------------------------- | -------- | -------- | ---------------------------------------- |
-| `<html-string>`              | Yes      |          | HTML string to convert                   |
-| `--gfm` / `--no-gfm`         | No       | `true`   | Enable GitHub-Flavored Markdown          |
-| `--heading-style <style>`    | No       | `atx`    | Heading style: `atx` or `setext`         |
-| `--code-block-style <style>` | No       | `fenced` | Code block style: `fenced` or `indented` |
+| Argument                     | Required   | Default  | Description                              |
+| ---------------------------- | ---------- | -------- | ---------------------------------------- |
+| `--html-file <path>`         | One of two |          | Input HTML file path                     |
+| `--html <string>`            | One of two |          | Inline HTML string                       |
+| `--output <path>`            | No         | stdout   | Output Markdown file path (file mode)    |
+| `--gfm` / `--no-gfm`         | No         | `true`   | Enable GitHub-Flavored Markdown          |
+| `--heading-style <style>`    | No         | `atx`    | Heading style: `atx` or `setext`         |
+| `--code-block-style <style>` | No         | `fenced` | Code block style: `fenced` or `indented` |
