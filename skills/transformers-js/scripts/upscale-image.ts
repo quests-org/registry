@@ -42,7 +42,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const [filePath] = positionals;
   if (!filePath) {
     console.error(
-      "Usage: tsx skills/transformers-js/scripts/upscale-image.ts <image> [--output <path>] [--model <id>]",
+      "Usage: tsx scripts/upscale-image.ts <image> [--output <path>] [--model <id>]",
     );
     process.exit(1);
   }

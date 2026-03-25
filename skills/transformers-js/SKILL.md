@@ -15,7 +15,7 @@ Export: `detectObjects({ inputPath, model?, threshold? })`
 Export: `detectAndAnnotate({ inputPath, outputPath, model?, threshold? })`
 
 ```bash
-tsx skills/transformers-js/scripts/detect-objects.ts <image> [--output <path>] [--model <id>] [--threshold <0-1>] [--json]
+tsx scripts/detect-objects.ts <image> [--output <path>] [--model <id>] [--threshold <0-1>] [--json]
 ```
 
 | Argument          | Required | Default                       | Description                                    |
@@ -36,7 +36,7 @@ Export: `classifyImage({ inputPath, model?, topK? })`
 Export: `classifyImageZeroShot({ inputPath, labels, model? })`
 
 ```bash
-tsx skills/transformers-js/scripts/classify-image.ts <image> [--labels <a,b,c>] [--model <id>] [--top-k <n>] [--json]
+tsx scripts/classify-image.ts <image> [--labels <a,b,c>] [--model <id>] [--top-k <n>] [--json]
 ```
 
 | Argument           | Required | Default                                                                               | Description                                                           |
@@ -54,7 +54,7 @@ Without `--labels`: standard ImageNet classification (1000 fixed categories). Wi
 Export: `describeImage({ inputPath, model?, maxTokens? })`
 
 ```bash
-tsx skills/transformers-js/scripts/describe-image.ts <image> [--model <id>] [--max-tokens <n>] [--json]
+tsx scripts/describe-image.ts <image> [--model <id>] [--max-tokens <n>] [--json]
 ```
 
 | Argument           | Required | Default                            | Description            |
@@ -71,7 +71,7 @@ Returns `{ text }` with a natural-language description of the image contents.
 Export: `estimateDepth({ inputPath, outputPath, model?, colorize? })`
 
 ```bash
-tsx skills/transformers-js/scripts/estimate-depth.ts <image> --output <path> [--model <id>] [--grayscale]
+tsx scripts/estimate-depth.ts <image> --output <path> [--model <id>] [--grayscale]
 ```
 
 | Argument          | Required | Default                                  | Description                           |
@@ -89,7 +89,7 @@ Export: `segmentImage({ inputPath, model? })`
 Export: `segmentAndVisualize({ inputPath, outputPath, model? })`
 
 ```bash
-tsx skills/transformers-js/scripts/segment-image.ts <image> [--output <path>] [--model <id>] [--json]
+tsx scripts/segment-image.ts <image> [--output <path>] [--model <id>] [--json]
 ```
 
 | Argument          | Required | Default                          | Description                              |
@@ -108,7 +108,7 @@ Export: `computeSimilarity({ textA, textB, model? })`
 Export: `rankBySimilarity({ query, candidates, model? })`
 
 ```bash
-tsx skills/transformers-js/scripts/embed-text.ts <text> [--compare <text>] [--candidates <a|b|c>] [--file <path>] [--model <id>] [--json]
+tsx scripts/embed-text.ts <text> [--compare <text>] [--candidates <a|b|c>] [--file <path>] [--model <id>] [--json]
 ```
 
 | Argument                 | Required | Default                   | Description                                              |
@@ -128,7 +128,7 @@ Export: `classifyText({ text, model?, topK? })`
 Export: `classifyTextZeroShot({ text, labels, model?, multiLabel? })`
 
 ```bash
-tsx skills/transformers-js/scripts/classify-text.ts <text> [--labels <a,b,c>] [--model <id>] [--top-k <n>] [--multi-label] [--json]
+tsx scripts/classify-text.ts <text> [--labels <a,b,c>] [--model <id>] [--top-k <n>] [--multi-label] [--json]
 ```
 
 | Argument           | Required | Default                                                                                                            | Description                                              |
@@ -148,7 +148,7 @@ Export: `extractEntities({ text, model? })`
 Export: `extractEntitiesByType({ text, model? })`
 
 ```bash
-tsx skills/transformers-js/scripts/extract-entities.ts <text> [--group] [--model <id>] [--json]
+tsx scripts/extract-entities.ts <text> [--group] [--model <id>] [--json]
 ```
 
 | Argument       | Required | Default                | Description                            |
@@ -167,7 +167,7 @@ Returns `{ entities: [{ type, text, score, start, end }] }`.
 Export: `removeBackground({ inputPath, outputPath, model? })`
 
 ```bash
-tsx skills/transformers-js/scripts/remove-background.ts <image> [--output <path>] [--model <id>]
+tsx scripts/remove-background.ts <image> [--output <path>] [--model <id>]
 ```
 
 | Argument          | Required | Default            | Description          |
@@ -185,7 +185,7 @@ Returns `{ outputPath, width, height }`.
 Export: `upscaleImage({ inputPath, outputPath, model? })`
 
 ```bash
-tsx skills/transformers-js/scripts/upscale-image.ts <image> [--output <path>] [--model <id>]
+tsx scripts/upscale-image.ts <image> [--output <path>] [--model <id>]
 ```
 
 | Argument          | Required | Default                             | Description          |
@@ -201,7 +201,7 @@ Upscales an image 2x using Swin2SR super-resolution. Good for enhancing low-reso
 Export: `speechToText({ inputPath, model?, language?, timestamps? })`
 
 ```bash
-tsx skills/transformers-js/scripts/speech-to-text.ts <audio> [--model <id>] [--language <code>] [--timestamps] [--json]
+tsx scripts/speech-to-text.ts <audio> [--model <id>] [--language <code>] [--timestamps] [--json]
 ```
 
 | Argument            | Required | Default                          | Description                                                              |
@@ -221,7 +221,7 @@ Returns `{ text, chunks }` where chunks contain timestamped segments when `--tim
 Export: `textToSpeech({ text, outputPath, model?, voice?, speed?, steps? })`
 
 ```bash
-tsx skills/transformers-js/scripts/text-to-speech.ts <text> --output <path> [--model <id>] [--voice <F1|M1>] [--speed <n>] [--steps <n>]
+tsx scripts/text-to-speech.ts <text> --output <path> [--model <id>] [--voice <F1|M1>] [--speed <n>] [--steps <n>]
 ```
 
 | Argument          | Required | Default                              | Description                                     |

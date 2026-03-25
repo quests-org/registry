@@ -33,9 +33,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const [filePath] = positionals;
 
   if (!filePath) {
-    console.error(
-      "Usage: tsx skills/markdown/scripts/md-to-pdf.ts <path> [--output <path>]",
-    );
+    console.error("Usage: tsx scripts/md-to-pdf.ts <path> [--output <path>]");
     process.exit(1);
   }
 

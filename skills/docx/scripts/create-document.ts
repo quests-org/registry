@@ -124,7 +124,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 
   if (!values.output) {
     console.error(
-      "Usage: tsx skills/docx/scripts/create-document.ts --output <path> --sections <json>\n       tsx skills/docx/scripts/create-document.ts --output <path> --title <title>",
+      "Usage: tsx scripts/create-document.ts --output <path> --sections <json>\n       tsx scripts/create-document.ts --output <path> --title <title>",
     );
     process.exit(1);
   }

@@ -5,7 +5,7 @@ description: "Work with Word documents (.docx). Use whenever the user wants to e
 
 # DOCX
 
-Use the scripts in `skills/docx/scripts/` to work with Word documents.
+Use the scripts in `scripts/` to work with Word documents.
 
 ## Scripts
 
@@ -18,7 +18,7 @@ Export: `extractDocxText({ inputPath })`
 Use when you need the full text content of a Word document, e.g. to summarize, search, or process its content.
 
 ```bash
-tsx skills/docx/scripts/extract-text.ts <path> [--output <path>]
+tsx scripts/extract-text.ts <path> [--output <path>]
 ```
 
 | Argument          | Required | Default | Description                    |
@@ -33,8 +33,8 @@ Export: `createDocument({ outputPath, sections })`
 Use when you need to generate a new .docx file with headings, paragraphs, and tables.
 
 ```bash
-tsx skills/docx/scripts/create-document.ts --output <path> --sections <json>
-tsx skills/docx/scripts/create-document.ts --output <path> --title <title>
+tsx scripts/create-document.ts --output <path> --sections <json>
+tsx scripts/create-document.ts --output <path> --title <title>
 ```
 
 | Argument            | Required | Default | Description                                          |
@@ -77,7 +77,7 @@ Export: `patchDocxDocument({ inputPath, outputPath, patches })`
 Use when you have a .docx template with `{{placeholder}}` markers and want to fill them with values.
 
 ```bash
-tsx skills/docx/scripts/patch-document.ts <input> --output <path> --patches-file <json>
+tsx scripts/patch-document.ts <input> --output <path> --patches-file <json>
 ```
 
 | Argument                | Required | Default | Description                                    |
@@ -99,7 +99,7 @@ Export: `detectPlaceholders({ inputPath })`
 Use when you need to discover what placeholders a template expects before patching it.
 
 ```bash
-tsx skills/docx/scripts/detect-placeholders.ts <path>
+tsx scripts/detect-placeholders.ts <path>
 ```
 
 | Argument | Required | Description               |

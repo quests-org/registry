@@ -14,7 +14,7 @@ Convert HTML to Markdown and Markdown to PDF.
 Export: `convertMdToPdf({ inputPath, outputPath? })`
 
 ```bash
-tsx skills/markdown/scripts/md-to-pdf.ts <path> [--output <path>]
+tsx scripts/md-to-pdf.ts <path> [--output <path>]
 ```
 
 | Argument          | Required | Default                   | Description          |
@@ -27,7 +27,7 @@ tsx skills/markdown/scripts/md-to-pdf.ts <path> [--output <path>]
 Export: `convertHtmlFile({ inputPath, outputPath?, gfm?, headingStyle?, codeBlockStyle? })`
 
 ```bash
-tsx skills/markdown/scripts/html-to-md.ts <path> [--output <path>] [--gfm] [--no-gfm] [--heading-style <style>] [--code-block-style <style>]
+tsx scripts/html-to-md.ts <path> [--output <path>] [--gfm] [--no-gfm] [--heading-style <style>] [--code-block-style <style>]
 ```
 
 | Argument                     | Required | Default  | Description                              |
@@ -43,7 +43,7 @@ tsx skills/markdown/scripts/html-to-md.ts <path> [--output <path>] [--gfm] [--no
 Export: `convertHtmlString({ html, gfm?, headingStyle?, codeBlockStyle? })`
 
 ```bash
-tsx skills/markdown/scripts/html-string-to-md.ts <html-string> [--gfm] [--no-gfm] [--heading-style <style>] [--code-block-style <style>]
+tsx scripts/html-string-to-md.ts <html-string> [--gfm] [--no-gfm] [--heading-style <style>] [--code-block-style <style>]
 ```
 
 | Argument                     | Required | Default  | Description                              |

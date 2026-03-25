@@ -106,7 +106,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 
   const [filePath] = positionals;
   if (!filePath) {
-    console.error("Usage: tsx skills/ffmpeg/scripts/probe.ts <file> [--json]");
+    console.error("Usage: tsx scripts/probe.ts <file> [--json]");
     process.exit(1);
   }
 

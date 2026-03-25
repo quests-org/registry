@@ -53,9 +53,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const [content] = positionals;
 
   if (!values.output) {
-    console.error(
-      "Usage: tsx skills/pdf/scripts/create-pdf.ts <content> --output <path>",
-    );
+    console.error("Usage: tsx scripts/create-pdf.ts <content> --output <path>");
     process.exit(1);
   }
 

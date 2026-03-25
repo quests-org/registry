@@ -125,7 +125,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 
   if (!filePath || (!values.json && !values["json-file"])) {
     console.error(
-      "Usage: tsx skills/sharp-images/scripts/annotate.ts <image> --json <inline-json> [--json-file <path>] [--stroke-width <px>] [--font-size <px>] [--output <path>]",
+      "Usage: tsx scripts/annotate.ts <image> --json <inline-json> [--json-file <path>] [--stroke-width <px>] [--font-size <px>] [--output <path>]",
     );
     console.error(
       '\nInline JSON: --json \'[{ "left": 10, "top": 10, "width": 100, "height": 50, "label": "Cat", "color": "#FF0000" }]\'',

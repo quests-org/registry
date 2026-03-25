@@ -80,7 +80,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 
   if (!filePath) {
     console.error(
-      "Usage: tsx skills/spreadsheet/scripts/query-csv.ts <path> [--column <name>] [--value <val>] [--columns <a,b,c>] [--sort <col>] [--limit <n>]",
+      "Usage: tsx scripts/query-csv.ts <path> [--column <name>] [--value <val>] [--columns <a,b,c>] [--sort <col>] [--limit <n>]",
     );
     process.exit(1);
   }

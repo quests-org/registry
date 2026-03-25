@@ -113,7 +113,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const [filePath] = positionals;
   if (!filePath) {
     console.error(
-      "Usage: tsx skills/transformers-js/scripts/detect-objects.ts <image> [--output <path>] [--model <id>] [--threshold <0-1>] [--json]",
+      "Usage: tsx scripts/detect-objects.ts <image> [--output <path>] [--model <id>] [--threshold <0-1>] [--json]",
     );
     process.exit(1);
   }

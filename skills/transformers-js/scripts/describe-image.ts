@@ -36,7 +36,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const [filePath] = positionals;
   if (!filePath) {
     console.error(
-      "Usage: tsx skills/transformers-js/scripts/describe-image.ts <image> [--model <id>] [--max-tokens <n>] [--json]",
+      "Usage: tsx scripts/describe-image.ts <image> [--model <id>] [--max-tokens <n>] [--json]",
     );
     process.exit(1);
   }

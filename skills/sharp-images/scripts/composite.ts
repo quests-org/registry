@@ -118,7 +118,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 
   if (!filePath || !values.overlay) {
     console.error(
-      "Usage: tsx skills/sharp-images/scripts/composite.ts <base-image> --overlay <image> [--gravity <pos>] [--top <px>] [--left <px>] [--blend <mode>] [--opacity <0-1>] [--tile] [--output <path>]",
+      "Usage: tsx scripts/composite.ts <base-image> --overlay <image> [--gravity <pos>] [--top <px>] [--left <px>] [--blend <mode>] [--opacity <0-1>] [--tile] [--output <path>]",
     );
     process.exit(1);
   }

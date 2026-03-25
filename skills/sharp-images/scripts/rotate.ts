@@ -61,7 +61,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 
   if (!filePath) {
     console.error(
-      "Usage: tsx skills/sharp-images/scripts/rotate.ts <path> [--angle <degrees>] [--flip] [--flop] [--background <color>] [--output <path>]",
+      "Usage: tsx scripts/rotate.ts <path> [--angle <degrees>] [--flip] [--flop] [--background <color>] [--output <path>]",
     );
     process.exit(1);
   }

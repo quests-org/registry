@@ -29,9 +29,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const [filePath] = positionals;
 
   if (!filePath) {
-    console.error(
-      "Usage: tsx skills/sharp-images/scripts/get-metadata.ts <path>",
-    );
+    console.error("Usage: tsx scripts/get-metadata.ts <path>");
     process.exit(1);
   }
 

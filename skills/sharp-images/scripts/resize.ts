@@ -85,7 +85,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 
   if (!filePath) {
     console.error(
-      "Usage: tsx skills/sharp-images/scripts/resize.ts <path> [--width <px>] [--height <px>] [--fit <mode>] [--output <path>]",
+      "Usage: tsx scripts/resize.ts <path> [--width <px>] [--height <px>] [--fit <mode>] [--output <path>]",
     );
     process.exit(1);
   }

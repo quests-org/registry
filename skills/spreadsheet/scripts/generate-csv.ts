@@ -35,7 +35,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 
   if (!jsonPath) {
     console.error(
-      "Usage: tsx skills/spreadsheet/scripts/generate-csv.ts <json-path> [--output <path>] [--delimiter <char>] [--no-header]",
+      "Usage: tsx scripts/generate-csv.ts <json-path> [--output <path>] [--delimiter <char>] [--no-header]",
     );
     process.exit(1);
   }

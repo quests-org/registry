@@ -89,7 +89,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const text = positionals.join(" ");
   if (!text) {
     console.error(
-      "Usage: tsx skills/transformers-js/scripts/text-to-speech.ts <text> --output <path> [--model <id>] [--voice <F1|M1>] [--speed <n>] [--steps <n>]",
+      "Usage: tsx scripts/text-to-speech.ts <text> --output <path> [--model <id>] [--voice <F1|M1>] [--speed <n>] [--steps <n>]",
     );
     process.exit(1);
   }

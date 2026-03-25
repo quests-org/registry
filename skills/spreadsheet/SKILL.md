@@ -5,7 +5,7 @@ description: "Work with tabular data files: spreadsheets, Excel, CSV, TSV, and c
 
 # Spreadsheet
 
-Use the scripts in `skills/spreadsheet/scripts/` to work with spreadsheet and tabular data files.
+Use the scripts in `scripts/` to work with spreadsheet and tabular data files.
 
 ## Scripts
 
@@ -18,7 +18,7 @@ Export: `readSpreadsheet({ inputPath })`
 Use when you need to extract data from a spreadsheet file as JSON.
 
 ```bash
-tsx skills/spreadsheet/scripts/read-spreadsheet.ts <path> [--sheet <name>] [--output <path>]
+tsx scripts/read-spreadsheet.ts <path> [--sheet <name>] [--output <path>]
 ```
 
 - Reads `.xlsx`, `.xls`, and `.csv` files
@@ -33,7 +33,7 @@ Export: `createSpreadsheet({ data, outputPath, sheetName? })`
 Use when you need to generate a spreadsheet from structured data.
 
 ```bash
-tsx skills/spreadsheet/scripts/create-spreadsheet.ts --output <path> [--sheet <name>] [--data <json>] [--data-file <path>]
+tsx scripts/create-spreadsheet.ts --output <path> [--sheet <name>] [--data <json>] [--data-file <path>]
 ```
 
 - `--data` inline JSON string (array of objects)
@@ -48,7 +48,7 @@ Export: `convertCsv({ inputPath, outputPath, sheetName? })`
 Use when you need to convert a CSV file to XLSX or an XLSX file to CSV.
 
 ```bash
-tsx skills/spreadsheet/scripts/convert-csv.ts <input> --output <path> [--sheet <name>]
+tsx scripts/convert-csv.ts <input> --output <path> [--sheet <name>]
 ```
 
 - Infers conversion direction from file extensions
@@ -60,7 +60,7 @@ tsx skills/spreadsheet/scripts/convert-csv.ts <input> --output <path> [--sheet <
 Export: `parseCsv({ inputPath, header?, delimiter? })`
 
 ```bash
-tsx skills/spreadsheet/scripts/parse-csv.ts <path> [--output <path>] [--no-header] [--delimiter <char>]
+tsx scripts/parse-csv.ts <path> [--output <path>] [--no-header] [--delimiter <char>]
 ```
 
 | Argument          | Required | Default     | Description                       |
@@ -75,7 +75,7 @@ tsx skills/spreadsheet/scripts/parse-csv.ts <path> [--output <path>] [--no-heade
 Export: `generateCsv({ data, header?, delimiter? })`
 
 ```bash
-tsx skills/spreadsheet/scripts/generate-csv.ts <json-path> [--output <path>] [--delimiter <char>] [--no-header]
+tsx scripts/generate-csv.ts <json-path> [--output <path>] [--delimiter <char>] [--no-header]
 ```
 
 | Argument          | Required | Default | Description                        |
@@ -90,7 +90,7 @@ tsx skills/spreadsheet/scripts/generate-csv.ts <json-path> [--output <path>] [--
 Export: `queryCsv({ inputPath, column?, value?, columns?, sort?, limit? })`
 
 ```bash
-tsx skills/spreadsheet/scripts/query-csv.ts <path> [--column <name>] [--value <val>] [--columns <a,b,c>] [--sort <col>] [--limit <n>]
+tsx scripts/query-csv.ts <path> [--column <name>] [--value <val>] [--columns <a,b,c>] [--sort <col>] [--limit <n>]
 ```
 
 | Argument           | Required | Default | Description                               |

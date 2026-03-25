@@ -49,7 +49,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 
   if (!filePath || !values.output || !values["patches-file"]) {
     console.error(
-      "Usage: tsx skills/docx/scripts/patch-document.ts <input> --output <path> --patches-file <json>",
+      "Usage: tsx scripts/patch-document.ts <input> --output <path> --patches-file <json>",
     );
     process.exit(1);
   }

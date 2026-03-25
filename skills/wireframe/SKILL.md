@@ -10,7 +10,7 @@ Generate a self-contained HTML wireframe powered by the `@tailwindcss/browser` p
 ## Usage
 
 ```bash
-tsx skills/wireframe/scripts/create-wireframe.ts --output <path> [--theme <css>] [--body <html>]
+tsx scripts/create-wireframe.ts --output <path> [--theme <css>] [--body <html>]
 ```
 
 | Argument          | Required | Description                         |
@@ -22,7 +22,7 @@ tsx skills/wireframe/scripts/create-wireframe.ts --output <path> [--theme <css>]
 **One-shot workflow:** Pass your HTML body directly via `--body` to generate the final wireframe in a single command with no read-then-edit round trip. Always run from the **project root** — do not `cd` into the skill directory.
 
 ```bash
-tsx skills/wireframe/scripts/create-wireframe.ts --output output/page.html --body "<div class='p-4'>Hello</div>"
+tsx scripts/create-wireframe.ts --output output/page.html --body "<div class='p-4'>Hello</div>"
 ```
 
 You do not need to read the generated file before editing — the full template structure is shown above. When you know the content upfront, use `--body` to skip the edit step.

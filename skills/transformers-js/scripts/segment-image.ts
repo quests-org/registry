@@ -130,7 +130,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const [filePath] = positionals;
   if (!filePath) {
     console.error(
-      "Usage: tsx skills/transformers-js/scripts/segment-image.ts <image> [--output <path>] [--model <id>] [--json]",
+      "Usage: tsx scripts/segment-image.ts <image> [--output <path>] [--model <id>] [--json]",
     );
     process.exit(1);
   }

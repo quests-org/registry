@@ -74,7 +74,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 
   if (!values.type || !values.labels || !values.data) {
     console.error(
-      "Usage: tsx skills/charts/scripts/quick-chart.ts --type <bar|line|pie|doughnut|radar> --labels <a,b,c> --data <1,2,3> [--title <text>] [--output <path>] [--width <px>] [--height <px>]",
+      "Usage: tsx scripts/quick-chart.ts --type <bar|line|pie|doughnut|radar> --labels <a,b,c> --data <1,2,3> [--title <text>] [--output <path>] [--width <px>] [--height <px>]",
     );
     process.exit(1);
   }

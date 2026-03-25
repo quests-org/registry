@@ -61,7 +61,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const text = positionals.join(" ");
   if (!text) {
     console.error(
-      "Usage: tsx skills/transformers-js/scripts/extract-entities.ts <text> [--group] [--model <id>] [--json]",
+      "Usage: tsx scripts/extract-entities.ts <text> [--group] [--model <id>] [--json]",
     );
     process.exit(1);
   }

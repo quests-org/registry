@@ -40,7 +40,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 
   if (!htmlString) {
     console.error(
-      "Usage: tsx skills/markdown/scripts/html-string-to-md.ts <html-string> [--gfm] [--no-gfm] [--heading-style <style>] [--code-block-style <style>]",
+      "Usage: tsx scripts/html-string-to-md.ts <html-string> [--gfm] [--no-gfm] [--heading-style <style>] [--code-block-style <style>]",
     );
     process.exit(1);
   }

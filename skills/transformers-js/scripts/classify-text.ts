@@ -75,7 +75,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const text = positionals.join(" ");
   if (!text) {
     console.error(
-      "Usage: tsx skills/transformers-js/scripts/classify-text.ts <text> [--labels <a,b,c>] [--model <id>] [--top-k <n>] [--json]",
+      "Usage: tsx scripts/classify-text.ts <text> [--labels <a,b,c>] [--model <id>] [--top-k <n>] [--json]",
     );
     process.exit(1);
   }

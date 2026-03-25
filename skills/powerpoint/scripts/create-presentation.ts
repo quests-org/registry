@@ -71,7 +71,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 
   if (!values.output) {
     console.error(
-      "Usage: tsx skills/powerpoint/scripts/create-presentation.ts --output <path> [--slides <json>]",
+      "Usage: tsx scripts/create-presentation.ts --output <path> [--slides <json>]",
     );
     process.exit(1);
   }

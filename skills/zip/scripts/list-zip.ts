@@ -31,7 +31,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const [zipFile] = positionals;
 
   if (!zipFile) {
-    console.error("Usage: tsx skills/zip/scripts/list-zip.ts <zipfile>");
+    console.error("Usage: tsx scripts/list-zip.ts <zipfile>");
     process.exit(1);
   }
 

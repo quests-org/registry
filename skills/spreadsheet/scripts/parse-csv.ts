@@ -42,7 +42,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 
   if (!filePath) {
     console.error(
-      "Usage: tsx skills/spreadsheet/scripts/parse-csv.ts <path> [--output <path>] [--no-header] [--delimiter <char>]",
+      "Usage: tsx scripts/parse-csv.ts <path> [--output <path>] [--no-header] [--delimiter <char>]",
     );
     process.exit(1);
   }

@@ -22,7 +22,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 
   if (!filePath) {
     console.error(
-      "Usage: tsx skills/powerpoint/scripts/extract-text.ts <path> [--output <path>]",
+      "Usage: tsx scripts/extract-text.ts <path> [--output <path>]",
     );
     process.exit(1);
   }

@@ -17,8 +17,8 @@ Export: `convert({ inputPath, outputPath, sampleRate?, channels?, codec?, bitrat
 Export: `toWav({ inputPath, outputPath?, sampleRate?, channels? })`
 
 ```bash
-tsx skills/ffmpeg/scripts/convert.ts <input> --output <path> [--sample-rate <n>] [--channels <n>] [--codec <name>] [--bitrate <rate>]
-tsx skills/ffmpeg/scripts/convert.ts <input> --wav [--output <path>] [--sample-rate <n>] [--channels <n>]
+tsx scripts/convert.ts <input> --output <path> [--sample-rate <n>] [--channels <n>] [--codec <name>] [--bitrate <rate>]
+tsx scripts/convert.ts <input> --wav [--output <path>] [--sample-rate <n>] [--channels <n>]
 ```
 
 | Argument            | Required | Default     | Description                                              |
@@ -42,7 +42,7 @@ The `convert()` function also accepts `extraArgs` for passing arbitrary FFmpeg f
 Export: `probe({ inputPath })`
 
 ```bash
-tsx skills/ffmpeg/scripts/probe.ts <file> [--json]
+tsx scripts/probe.ts <file> [--json]
 ```
 
 | Argument | Required | Default | Description      |
@@ -59,14 +59,14 @@ Returns `{ format, duration, bitrate, streams }` where each stream has `codec`, 
 The `transformers-js` speech-to-text script requires `.wav` input. Convert other formats first:
 
 ```bash
-tsx skills/ffmpeg/scripts/convert.ts recording.m4a --wav --output recording.wav
+tsx scripts/convert.ts recording.m4a --wav --output recording.wav
 tsx skills/transformers-js/scripts/speech-to-text.ts recording.wav
 ```
 
 Or programmatically:
 
 ```typescript
-import { toWav } from "./skills/ffmpeg/scripts/convert.ts";
+import { toWav } from "./scripts/convert.ts";
 import { speechToText } from "./skills/transformers-js/scripts/speech-to-text.ts";
 
 const { outputPath } = toWav({
@@ -79,13 +79,13 @@ const { text } = await speechToText({ inputPath: outputPath });
 ### Extracting audio from video
 
 ```bash
-tsx skills/ffmpeg/scripts/convert.ts video.mp4 --output audio.mp3 --codec libmp3lame --bitrate 192k
+tsx scripts/convert.ts video.mp4 --output audio.mp3 --codec libmp3lame --bitrate 192k
 ```
 
 ### Trimming a clip
 
 ```typescript
-import { convert } from "./skills/ffmpeg/scripts/convert.ts";
+import { convert } from "./scripts/convert.ts";
 
 convert({
   inputPath: "long-video.mp4",

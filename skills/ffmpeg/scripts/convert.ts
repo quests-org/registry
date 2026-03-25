@@ -82,7 +82,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const [filePath] = positionals;
   if (!filePath) {
     console.error(
-      "Usage: tsx skills/ffmpeg/scripts/convert.ts <input> --output <path> [--wav] [--sample-rate <n>] [--channels <n>] [--codec <name>] [--bitrate <rate>]",
+      "Usage: tsx scripts/convert.ts <input> --output <path> [--wav] [--sample-rate <n>] [--channels <n>] [--codec <name>] [--bitrate <rate>]",
     );
     process.exit(1);
   }

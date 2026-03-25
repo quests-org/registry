@@ -65,7 +65,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 
   if (positionals.length === 0 || !values.output) {
     console.error(
-      "Usage: tsx skills/pdf/scripts/image-to-pdf.ts <image1> [image2 ...] --output <path> [--size letter|a4|legal]",
+      "Usage: tsx scripts/image-to-pdf.ts <image1> [image2 ...] --output <path> [--size letter|a4|legal]",
     );
     process.exit(1);
   }

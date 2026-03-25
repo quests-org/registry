@@ -14,7 +14,7 @@ Create chart images server-side using Chart.js via `chartjs-node-canvas`. Suppor
 Export: `createChartFromConfig({ configPath, outputPath?, width?, height?, format? })`
 
 ```bash
-tsx skills/charts/scripts/create-chart.ts --config <path> [--output <path>] [--width <px>] [--height <px>] [--format png|pdf]
+tsx scripts/create-chart.ts --config <path> [--output <path>] [--width <px>] [--height <px>] [--format png|pdf]
 ```
 
 | Argument          | Required | Default     | Description                            |
@@ -30,7 +30,7 @@ tsx skills/charts/scripts/create-chart.ts --config <path> [--output <path>] [--w
 Export: `createQuickChart({ type, labels, data, title?, outputPath?, width?, height? })`
 
 ```bash
-tsx skills/charts/scripts/quick-chart.ts --type <type> --labels <a,b,c> --data <1,2,3> [--title <text>] [--output <path>] [--width <px>] [--height <px>]
+tsx scripts/quick-chart.ts --type <type> --labels <a,b,c> --data <1,2,3> [--title <text>] [--output <path>] [--width <px>] [--height <px>]
 ```
 
 | Argument          | Required | Default     | Description                                           |

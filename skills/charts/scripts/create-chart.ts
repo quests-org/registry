@@ -45,7 +45,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 
   if (!values.config) {
     console.error(
-      "Usage: tsx skills/charts/scripts/create-chart.ts --config <path> [--output <path>] [--width <px>] [--height <px>] [--format png|pdf]",
+      "Usage: tsx scripts/create-chart.ts --config <path> [--output <path>] [--width <px>] [--height <px>] [--format png|pdf]",
     );
     process.exit(1);
   }

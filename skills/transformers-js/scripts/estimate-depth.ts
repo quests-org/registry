@@ -108,7 +108,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const [filePath] = positionals;
   if (!filePath) {
     console.error(
-      "Usage: tsx skills/transformers-js/scripts/estimate-depth.ts <image> --output <path> [--model <id>] [--grayscale]",
+      "Usage: tsx scripts/estimate-depth.ts <image> --output <path> [--model <id>] [--grayscale]",
     );
     process.exit(1);
   }

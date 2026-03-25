@@ -18,9 +18,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const [filePath] = positionals;
 
   if (!filePath) {
-    console.error(
-      "Usage: tsx skills/docx/scripts/detect-placeholders.ts <path>",
-    );
+    console.error("Usage: tsx scripts/detect-placeholders.ts <path>");
     process.exit(1);
   }
 

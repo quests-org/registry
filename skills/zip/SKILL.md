@@ -14,7 +14,7 @@ Create, extract, and inspect zip archives using `adm-zip`.
 Export: `createZip({ outputPath, inputPaths })`
 
 ```bash
-tsx skills/zip/scripts/create-zip.ts --output <path> <input...>
+tsx scripts/create-zip.ts --output <path> <input...>
 ```
 
 | Argument          | Required | Description                             |
@@ -27,7 +27,7 @@ tsx skills/zip/scripts/create-zip.ts --output <path> <input...>
 Export: `extractZip({ inputPath, outputDir })`
 
 ```bash
-tsx skills/zip/scripts/extract-zip.ts <zipfile> [--output <dir>]
+tsx scripts/extract-zip.ts <zipfile> [--output <dir>]
 ```
 
 | Argument         | Required | Default                     | Description          |
@@ -40,7 +40,7 @@ tsx skills/zip/scripts/extract-zip.ts <zipfile> [--output <dir>]
 Export: `listZip({ inputPath })`
 
 ```bash
-tsx skills/zip/scripts/list-zip.ts <zipfile>
+tsx scripts/list-zip.ts <zipfile>
 ```
 
 | Argument    | Required | Description          |

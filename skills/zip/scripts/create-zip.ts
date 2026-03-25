@@ -43,7 +43,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 
   if (!values.output || positionals.length === 0) {
     console.error(
-      "Usage: tsx skills/zip/scripts/create-zip.ts --output <path> <input...>",
+      "Usage: tsx scripts/create-zip.ts --output <path> <input...>",
     );
     process.exit(1);
   }

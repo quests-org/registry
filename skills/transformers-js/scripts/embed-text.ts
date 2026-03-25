@@ -89,7 +89,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   if (values.candidates) {
     if (!text) {
       console.error(
-        "Usage: tsx skills/transformers-js/scripts/embed-text.ts <query> --candidates <a|b|c> [--model <id>] [--json]",
+        "Usage: tsx scripts/embed-text.ts <query> --candidates <a|b|c> [--model <id>] [--json]",
       );
       process.exit(1);
     }
@@ -110,7 +110,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   } else if (values.compare) {
     if (!text) {
       console.error(
-        "Usage: tsx skills/transformers-js/scripts/embed-text.ts <textA> --compare <textB> [--model <id>] [--json]",
+        "Usage: tsx scripts/embed-text.ts <textA> --compare <textB> [--model <id>] [--json]",
       );
       process.exit(1);
     }
@@ -147,7 +147,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   } else {
     if (!text) {
       console.error(
-        "Usage: tsx skills/transformers-js/scripts/embed-text.ts <text> [--compare <text>] [--candidates <a|b|c>] [--file <path>] [--model <id>] [--json]",
+        "Usage: tsx scripts/embed-text.ts <text> [--compare <text>] [--candidates <a|b|c>] [--file <path>] [--model <id>] [--json]",
       );
       process.exit(1);
     }

@@ -5,7 +5,7 @@ description: "Work with PowerPoint files. Use whenever the user wants to create 
 
 # PowerPoint
 
-Use the scripts in `skills/powerpoint/scripts/` to create and read PowerPoint presentations.
+Use the scripts in `scripts/` to create and read PowerPoint presentations.
 
 ## Scripts
 
@@ -16,7 +16,7 @@ Each script can also be used programmatically via its exported function.
 Export: `createPresentation({ slides, outputPath })`
 
 ```bash
-tsx skills/powerpoint/scripts/create-presentation.ts --output <path> [--slides <json>]
+tsx scripts/create-presentation.ts --output <path> [--slides <json>]
 ```
 
 | Argument          | Required | Default | Description                                                                             |
@@ -29,7 +29,7 @@ tsx skills/powerpoint/scripts/create-presentation.ts --output <path> [--slides <
 Export: `extractPptxText({ inputPath })`
 
 ```bash
-tsx skills/powerpoint/scripts/extract-text.ts <path> [--output <path>]
+tsx scripts/extract-text.ts <path> [--output <path>]
 ```
 
 | Argument          | Required | Default | Description                    |

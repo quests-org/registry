@@ -77,7 +77,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     values.y === undefined
   ) {
     console.error(
-      "Usage: tsx skills/pdf/scripts/insert-image.ts <input> --image <path> --x <n> --y <n> --output <path> [--page <n>] [--width <n>] [--height <n>] [--opacity <0-1>]",
+      "Usage: tsx scripts/insert-image.ts <input> --image <path> --x <n> --y <n> --output <path> [--page <n>] [--width <n>] [--height <n>] [--opacity <0-1>]",
     );
     process.exit(1);
   }

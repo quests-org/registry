@@ -5,7 +5,7 @@ description: "Work with PDF files. Use whenever the user wants to do anything wi
 
 # PDF
 
-Use the scripts in `skills/pdf/scripts/` to work with PDF files.
+Use the scripts in `scripts/` to work with PDF files.
 
 ## Scripts
 
@@ -18,7 +18,7 @@ Export: `extractPdfText({ inputPath, mergePages? })`
 Use when you need the full text content of a PDF, e.g. to summarize, search, or process its content.
 
 ```bash
-tsx skills/pdf/scripts/extract-text.ts <path> [--output <path>] [--no-merge]
+tsx scripts/extract-text.ts <path> [--output <path>] [--no-merge]
 ```
 
 - Merges all pages into a single string by default
@@ -32,7 +32,7 @@ Export: `extractPdfLinks({ inputPath })`
 Use when you need to find hyperlinks embedded in a PDF.
 
 ```bash
-tsx skills/pdf/scripts/extract-links.ts <path>
+tsx scripts/extract-links.ts <path>
 ```
 
 ### `get-meta.ts` Get PDF metadata
@@ -42,7 +42,7 @@ Export: `getPdfMeta({ inputPath, parseDates? })`
 Use when you need author, title, creation date, or other document properties.
 
 ```bash
-tsx skills/pdf/scripts/get-meta.ts <path> [--parse-dates]
+tsx scripts/get-meta.ts <path> [--parse-dates]
 ```
 
 - `--parse-dates` parses date strings into structured date objects
@@ -54,7 +54,7 @@ Export: `extractPdfImages({ inputPath, page? })`
 Use when you need to save embedded images from a PDF. Extracts all pages by default.
 
 ```bash
-tsx skills/pdf/scripts/extract-images.ts <path> [--page <number>] [--output <dir>]
+tsx scripts/extract-images.ts <path> [--page <number>] [--output <dir>]
 ```
 
 - `--page` page number to extract from (default: all pages)
@@ -68,7 +68,7 @@ Export: `renderPdfPages({ inputPath, page?, scale? })`
 Use when you need a visual representation of PDF pages as PNG files.
 
 ```bash
-tsx skills/pdf/scripts/render-pages.ts <path> [--page <number>] [--scale <number>] [--output <dir>]
+tsx scripts/render-pages.ts <path> [--page <number>] [--scale <number>] [--output <dir>]
 ```
 
 - `--page` page number to render (default: all pages)
@@ -85,7 +85,7 @@ Export: `insertImage({ inputPath, outputPath, imagePath, x, y, page?, width?, he
 Use when you need to overlay an image onto a specific page of an existing PDF at given coordinates.
 
 ```bash
-tsx skills/pdf/scripts/insert-image.ts <input> --image <path> --x <n> --y <n> --output <path> [--page <n>] [--width <n>] [--height <n>] [--opacity <0-1>]
+tsx scripts/insert-image.ts <input> --image <path> --x <n> --y <n> --output <path> [--page <n>] [--width <n>] [--height <n>] [--opacity <0-1>]
 ```
 
 - `--image` path to the image file to insert (JPEG or PNG)
@@ -101,7 +101,7 @@ Export: `imageToPdf({ imagePaths, outputPath, size? })`
 Use when you need to convert one or more images (JPEG or PNG) into a PDF.
 
 ```bash
-tsx skills/pdf/scripts/image-to-pdf.ts <image1> [image2 ...] --output <path> [--size letter|a4|legal]
+tsx scripts/image-to-pdf.ts <image1> [image2 ...] --output <path> [--size letter|a4|legal]
 ```
 
 - Accepts one or more JPEG or PNG image paths; each becomes one page
@@ -115,7 +115,7 @@ Export: `createPdf({ content, outputPath })`
 Use when you need to generate a new PDF from text content.
 
 ```bash
-tsx skills/pdf/scripts/create-pdf.ts <content> --output <path>
+tsx scripts/create-pdf.ts <content> --output <path>
 ```
 
 - `--output` path to write the output PDF (required)
@@ -128,7 +128,7 @@ Export: `watermarkPdf({ inputPath, outputPath, text, opacity?, fontSize? })`
 Use when you need to add large diagonal text across every page of a document.
 
 ```bash
-tsx skills/pdf/scripts/watermark-pdf.ts <input> --text <text> --output <path> [--opacity <0-1>] [--font-size <n>]
+tsx scripts/watermark-pdf.ts <input> --text <text> --output <path> [--opacity <0-1>] [--font-size <n>]
 ```
 
 - `--text` watermark label (required)
@@ -142,7 +142,7 @@ Export: `mergePdfs({ inputPaths, outputPath })`
 Use when you need to combine several PDF files into a single document.
 
 ```bash
-tsx skills/pdf/scripts/merge-pdfs.ts <input1> <input2> [...inputs] --output <path>
+tsx scripts/merge-pdfs.ts <input1> <input2> [...inputs] --output <path>
 ```
 
 - Accepts two or more input PDF paths
@@ -156,7 +156,7 @@ Export: `splitPdf({ inputPath, outputPath, pages })`
 Use when you need a single page or a range of pages from a larger document.
 
 ```bash
-tsx skills/pdf/scripts/split-pdf.ts <input> --output <path> [--page <n>] [--start <n> --end <n>]
+tsx scripts/split-pdf.ts <input> --output <path> [--page <n>] [--start <n> --end <n>]
 ```
 
 - `--page` extract a single page by number (1-indexed)
@@ -170,7 +170,7 @@ Export: `fillForm({ inputPath, outputPath, fields, flatten? })`
 Use when you need to populate a fillable PDF form.
 
 ```bash
-tsx skills/pdf/scripts/fill-form.ts <input> --output <path> --fields-file <json> [--flatten] [--list]
+tsx scripts/fill-form.ts <input> --output <path> --fields-file <json> [--flatten] [--list]
 ```
 
 - `--fields-file` path to a JSON file containing a `{ "FieldName": "value" }` object; use `true`/`false` for checkboxes
@@ -186,7 +186,7 @@ Export: `rotatePages({ inputPath, outputPath, rotation, pages? })`
 Use when you need to rotate pages in a PDF.
 
 ```bash
-tsx skills/pdf/scripts/rotate-pages.ts <input> --output <path> [--rotation <90|180|270>] [--pages <1,2,3>]
+tsx scripts/rotate-pages.ts <input> --output <path> [--rotation <90|180|270>] [--pages <1,2,3>]
 ```
 
 - `--rotation` degrees to rotate clockwise (default: `90`)
@@ -199,7 +199,7 @@ Export: `addPageNumbers({ inputPath, outputPath, startAt?, position?, fontSize?,
 Use when you need to add page numbers, a header, or a footer to every page.
 
 ```bash
-tsx skills/pdf/scripts/add-page-numbers.ts <input> --output <path> [--start-at <n>] [--position <pos>] [--font-size <n>] [--format '<text>'] [--header <text>] [--footer <text>]
+tsx scripts/add-page-numbers.ts <input> --output <path> [--start-at <n>] [--position <pos>] [--font-size <n>] [--format '<text>'] [--header <text>] [--footer <text>]
 ```
 
 - `--start-at` first page number (default: `1`)
@@ -216,7 +216,7 @@ Export: `setMeta({ inputPath, outputPath, title?, author?, subject?, keywords?, 
 Use when you need to update the title, author, subject, keywords, producer, or creator fields of a PDF.
 
 ```bash
-tsx skills/pdf/scripts/set-meta.ts <input> --output <path> [--title <t>] [--author <a>] [--subject <s>] [--keywords <k1,k2>] [--producer <p>] [--creator <c>]
+tsx scripts/set-meta.ts <input> --output <path> [--title <t>] [--author <a>] [--subject <s>] [--keywords <k1,k2>] [--producer <p>] [--creator <c>]
 ```
 
 - Any combination of metadata fields can be set; unspecified fields are left unchanged

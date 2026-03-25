@@ -74,7 +74,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 
   if (!filePath || !values.format) {
     console.error(
-      "Usage: tsx skills/sharp-images/scripts/convert.ts <path> --format <fmt> [--quality <1-100>] [--output <path>]",
+      "Usage: tsx scripts/convert.ts <path> --format <fmt> [--quality <1-100>] [--output <path>]",
     );
     process.exit(1);
   }

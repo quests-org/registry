@@ -42,7 +42,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 
   if (!zipFile) {
     console.error(
-      "Usage: tsx skills/zip/scripts/extract-zip.ts <zipfile> [--output <dir>]",
+      "Usage: tsx scripts/extract-zip.ts <zipfile> [--output <dir>]",
     );
     process.exit(1);
   }

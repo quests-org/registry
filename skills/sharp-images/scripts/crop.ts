@@ -67,7 +67,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 
   if (!filePath || !values.width || !values.height) {
     console.error(
-      "Usage: tsx skills/sharp-images/scripts/crop.ts <path> --width <px> --height <px> [--left <px>] [--top <px>] [--strategy <entropy|attention>] [--output <path>]",
+      "Usage: tsx scripts/crop.ts <path> --width <px> --height <px> [--left <px>] [--top <px>] [--strategy <entropy|attention>] [--output <path>]",
     );
     process.exit(1);
   }
