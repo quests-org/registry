@@ -13,15 +13,14 @@ Each script can also be used programmatically via its exported function.
 
 ### `create-presentation.ts` Create a new PowerPoint presentation
 
-Export: `createPresentation({ title, slides, outputPath })`
+Export: `createPresentation({ slides, outputPath })`
 
 ```bash
-tsx skills/powerpoint/scripts/create-presentation.ts --title <title> --output <path> --slides <json>
+tsx skills/powerpoint/scripts/create-presentation.ts --output <path> [--slides <json>]
 ```
 
 | Argument          | Required | Default | Description                                                                             |
 | ----------------- | -------- | ------- | --------------------------------------------------------------------------------------- |
-| `--title <title>` | Yes      |         | Presentation title (shown on the first slide)                                           |
 | `--output <path>` | Yes      |         | Output .pptx file path                                                                  |
 | `--slides <json>` | No       | `[]`    | JSON array of slides: `[{"title":"…","body":"…"}]` or `[{"title":"…","bullets":["…"]}]` |
 

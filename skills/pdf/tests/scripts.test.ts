@@ -90,10 +90,9 @@ describe("getPdfMeta", () => {
 });
 
 describe("createPdf", () => {
-  it("creates a PDF with the given title and content", async () => {
+  it("creates a PDF with the given content", async () => {
     const outputPath = path.join(os.tmpdir(), "test-create.pdf");
     const result = await createPdf({
-      title: "Test Title",
       content: "Line one\nLine two",
       outputPath,
     });
@@ -101,7 +100,6 @@ describe("createPdf", () => {
     expect(result.outputPath).toBe(outputPath);
 
     const { text } = await extractPdfText({ inputPath: outputPath });
-    expect(text).toContain("Test Title");
     expect(text).toContain("Line one");
   });
 });
@@ -128,7 +126,6 @@ describe("mergePdfs", () => {
   it("merges multiple PDFs into one", async () => {
     const createdPath = path.join(os.tmpdir(), "test-merge-source.pdf");
     await createPdf({
-      title: "Merge Source",
       content: "Merge source content",
       outputPath: createdPath,
     });
@@ -149,13 +146,11 @@ describe("splitPdf", () => {
   it("extracts a single page", async () => {
     const sourcePath = path.join(os.tmpdir(), "test-split-source.pdf");
     await createPdf({
-      title: "Page 1",
       content: "First page",
       outputPath: sourcePath,
     });
     const sourcePath2 = path.join(os.tmpdir(), "test-split-source2.pdf");
     await createPdf({
-      title: "Page 2",
       content: "Second page",
       outputPath: sourcePath2,
     });
@@ -182,7 +177,6 @@ describe("splitPdf", () => {
       ["A", "B", "C"].map(async (label, i) => {
         const p = path.join(os.tmpdir(), `test-split-range-${i}.pdf`);
         await createPdf({
-          title: label,
           content: `Content ${label}`,
           outputPath: p,
         });
@@ -287,7 +281,7 @@ describe("rotatePages", () => {
   it("rotates only specified pages", async () => {
     const twoPagePath = path.join(os.tmpdir(), "test-rotate-source.pdf");
     const p2 = path.join(os.tmpdir(), "test-rotate-p2.pdf");
-    await createPdf({ title: "P2", content: "page two", outputPath: p2 });
+    await createPdf({ content: "page two", outputPath: p2 });
     await mergePdfs({ inputPaths: [samplePdf, p2], outputPath: twoPagePath });
 
     const outputPath = path.join(os.tmpdir(), "test-rotate-partial.pdf");

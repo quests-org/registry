@@ -110,15 +110,14 @@ tsx skills/pdf/scripts/image-to-pdf.ts <image1> [image2 ...] --output <path> [--
 
 ### `create-pdf.ts` Create a new PDF from scratch
 
-Export: `createPdf({ title, content, outputPath })`
+Export: `createPdf({ content, outputPath })`
 
-Use when you need to generate a new PDF with a title and text content.
+Use when you need to generate a new PDF from text content.
 
 ```bash
-tsx skills/pdf/scripts/create-pdf.ts <content> --title <title> --output <path>
+tsx skills/pdf/scripts/create-pdf.ts <content> --output <path>
 ```
 
-- `--title` document title (shown as heading and set as PDF metadata)
 - `--output` path to write the output PDF (required)
 - Multi-line content is supported; new pages are added automatically when content overflows
 

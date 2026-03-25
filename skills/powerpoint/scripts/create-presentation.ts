@@ -10,28 +10,13 @@ export interface SlideInput {
 }
 
 export async function createPresentation({
-  title,
   slides,
   outputPath,
 }: {
-  title: string;
   slides: SlideInput[];
   outputPath: string;
 }) {
   const pptx = new PptxGenJS();
-  pptx.title = title;
-
-  const titleSlide = pptx.addSlide();
-  titleSlide.addText(title, {
-    x: "10%",
-    y: "40%",
-    w: "80%",
-    h: "20%",
-    fontSize: 36,
-    bold: true,
-    align: "center",
-    color: "1F2937",
-  });
 
   for (const slide of slides) {
     const s = pptx.addSlide();
@@ -73,21 +58,20 @@ export async function createPresentation({
 
   await pptx.writeFile({ fileName: outputPath });
 
-  return { slideCount: slides.length + 1, outputPath };
+  return { slideCount: slides.length, outputPath };
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const { values } = parseArgs({
     options: {
-      title: { type: "string" },
       output: { type: "string" },
       slides: { type: "string" },
     },
   });
 
-  if (!values.title || !values.output) {
+  if (!values.output) {
     console.error(
-      "Usage: tsx skills/powerpoint/scripts/create-presentation.ts --title <title> --output <path> [--slides <json>]",
+      "Usage: tsx skills/powerpoint/scripts/create-presentation.ts --output <path> [--slides <json>]",
     );
     process.exit(1);
   }
@@ -97,7 +81,6 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     : [];
 
   const result = await createPresentation({
-    title: values.title,
     slides,
     outputPath: resolve(values.output),
   });
