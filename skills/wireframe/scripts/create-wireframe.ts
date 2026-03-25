@@ -1,17 +1,34 @@
 import { mkdir, writeFile } from "node:fs/promises";
+import { createRequire } from "node:module";
 import { dirname, relative, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { parseArgs } from "node:util";
 import { buildHtml } from "./lib/template.ts";
 
+const require = createRequire(import.meta.url);
+
+function checkTailwindDep() {
+  try {
+    require.resolve("@tailwindcss/browser");
+  } catch {
+    console.warn(
+      `Warning: @tailwindcss/browser not found. ` +
+        `Make sure dependencies are installed.`,
+    );
+  }
+}
+
 export async function createWireframe({
+  body,
   outputPath,
-  title,
+  theme,
 }: {
+  body?: string;
   outputPath: string;
-  title: string;
+  theme?: string;
 }) {
-  const html = buildHtml({ title });
+  checkTailwindDep();
+  const html = buildHtml({ body, theme });
   await mkdir(dirname(outputPath), { recursive: true });
   await writeFile(outputPath, html, "utf-8");
   return { outputPath };
@@ -20,8 +37,9 @@ export async function createWireframe({
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   const { values } = parseArgs({
     options: {
+      body: { type: "string" },
       output: { type: "string" },
-      title: { type: "string", default: "Wireframe" },
+      theme: { type: "string" },
     },
   });
 
@@ -31,8 +49,9 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   }
 
   const result = await createWireframe({
+    body: values.body,
     outputPath: resolve(values.output),
-    title: values.title ?? "Wireframe",
+    theme: values.theme,
   });
 
   const relOutput = relative(process.cwd(), result.outputPath) || ".";

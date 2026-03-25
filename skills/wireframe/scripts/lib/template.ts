@@ -1,26 +1,29 @@
-const TAILWIND_SCRIPT_SRC =
-  "/_quests/assets/skills/wireframe/node_modules/@tailwindcss/browser/dist/index.global.js";
+const TAILWIND_SCRIPT_SRC = `/_quests/assets/skills/wireframe/node_modules/@tailwindcss/browser/dist/index.global.js`;
 
-export function buildHtml({ title }: { title: string }) {
+const DEFAULT_BODY = `\
+  <main class="max-w-5xl mx-auto px-6 py-12">
+    <p>Replace this content with your wireframe.</p>
+  </main>`;
+
+export function buildHtml({ body, theme }: { body?: string; theme?: string }) {
+  const bodyContent = body ?? DEFAULT_BODY;
+  const themeContent = theme ? `\n${theme}` : "";
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>${escapeHtml(title)}</title>
+  <title>Wireframe</title>
   <style type="text/tailwindcss">
 @import "tailwindcss";
 
-@theme {
+@theme {${themeContent}
 }
   </style>
   <script src="${TAILWIND_SCRIPT_SRC}"></script>
 </head>
 <body>
-  <main class="max-w-5xl mx-auto px-6 py-12">
-    <h1 class="text-3xl font-bold mb-4">${escapeHtml(title)}</h1>
-    <p>Replace this content with your wireframe.</p>
-  </main>
+${bodyContent}
 </body>
 </html>
 `;

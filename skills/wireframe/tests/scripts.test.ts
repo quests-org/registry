@@ -20,11 +20,11 @@ async function makeTmpDir() {
 
 describe("buildHtml", () => {
   it("produces valid HTML structure", () => {
-    const html = buildHtml({ title: "Test Page" });
+    const html = buildHtml({});
 
     expect(html).toContain("<!DOCTYPE html>");
     expect(html).toContain('<html lang="en">');
-    expect(html).toContain("<title>Test Page</title>");
+    expect(html).toContain("<title>Wireframe</title>");
     expect(html).toContain('<style type="text/tailwindcss">');
     expect(html).toContain('@import "tailwindcss"');
     expect(html).toContain(
@@ -34,22 +34,15 @@ describe("buildHtml", () => {
     expect(html).toContain("</html>");
   });
 
-  it("escapes HTML in title", () => {
-    const html = buildHtml({ title: '<script>alert("xss")</script>' });
-
-    expect(html).not.toContain("<script>alert");
-    expect(html).toContain("&lt;script&gt;");
-  });
-
   it("contains a bare tailwindcss import and empty @theme block", () => {
-    const html = buildHtml({ title: "Theme Test" });
+    const html = buildHtml({});
 
     expect(html).toContain('@import "tailwindcss"');
     expect(html).toContain("@theme {");
   });
 
   it("does not inline the tailwind script", () => {
-    const html = buildHtml({ title: "No Inline" });
+    const html = buildHtml({});
 
     expect(html.length).toBeLessThan(5_000);
     expect(html).not.toContain("function tailwind");
@@ -61,16 +54,13 @@ describe("createWireframe", () => {
     const dir = await makeTmpDir();
     const outputPath = path.join(dir, "out.html");
 
-    const result = await createWireframe({
-      outputPath,
-      title: "Test wireframe",
-    });
+    const result = await createWireframe({ outputPath });
 
     expect(result.outputPath).toBe(outputPath);
 
     const content = await fs.readFile(outputPath, "utf-8");
     expect(content).toContain("<!DOCTYPE html>");
-    expect(content).toContain("<title>Test wireframe</title>");
+    expect(content).toContain("<title>Wireframe</title>");
     expect(content).toContain('@import "tailwindcss"');
     expect(content).toContain(
       "/_quests/assets/skills/wireframe/node_modules/@tailwindcss/browser/dist/index.global.js",
@@ -83,8 +73,8 @@ describe("createWireframe", () => {
     const shallowOutput = path.join(dir, "out.html");
     const deepOutput = path.join(dir, "nested", "deep", "out.html");
 
-    await createWireframe({ outputPath: shallowOutput, title: "Shallow" });
-    await createWireframe({ outputPath: deepOutput, title: "Deep" });
+    await createWireframe({ outputPath: shallowOutput });
+    await createWireframe({ outputPath: deepOutput });
 
     const shallowContent = await fs.readFile(shallowOutput, "utf-8");
     const deepContent = await fs.readFile(deepOutput, "utf-8");
@@ -102,7 +92,7 @@ describe("createWireframe", () => {
     const dir = await makeTmpDir();
     const outputPath = path.join(dir, "nested", "deep", "wireframe.html");
 
-    await createWireframe({ outputPath, title: "Nested" });
+    await createWireframe({ outputPath });
 
     const stat = await fs.stat(outputPath);
     expect(stat.isFile()).toBe(true);
