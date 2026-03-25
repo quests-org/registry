@@ -16,7 +16,7 @@ For the complete Sharp API reference, see [references/REFERENCE.md](references/R
 Export: `resizeImage({ inputPath, outputPath, width?, height?, fit?, withoutEnlargement?, background?, kernel?, position? })`
 
 ```bash
-tsx skills/sharp-images/scripts/resize.ts <path> [--width <px>] [--height <px>] [--fit <mode>] [--no-enlarge] [--output <path>]
+tsx skills/sharp-images/scripts/resize.ts <path> [--width <px>] [--height <px>] [--fit <mode>] [--no-enlarge] [--kernel <k>] [--position <p>] [--output <path>]
 ```
 
 | Argument           | Required | Default | Description                                                      |
@@ -28,6 +28,7 @@ tsx skills/sharp-images/scripts/resize.ts <path> [--width <px>] [--height <px>] 
 | `--no-enlarge`     | No       |         | Don't enlarge if already smaller                                 |
 | `--kernel <k>`     | No       |         | `nearest`, `linear`, `cubic`, `mitchell`, `lanczos2`, `lanczos3` |
 | `--background <c>` | No       |         | Background color for `contain` fit                               |
+| `--position <p>`   | No       |         | Gravity or pixel offset for crop/embed positioning               |
 | `--output <path>`  | No       | auto    | Output path (defaults to `<name>-resized.<ext>`)                 |
 
 If neither `--width` nor `--height` is given, prints image metadata instead.
@@ -111,17 +112,17 @@ Export: `compositeImages({ inputPath, outputPath, overlayPath, gravity?, top?, l
 tsx skills/sharp-images/scripts/composite.ts <base-image> --overlay <image> [--gravity <pos>] [--top <px>] [--left <px>] [--blend <mode>] [--opacity <0-1>] [--tile] [--output <path>]
 ```
 
-| Argument            | Required | Default  | Description                                   |
-| ------------------- | -------- | -------- | --------------------------------------------- |
-| `<base-image>`      | Yes      |          | Base image file                               |
-| `--overlay <image>` | Yes      |          | Image to overlay                              |
-| `--gravity <pos>`   | No       | `center` | Gravity: `north`, `southeast`, `center`, etc. |
-| `--top <px>`        | No       |          | Exact Y position (overrides gravity)          |
-| `--left <px>`       | No       |          | Exact X position (overrides gravity)          |
-| `--blend <mode>`    | No       | `over`   | Blend mode (see reference)                    |
-| `--opacity <0-1>`   | No       | `1`      | Overlay opacity                               |
-| `--tile`            | No       |          | Repeat overlay as tiles                       |
-| `--output <path>`   | No       | auto     | Output path                                   |
+| Argument            | Required | Default  | Description                                                   |
+| ------------------- | -------- | -------- | ------------------------------------------------------------- |
+| `<base-image>`      | Yes      |          | Base image file                                               |
+| `--overlay <image>` | Yes      |          | Image to overlay                                              |
+| `--gravity <pos>`   | No       | `center` | Gravity: `north`, `southeast`, `center`, etc.                 |
+| `--top <px>`        | No       |          | Exact Y position (overrides gravity)                          |
+| `--left <px>`       | No       |          | Exact X position (overrides gravity)                          |
+| `--blend <mode>`    | No       | `over`   | Blend mode (see reference)                                    |
+| `--opacity <0-1>`   | No       | `1`      | Overlay opacity (`0` = fully transparent, `1` = fully opaque) |
+| `--tile`            | No       |          | Repeat overlay as tiles                                       |
+| `--output <path>`   | No       | auto     | Output path                                                   |
 
 ### `annotate.ts` Draw bounding boxes and labels on an image
 
@@ -141,7 +142,7 @@ tsx skills/sharp-images/scripts/annotate.ts <image> --json <annotations> [--stro
 
 Each annotation object: `{ left, top, width, height, label?, color? }`. Colors cycle automatically when omitted.
 
-Renders SVG shapes directly onto the image — no extra dependencies needed. Useful for marking up regions, drawing detection results, or highlighting areas for the user.
+Renders SVG shapes directly onto the image — no dependencies beyond sharp. Useful for marking up regions, drawing detection results, or highlighting areas for the user.
 
 ### `adjust.ts` Adjust image appearance
 
