@@ -44,6 +44,7 @@ export async function probe({
   let stderr: string;
   try {
     const result = await execFileAsync(bin, ["-i", inputPath, "-hide_banner"], {
+      encoding: "utf-8",
       signal,
     });
     stderr = result.stderr;
