@@ -17,7 +17,6 @@
   ],
   "dictionaries": ["typescript", "node", "npm", "html", "css", "bash"],
   "words": [
-    "acodec",
     "Acro",
     "agentic",
     "binarize",
@@ -51,7 +50,6 @@
     "huggingface",
     "jscodeshift",
     "lanczos",
-    "libmp",
     "libpdf",
     "logomark",
     "mdpdf",
