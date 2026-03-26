@@ -15,8 +15,8 @@ Convert, probe, and manipulate audio/video files with a statically bundled FFmpe
 
 Exports:
 
-- `convert({ inputPath, outputPath, sampleRate, channels, codec, bitrate, overwrite, extraArgs, }: { inputPath: string; outputPath: string; sampleRate?: number; channels?: number; codec?: string; bitrate?: string; overwrite?: boolean; extraArgs?: string[]; }): { outputPath: string; }`
-- `toWav({ inputPath, outputPath, sampleRate, channels, }: { inputPath: string; outputPath?: string; sampleRate?: number; channels?: number; }): { outputPath: string; }`
+- `convert({ inputPath, outputPath, sampleRate, channels, codec, bitrate, overwrite, extraArgs, signal, }: { inputPath: string; outputPath: string; sampleRate?: number; channels?: number; codec?: string; bitrate?: string; overwrite?: boolean; extraArgs?: string[]; signal?: AbortSignal; }): Promise<{ outputPath: string; }>`
+- `toWav({ inputPath, outputPath, sampleRate, channels, signal, }: { inputPath: string; outputPath?: string; sampleRate?: number; channels?: number; signal?: AbortSignal; }): Promise<{ outputPath: string; }>`
 
 ```text
 convert
@@ -41,7 +41,7 @@ Options:
 
 Exports:
 
-- `probe({ inputPath }: { inputPath: string; }): ProbeResult`
+- `probe({ inputPath, signal, }: { inputPath: string; signal?: AbortSignal; }): Promise<ProbeResult>`
 
 ```text
 probe

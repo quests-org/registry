@@ -52,22 +52,22 @@ describe("probe", () => {
     tempDirs.length = 0;
   });
 
-  it("probes a WAV file", () => {
+  it("probes a WAV file", async () => {
     const dir = makeTempDir();
     tempDirs.push(dir);
 
     const wavPath = path.join(dir, "test.wav");
     createTestWav(wavPath);
 
-    const result = probe({ inputPath: wavPath });
+    const result = await probe({ inputPath: wavPath });
     expect(result.format).toMatchInlineSnapshot(`"wav"`);
     expect(result.duration).toBeGreaterThan(0);
     expect(result.streams.length).toBeGreaterThanOrEqual(1);
     expect(result.streams[0].codecType).toBe("audio");
   });
 
-  it("throws for missing file", () => {
-    expect(() => probe({ inputPath: "/nonexistent/file.wav" })).toThrow(
+  it("throws for missing file", async () => {
+    await expect(probe({ inputPath: "/nonexistent/file.wav" })).rejects.toThrow(
       "File not found",
     );
   });
@@ -83,7 +83,7 @@ describe("convert", () => {
     tempDirs.length = 0;
   });
 
-  it("converts WAV to a different sample rate", () => {
+  it("converts WAV to a different sample rate", async () => {
     const dir = makeTempDir();
     tempDirs.push(dir);
 
@@ -91,7 +91,7 @@ describe("convert", () => {
     createTestWav(inputPath, 0.5, 44100);
 
     const outputPath = path.join(dir, "output.wav");
-    const result = convert({
+    const result = await convert({
       inputPath,
       outputPath,
       sampleRate: 16000,
@@ -102,18 +102,18 @@ describe("convert", () => {
     expect(result.outputPath).toBe(outputPath);
     expect(fs.existsSync(outputPath)).toBe(true);
 
-    const info = probe({ inputPath: outputPath });
+    const info = await probe({ inputPath: outputPath });
     const audio = info.streams.find((s) => s.codecType === "audio");
     expect(audio?.sampleRate).toBe(16000);
   });
 
-  it("throws for missing input", () => {
-    expect(() =>
+  it("throws for missing input", async () => {
+    await expect(
       convert({
         inputPath: "/nonexistent/file.wav",
         outputPath: "/tmp/out.wav",
       }),
-    ).toThrow("Input file not found");
+    ).rejects.toThrow("Input file not found");
   });
 });
 
@@ -127,7 +127,7 @@ describe("toWav", () => {
     tempDirs.length = 0;
   });
 
-  it("converts to 16kHz mono WAV by default", () => {
+  it("converts to 16kHz mono WAV by default", async () => {
     const dir = makeTempDir();
     tempDirs.push(dir);
 
@@ -135,24 +135,24 @@ describe("toWav", () => {
     createTestWav(inputPath, 0.5, 44100);
 
     const outputPath = path.join(dir, "output.wav");
-    const result = toWav({ inputPath, outputPath });
+    const result = await toWav({ inputPath, outputPath });
 
     expect(fs.existsSync(result.outputPath)).toBe(true);
 
-    const info = probe({ inputPath: result.outputPath });
+    const info = await probe({ inputPath: result.outputPath });
     const audio = info.streams.find((s) => s.codecType === "audio");
     expect(audio?.sampleRate).toBe(16000);
     expect(audio?.channels).toBe(1);
   });
 
-  it("generates output path from input name when not specified", () => {
+  it("generates output path from input name when not specified", async () => {
     const dir = makeTempDir();
     tempDirs.push(dir);
 
     const inputPath = path.join(dir, "recording.wav");
     createTestWav(inputPath);
 
-    const result = toWav({
+    const result = await toWav({
       inputPath,
       outputPath: path.join(dir, "recording-out.wav"),
     });

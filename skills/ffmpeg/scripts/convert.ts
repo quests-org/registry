@@ -8,7 +8,7 @@ import { pathToFileURL } from "node:url";
 import { cac } from "cac";
 import { runFFmpeg } from "./lib/ffmpeg.ts";
 
-export function convert({
+export async function convert({
   inputPath,
   outputPath,
   sampleRate,
@@ -17,6 +17,7 @@ export function convert({
   bitrate,
   overwrite = true,
   extraArgs = [],
+  signal,
 }: {
   inputPath: string;
   outputPath: string;
@@ -26,6 +27,7 @@ export function convert({
   bitrate?: string;
   overwrite?: boolean;
   extraArgs?: string[];
+  signal?: AbortSignal;
 }) {
   if (!existsSync(inputPath)) {
     throw new Error(`Input file not found: ${inputPath}`);
@@ -41,21 +43,23 @@ export function convert({
   args.push(...extraArgs);
   args.push(outputPath);
 
-  runFFmpeg(args);
+  await runFFmpeg(args, { signal });
 
   return { outputPath };
 }
 
-export function toWav({
+export async function toWav({
   inputPath,
   outputPath,
   sampleRate = 16000,
   channels = 1,
+  signal,
 }: {
   inputPath: string;
   outputPath?: string;
   sampleRate?: number;
   channels?: number;
+  signal?: AbortSignal;
 }) {
   const resolved = resolve(inputPath);
   const name = basename(resolved, extname(resolved));
@@ -67,6 +71,7 @@ export function toWav({
     codec: "pcm_s16le",
     sampleRate,
     channels,
+    signal,
   });
 }
 
@@ -92,17 +97,22 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   }
 
   const inputPath = resolve(filePath);
+  const ac = new AbortController();
+  for (const sig of ["SIGINT", "SIGTERM"] as const) {
+    process.once(sig, () => ac.abort());
+  }
 
   let result: { outputPath: string };
 
   if (options.wav) {
-    result = toWav({
+    result = await toWav({
       inputPath,
       outputPath: options.output ? resolve(options.output) : undefined,
       sampleRate: options["sampleRate"]
         ? Number(options["sampleRate"])
         : undefined,
       channels: options.channels ? Number(options.channels) : undefined,
+      signal: ac.signal,
     });
   } else {
     if (!options.output) {
@@ -111,7 +121,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
       );
       process.exit(1);
     }
-    result = convert({
+    result = await convert({
       inputPath,
       outputPath: resolve(options.output),
       sampleRate: options["sampleRate"]
@@ -120,9 +130,9 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
       channels: options.channels ? Number(options.channels) : undefined,
       codec: options.codec,
       bitrate: options.bitrate,
+      signal: ac.signal,
     });
   }
 
-  const relOutput = result.outputPath;
-  console.log(`Converted to ${relOutput}`);
+  console.log(`Converted to ${result.outputPath}`);
 }

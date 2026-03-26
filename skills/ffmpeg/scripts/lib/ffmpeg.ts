@@ -1,5 +1,8 @@
-import { execFileSync } from "node:child_process";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 import ffmpegPath from "ffmpeg-static";
+
+const execFileAsync = promisify(execFile);
 
 export function getFFmpegPath(): string {
   if (!ffmpegPath) {
@@ -10,16 +13,16 @@ export function getFFmpegPath(): string {
   return ffmpegPath;
 }
 
-export function runFFmpeg(
+export async function runFFmpeg(
   args: string[],
-  { quiet = true }: { quiet?: boolean } = {},
+  { quiet = true, signal }: { quiet?: boolean; signal?: AbortSignal } = {},
 ) {
   const bin = getFFmpegPath();
   const fullArgs = quiet
     ? ["-hide_banner", "-loglevel", "error", ...args]
     : args;
-  return execFileSync(bin, fullArgs, {
+  return execFileAsync(bin, fullArgs, {
     maxBuffer: 50 * 1024 * 1024,
-    stdio: ["pipe", "pipe", "pipe"],
+    signal,
   });
 }

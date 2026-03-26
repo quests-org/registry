@@ -1,12 +1,15 @@
 /**
  * Inspect audio/video file format, duration, bitrate, and stream info
  */
-import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { cac } from "cac";
 import { getFFmpegPath } from "./lib/ffmpeg.ts";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
+
+const execFileAsync = promisify(execFile);
 
 interface StreamInfo {
   codec: string;
@@ -26,7 +29,13 @@ interface ProbeResult {
   streams: StreamInfo[];
 }
 
-export function probe({ inputPath }: { inputPath: string }): ProbeResult {
+export async function probe({
+  inputPath,
+  signal,
+}: {
+  inputPath: string;
+  signal?: AbortSignal;
+}): Promise<ProbeResult> {
   if (!existsSync(inputPath)) {
     throw new Error(`File not found: ${inputPath}`);
   }
@@ -34,11 +43,10 @@ export function probe({ inputPath }: { inputPath: string }): ProbeResult {
   const bin = getFFmpegPath();
   let stderr: string;
   try {
-    execFileSync(bin, ["-i", inputPath, "-hide_banner"], {
-      encoding: "utf-8",
-      stdio: ["pipe", "pipe", "pipe"],
+    const result = await execFileAsync(bin, ["-i", inputPath, "-hide_banner"], {
+      signal,
     });
-    stderr = "";
+    stderr = result.stderr;
   } catch (err: unknown) {
     const e = err as { stderr?: string };
     stderr = e.stderr ?? "";
@@ -114,13 +122,17 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   }
 
   const inputPath = resolve(filePath);
-  const result = probe({ inputPath });
-  const relInput = filePath;
+  const ac = new AbortController();
+  for (const sig of ["SIGINT", "SIGTERM"] as const) {
+    process.once(sig, () => ac.abort());
+  }
+
+  const result = await probe({ inputPath, signal: ac.signal });
 
   if (options.json) {
     console.log(JSON.stringify(result, null, 2));
   } else {
-    console.log(`${relInput}:`);
+    console.log(`${filePath}:`);
     console.log(`  Format: ${result.format}`);
     if (result.duration !== undefined)
       console.log(`  Duration: ${result.duration.toFixed(2)}s`);
