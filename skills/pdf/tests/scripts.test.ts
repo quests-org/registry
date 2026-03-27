@@ -8,7 +8,7 @@ import { createPdf } from "../scripts/create-pdf";
 import { extractPdfImages } from "../scripts/extract-images";
 import { extractPdfLinks } from "../scripts/extract-links";
 import { extractPdfText } from "../scripts/extract-text";
-import { fillForm } from "../scripts/fill-form";
+import { fillForm, parseFillFormFieldsJson } from "../scripts/fill-form";
 import { getPdfMeta } from "../scripts/get-meta";
 import { imageToPdf } from "../scripts/image-to-pdf";
 import { insertImage } from "../scripts/insert-image";
@@ -259,6 +259,30 @@ describe("fillForm", () => {
 
     expect(result.filled).toContain("Name_First");
     expect(result.skipped).toContain("DoesNotExist");
+  });
+});
+
+describe("parseFillFormFieldsJson", () => {
+  it("preserves array values for multi-select fields", () => {
+    expect(
+      parseFillFormFieldsJson(
+        JSON.stringify({
+          Departments: ["Engineering", "Finance"],
+          Level: 2,
+          Agree: true,
+        }),
+      ),
+    ).toEqual({
+      Departments: ["Engineering", "Finance"],
+      Level: "2",
+      Agree: true,
+    });
+  });
+
+  it("rejects non-object JSON input", () => {
+    expect(() => parseFillFormFieldsJson(JSON.stringify(["nope"]))).toThrow(
+      "JSON must be an object of key/value pairs",
+    );
   });
 });
 

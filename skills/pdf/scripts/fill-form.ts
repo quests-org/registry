@@ -1,6 +1,6 @@
 /**
  * Fill PDF form fields by name and optionally flatten the form
- * @note One of --json (inline JSON object) or --json-file (path to JSON file) is required. Each key is a field name; values are strings or booleans (for checkboxes).
+ * @note One of --json (inline JSON object) or --json-file (path to JSON file) is required. Each key is a field name; values are strings, booleans (for checkboxes), or string arrays (for multi-select list boxes).
  * @note Use --list to discover available field names before filling. Field names are matched with trimmed whitespace.
  * @note Use --flatten to bake filled values into the page so the form is no longer editable.
  */
@@ -9,6 +9,8 @@ import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { PDF } from "@libpdf/core";
 import { cac } from "cac";
+
+export type FillFormValue = string | boolean | string[];
 
 function buildTrimmedLookup(fieldNames: string[]) {
   const map = new Map<string, string>();
@@ -22,6 +24,31 @@ function buildTrimmedLookup(fieldNames: string[]) {
   return map;
 }
 
+export function parseFillFormFieldsJson(
+  raw: string,
+): Record<string, FillFormValue> {
+  const parsed: unknown = JSON.parse(raw);
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+    throw new Error("JSON must be an object of key/value pairs");
+  }
+
+  const fields: Record<string, FillFormValue> = {};
+  for (const [key, val] of Object.entries(parsed)) {
+    if (
+      Array.isArray(val) &&
+      val.every((item) => typeof item === "string" || typeof item === "number")
+    ) {
+      fields[key] = val.map(String);
+    } else if (typeof val === "boolean") {
+      fields[key] = val;
+    } else {
+      fields[key] = String(val);
+    }
+  }
+
+  return fields;
+}
+
 export async function fillForm({
   inputPath,
   outputPath,
@@ -30,7 +57,7 @@ export async function fillForm({
 }: {
   inputPath: string;
   outputPath: string;
-  fields: Record<string, string | boolean>;
+  fields: Record<string, FillFormValue>;
   flatten?: boolean;
 }) {
   const bytes = await readFile(inputPath);
@@ -146,7 +173,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     process.exit(1);
   }
 
-  let fields: Record<string, string | boolean>;
+  let fields: Record<string, FillFormValue>;
   try {
     const raw = options.jsonFile
       ? await readFile(resolve(options.jsonFile), "utf-8")
@@ -154,14 +181,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     if (raw === undefined) {
       throw new Error("Missing fields JSON");
     }
-    const parsed: unknown = JSON.parse(raw);
-    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
-      throw new Error("JSON must be an object of key/value pairs");
-    }
-    fields = {};
-    for (const [key, val] of Object.entries(parsed)) {
-      fields[key] = typeof val === "boolean" ? val : String(val);
-    }
+    fields = parseFillFormFieldsJson(raw);
   } catch {
     console.error("Failed to parse fields JSON");
     process.exit(1);

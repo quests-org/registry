@@ -111,7 +111,8 @@ Options:
 
 Exports:
 
-- `fillForm({ inputPath, outputPath, fields, flatten, }: { inputPath: string; outputPath: string; fields: Record<string, string | boolean>; flatten?: boolean; }): Promise<{ filled: string[]; skipped: string[]; outputPath: string; warnings: string[]; }>`
+- `fillForm({ inputPath, outputPath, fields, flatten, }: { inputPath: string; outputPath: string; fields: Record<string, FillFormValue>; flatten?: boolean; }): Promise<{ filled: string[]; skipped: string[]; outputPath: string; warnings: string[]; }>`
+- `parseFillFormFieldsJson(raw: string): Record<string, FillFormValue>`
 
 ```text
 fill-form
@@ -129,7 +130,7 @@ Options:
 ```
 
 > [!NOTE]
-> One of --json (inline JSON object) or --json-file (path to JSON file) is required. Each key is a field name; values are strings or booleans (for checkboxes).
+> One of --json (inline JSON object) or --json-file (path to JSON file) is required. Each key is a field name; values are strings, booleans (for checkboxes), or string arrays (for multi-select list boxes).
 > Use --list to discover available field names before filling. Field names are matched with trimmed whitespace.
 > Use --flatten to bake filled values into the page so the form is no longer editable.
 
