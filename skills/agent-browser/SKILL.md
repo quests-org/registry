@@ -612,6 +612,29 @@ agent-browser wait 5000
 
 When dealing with consistently slow websites, use `wait --load networkidle` after `open` to ensure the page is fully loaded before taking a snapshot. If a specific element is slow to render, wait for it directly with `wait <selector>` or `wait @ref`.
 
+### Lazy-Loaded Images
+
+Many sites (Amazon, Google Images, etc.) use lazy-loading: `<img>` elements have a placeholder `src` until they are scrolled into view, at which point JS replaces it with the real URL. `wait --load networkidle` does **not** trigger lazy loading -- only scrolling into the viewport does.
+
+To extract real image URLs from lazy-loaded content:
+
+1. Scroll the images into view first, then evaluate:
+
+```bash
+agent-browser scrollintoview @e1     # scroll a product/image into view
+agent-browser eval 'document.querySelector("img.product-image").src'
+```
+
+2. Or use `screenshot --annotate` while the images are visible -- the screenshot captures rendered pixels regardless of lazy loading.
+
+3. If you already have the product page URL, navigate to it directly and take a screenshot -- product detail pages load images eagerly:
+
+```bash
+agent-browser open "https://example.com/product/123" && agent-browser wait --load networkidle && agent-browser screenshot product.png
+```
+
+Do **not** expect `eval` queries for `img.src` to return real URLs on a search results page without first scrolling those items into view.
+
 ## JavaScript Dialogs (alert / confirm / prompt)
 
 When a page opens a JavaScript dialog (`alert()`, `confirm()`, or `prompt()`), it blocks all other browser commands (snapshot, screenshot, click, etc.) until the dialog is dismissed. If commands start timing out unexpectedly, check for a pending dialog:
